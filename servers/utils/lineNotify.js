@@ -9,17 +9,29 @@ const lineConfig = {
 const client = new line.Client(lineConfig);
 
 // ฟังก์ชันส่งข้อความ
-exports.sendMessage = async (message) => {
+exports.sendMessage = async (message, imageUrl) => {
   try {
-    const payload = {
-      type: 'text',
-      text: message,
-    };
+    // Define the payload for text and image messages
+    const messages = [
+      {
+        type: 'text',
+        text: message,
+      },
+    ];
 
-    // ระบุ userId หรือ groupId ที่ต้องการส่งข้อความ
-    const recipientId = 'U378cf98b6a5841d4a8e8ea1b2ff6c32d'; // ใส่ ID ที่ได้จาก Webhook หรือกำหนดเอง
+    if (imageUrl) {
+      messages.push({
+        type: 'image',
+        originalContentUrl: imageUrl, 
+        previewImageUrl: imageUrl,
+      });
+    }
 
-    await client.pushMessage(recipientId, payload);
+
+    const recipientId = 'U378cf98b6a5841d4a8e8ea1b2ff6c32d'; 
+
+    // Send the message using LINE's pushMessage method
+    await client.pushMessage(recipientId, messages);
     console.log('Message sent successfully');
   } catch (error) {
     console.error('Error sending LINE message:', error);
