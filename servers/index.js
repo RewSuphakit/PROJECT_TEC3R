@@ -9,6 +9,7 @@ const borrowRecordsRoutes = require('./routes/borrowRecords');
 app.use(cors());
 app.use(express.json());
 
+app.use('/image_return', express.static('image_return'));
 app.use('/image_borrow', express.static('image_borrow'));
 app.use('/uploads', express.static('uploads'));
 app.use('/api/equipment', equipmentRoutes);

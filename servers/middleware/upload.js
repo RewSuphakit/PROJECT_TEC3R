@@ -29,7 +29,7 @@ const upload = multer({
 const compressImage = (req, res, next) => {
   if (!req.file) return next(); // ถ้าไม่มีไฟล์ก็ไม่ต้องทำอะไร
 
-  const filename = `compressed-${Date.now()}.jpg`;  // ตั้งชื่อไฟล์ใหม่หลังจากบีบอัด
+  const filename = `RMUTI-${Date.now()}.jpg`;  // ตั้งชื่อไฟล์ใหม่หลังจากบีบอัด
   const outputPath = path.join(__dirname, '..', 'uploads', filename);  // เส้นทางการเก็บไฟล์ที่บีบอัด
 
   // บีบอัดไฟล์

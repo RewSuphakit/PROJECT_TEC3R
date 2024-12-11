@@ -19,18 +19,18 @@ const fileFilter = (req, file, cb) => {
 };
 
 // สร้าง Multer middleware
-const upload = multer({
+const upload_return = multer({
   storage: storage,       // กำหนดการจัดเก็บไฟล์ในหน่วยความจำ
   limits: { fileSize: 10 * 1024 * 1024 },  // กำหนดขนาดไฟล์สูงสุด (10MB)
   fileFilter: fileFilter  // กรองชนิดไฟล์
 });
 
 // Middleware สำหรับการบีบอัดไฟล์
-const compressImage = (req, res, next) => {
+const compressImage_return = (req, res, next) => {
   if (!req.file) return next(); // ถ้าไม่มีไฟล์ก็ไม่ต้องทำอะไร
 
   const filename = `RMUTI-${Date.now()}.png`;  // ตั้งชื่อไฟล์ใหม่หลังจากบีบอัด
-  const outputPath = path.join(__dirname, '..', 'image_borrow', filename);  // เส้นทางการเก็บไฟล์ที่บีบอัด
+  const outputPath = path.join(__dirname, '..', 'image_return', filename);  // เส้นทางการเก็บไฟล์ที่บีบอัด
 
   // บีบอัดไฟล์
   sharp(req.file.buffer)  // ใช้ไฟล์ที่เก็บในหน่วยความจำ
@@ -50,4 +50,4 @@ const compressImage = (req, res, next) => {
     });
 };    
 
-module.exports = { upload, compressImage };
+module.exports = { upload_return, compressImage_return };
