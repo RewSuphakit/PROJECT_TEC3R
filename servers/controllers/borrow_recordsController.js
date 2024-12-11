@@ -33,6 +33,7 @@ exports.addBorrowRecord = async (req, res) => {
       throw new Error('Insufficient quantity or equipment not found');
     }
 
+<<<<<<< HEAD
     const [userResult] = await connection.promise().query(`
       SELECT u.student_name, u.student_id, u.phone, e.equipment_name
       FROM users u
@@ -55,6 +56,51 @@ exports.addBorrowRecord = async (req, res) => {
     await lineNotify.sendMessage(message, imageUrl);
 
     await connection.promise().commit();
+=======
+   // Get the username for the notification
+const [userResult] = await connection.promise().query(`
+  SELECT 
+    u.student_name ,u.student_id,u.year_of_study,u.phone,e.equipment_name,e.image
+  FROM 
+    borrow_records br
+  JOIN 
+    users u 
+  ON 
+    br.user_id = u.user_id
+  JOIN 
+    equipment e 
+  ON 
+    br.equipment_id = e.equipment_id
+  WHERE 
+    u.user_id = ? and e.equipment_id = ?
+`, [user_id, equipment_id]);
+
+if (!userResult || userResult.length === 0) {
+  throw new Error('User not found or no matching record in users table');
+}
+
+const user = userResult[0]; // Ensure proper indexing
+const studentName = user.student_name;
+
+if (!studentName) {
+  throw new Error('Student name is undefined');
+}
+// Proceed with the notification
+const message = `มีการยืมอุปกรณ์ใหม่จากผู้ใช้: 
+- ชื่อผู้ใช้: ${user.student_name}
+- รหัสนักศึกษา: ${user.student_id}
+- ชื่ออุปกรณ์: ${user.equipment_name}
+- เบอร์โทร: ${user.phone}
+- วันที่ยืม: ${borrow_date}
+- รูปภาพ: https://www.paws.org/wp-content/uploads/2020/02/HappyCat-HP.jpg`;
+
+
+try {
+  await lineNotify.sendMessage(message);
+} catch (lineError) {
+  console.error('Error sending LINE notification:', lineError);
+}
+>>>>>>> e474c11e67f1b36ffac22c57a421b1bd64b766a9
     res.status(201).json({ message: 'Borrow record added successfully' });
   } catch (error) {
     console.error('Error adding borrow record:', error);
