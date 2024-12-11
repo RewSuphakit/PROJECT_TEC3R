@@ -33,30 +33,6 @@ exports.addBorrowRecord = async (req, res) => {
       throw new Error('Insufficient quantity or equipment not found');
     }
 
-<<<<<<< HEAD
-    const [userResult] = await connection.promise().query(`
-      SELECT u.student_name, u.student_id, u.phone, e.equipment_name
-      FROM users u
-      JOIN equipment e ON u.user_id = ? AND e.equipment_id = ?
-    `, [user_id, equipment_id]);
-
-    if (!userResult.length) {
-      throw new Error('User or equipment not found');
-    }
-
-    const { student_name, student_id, phone, equipment_name } = userResult[0];
-    const message = `มีการยืมอุปกรณ์ใหม่:
-- ชื่อผู้ใช้: ${student_name}
-- รหัสนักศึกษา: ${student_id}
-- ชื่ออุปกรณ์: ${equipment_name}
-- เบอร์โทร: ${phone}
-- วันเวลาที่ยืม: ${borrow_date}`;
-
-    const imageUrl = image ? `https://9b12-171-97-72-128.ngrok-free.app/image_borrow/${image}` : null;
-    await lineNotify.sendMessage(message, imageUrl);
-
-    await connection.promise().commit();
-=======
    // Get the username for the notification
 const [userResult] = await connection.promise().query(`
   SELECT 
@@ -100,7 +76,6 @@ try {
 } catch (lineError) {
   console.error('Error sending LINE notification:', lineError);
 }
->>>>>>> e474c11e67f1b36ffac22c57a421b1bd64b766a9
     res.status(201).json({ message: 'Borrow record added successfully' });
   } catch (error) {
     console.error('Error adding borrow record:', error);
