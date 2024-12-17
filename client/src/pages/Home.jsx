@@ -52,7 +52,7 @@ const Home = () => {
       <button onClick={captureImage}>Capture Image</button>
       {capturedImage && (
         <div>
-          <img src={capturedImage} alt="Captured" style={{ width: '100%', marginTop: '10px' }} />
+          <img src={capturedImage} alt="Captured" style={{ width: '50%', marginTop: '10px' }} />
           <button onClick={uploadImage}>Upload Image</button>
         </div>
       )}

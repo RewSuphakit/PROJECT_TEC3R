@@ -49,8 +49,6 @@ exports.register = async (req, res) => {
   }
 };
 
-
-
 exports.login = async (req, res) => {
     const { student_email, password } = req.body;
   
@@ -86,7 +84,7 @@ exports.login = async (req, res) => {
           // สร้าง JWT token
           const payload = {
             user: {
-              id: user.id,
+              user_id : user.user_id ,
               student_id: user.student_id,
               student_name: user.student_name,
               year_of_study: user.year_of_study,
@@ -112,6 +110,39 @@ exports.login = async (req, res) => {
   
 
 
+
+
+  exports.getUserProfile = async (req, res) => {
+    try {
+      const { user_id, student_id, student_name, year_of_study, student_email, password, phone, role } = req.user;
+  
+      // ตรวจสอบว่า role มีอยู่ในข้อมูลหรือไม่
+      if (!role) {
+        return res.status(400).json({ error: 'Role is missing in the user profile' });
+      }
+  
+      if (role !== 'admin' && role !== 'user') {
+        return res.status(403).json({ error: 'Unauthorized: Invalid user role' });
+      }
+  
+      const userProfile = {
+        user_id,
+        student_id,
+        student_name,
+        year_of_study,
+        student_email,
+        password,
+        phone,
+        role
+      };
+  
+      res.status(200).json(userProfile);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  };
+  
 
 
 
