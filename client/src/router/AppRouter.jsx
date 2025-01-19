@@ -3,15 +3,19 @@ import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import LoginForm from "../pages/Login";
 import RegisterForm from "../pages/Register";
-import HomePage from "../pages/HomePage";
+import HomePage from "../pages/Home";
 import NotFound from "../components/NotFound404";
-
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
+import HomeUser from "../pages/users/home_u";
+import Dashboard from "../pages/admin/Dashboard";
 
 
 
 const guestRouter = createBrowserRouter([
     {
-      path: "/Rmuti/",
+      path: "/RMUTI/",
       element: (
         <>
           <Header />
@@ -23,9 +27,9 @@ const guestRouter = createBrowserRouter([
         // หน้าหลัก
         { index: true, element: <HomePage /> },
         // หน้าเข้าสู่ระบบ
-        { path: "/Rmuti/login", element: <LoginForm /> },
+        { path: "/RMUTI/login", element: <LoginForm /> },
         // หน้าลงทะเบียน
-        { path: "/Rmuti/register", element: <RegisterForm /> },
+        { path: "/RMUTI/register", element: <RegisterForm /> },
         // เพิ่มเส้นทางสำหรับ 404 Not Found
         { path: "*", element: <NotFound /> }
       ]
@@ -35,7 +39,7 @@ const guestRouter = createBrowserRouter([
   // สร้าง Router สำหรับผู้ใช้ที่เข้าสู่ระบบแล้ว
   const userRouter = createBrowserRouter([
     {
-      path: "/Rmuti/",
+      path: "/RMUTI/",
       element: (
         <>
           <Header />
@@ -44,12 +48,9 @@ const guestRouter = createBrowserRouter([
         </>
       ),
       children: [
-        { index: true, element: <UserProduct /> },
-        { path: "/Rmuti/UserProduct", element: <UserProduct /> },
-        { path: "/Rmuti/ProductDetails/:id", element: <ProductDetails /> },
-        { path: "/Rmuti/Cart/:id", element: <Cart /> },
-        { path: "/Rmuti/Profile", element: <UserProfile /> },
-        { path: "/Rmuti/*", element: <NotFound /> },
+        { index: true, element: <HomeUser /> },
+        { path: "/RMUTI/HomeUser", element: <HomeUser /> },
+        { path: "/RMUTI/*", element: <NotFound /> },
         
       ]
     }
@@ -58,7 +59,7 @@ const guestRouter = createBrowserRouter([
  // สร้าง Router สำหรับผู้ใช้ที่เป็น Admin
 const adminRouter = createBrowserRouter([
   {
-    path: "/Rmuti/",
+    path: "/RMUTI/",
     element: (
       <>
         <Navbar/>
@@ -68,23 +69,19 @@ const adminRouter = createBrowserRouter([
     children: [
       // หน้าหลักสำหรับผู้ใช้ที่เป็น Admin
       { index: true, element: <Dashboard /> },
-      { path: "/Rmuti/Dashboard", element: <Dashboard /> },
-      { path: "/Rmuti/AddProductForm", element: <AddProductForm/> },
-      { path: "/Rmuti/Dashboard", element: <Dashboard />},
-      { path: "/Rmuti/ListProduct", element: <ListProduct /> },
-      { path:"/Rmuti/EditProduct/:id",element :<EditProduct />},
-      { path: "/Rmuti/*", element: <NotFound /> }
+      { path: "/RMUTI/Dashboard", element: <Dashboard /> },
+      { path: "/RMUTI/*", element: <NotFound /> }
       // อื่น ๆ ที่เฉพาะสำหรับผู้ใช้ที่เป็น Admin
     ]
   }
 ]);
 
-// ตรวจสอบสถานะการเข้าสู่ระบบของผู้ใช้และเลือก Router ที่เหมาะสม
+// สร้าง Router สำหรับผู้ใช้ที่เข้าสู่ระบบแล้ว
 export default function AppRouter() {
   const { user } = useAuth();
 
   // เช็คว่ามีข้อมูลผู้ใช้และมี role เป็น Admin หรือไม่
-  const isAdmin = user?.role === "Admin";
+  const isAdmin = user?.role === "admin";
 
   // เลือก Router ตามสถานะการเข้าสู่ระบบและบทบาทของผู้ใช้
   const finalRouter = user ? (isAdmin ? adminRouter : userRouter) : guestRouter;

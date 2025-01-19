@@ -12,7 +12,7 @@ const Login = () => {
       const response = await axios.post('http://localhost:5000/api/users/login', { student_email, password });
       setMessage(response.data.message);
       localStorage.setItem('token', response.data.token); 
-      navigate('/Home/');// เก็บ token สำหรับการล็อกอิน
+      navigate('/RMUTI/');// เก็บ token สำหรับการล็อกอิน
     } catch (error) {
       setMessage('Login failed');
     }

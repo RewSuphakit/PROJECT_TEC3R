@@ -44,7 +44,8 @@ exports.addBorrowRecord = async (req, res) => {
         u.year_of_study,
         u.phone,
         e.equipment_name,
-        br.borrow_date
+        br.borrow_date,
+        br.image
       FROM 
         borrow_records br
       JOIN 
@@ -85,7 +86,7 @@ exports.addBorrowRecord = async (req, res) => {
 - วันที่ยืมอุปกรณ์:
  ${thaiTimeCustom}`;
 
-    const imageUrl = image ? `https://e53d-171-97-72-128.ngrok-free.app/image_borrow/${image}` : null;
+    const imageUrl = image ? `https://e675-203-158-200-73.ngrok-free.app/image_borrow/${image}` : null;
     await lineNotify.sendMessage(message, imageUrl);
 
     // Commit transaction
@@ -190,7 +191,7 @@ ${thai_return_date}
 - สถานะ: ${borrow_status || 'returned'}`;
 
     // Image URL
-    const imageUrl = image_return ? `https://e53d-171-97-72-128.ngrok-free.app/image_return/${image_return}` : null;  // Replace with your domain or cloud URL
+    const imageUrl = image_return ? `https://e675-203-158-200-73.ngrok-free.app/image_return/${image_return}` : null;  // Replace with your domain or cloud URL
 
     // Send notification
     try {

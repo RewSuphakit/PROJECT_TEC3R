@@ -1,9 +1,9 @@
 const line = require('@line/bot-sdk');
-
+require('dotenv').config();
 // ตั้งค่า LINE Messaging API
 const lineConfig = {
   channelAccessToken: 'Hoeb7kLJkOMTh3DuVCaPvOWCOQJnoLjwSjq4R4V/jaS+v0RqatrNTR2/8FUjUz+etULAVSxP7v6syMmPhBHFISjemC/J4/ezS1zwF1VBAo0eAJ3gWnQT5fjsp79HQFHhJzRPdLk161fQqfHob3eY/wdB04t89/1O/w1cDnyilFU=', // ใส่ Access Token จาก LINE Developers
-  channelSecret: 'f760512df0182f77a685b476b80e7afc',           // ใส่ Secret จาก LINE Developers
+  channelSecret: 'f760512df0182f77a685b476b80e7afc',           
 };
 
 const client = new line.Client(lineConfig);
@@ -37,3 +37,4 @@ exports.sendMessage = async (message, imageUrl) => {
     console.error('Error sending LINE message:', error);
   }
 };
+  

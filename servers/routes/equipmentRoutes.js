@@ -3,7 +3,7 @@ const router = express.Router();
 const equipmentController = require('../controllers/equipmentController');
 const { upload, compressImage } = require('../middleware/upload');
 
-// เส้นทางการทำงานกับอุปกรณ์
+//อุปกรณ์ END POint 
 router.post('/equipment', upload.single('image'), compressImage,equipmentController.addEquipment);  // เพิ่มอุปกรณ์
 router.get('/equipment', equipmentController.getAllEquipment);  // ดึงข้อมูลอุปกรณ์ทั้งหมด
 router.get('/equipment/:id', equipmentController.getEquipmentById);  // ดึงข้อมูลอุปกรณ์ตาม ID
