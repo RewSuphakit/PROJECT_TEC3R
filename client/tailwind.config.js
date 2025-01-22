@@ -6,7 +6,7 @@ export default {
   ],
   theme: {
     fontFamily: {
-      sans: ['Krub', 'sans-serif'],
+      sans: ["Kanit"],
     },
     extend: {},
   },
@@ -15,6 +15,8 @@ export default {
     require('tailwindcss-animated'),
   ],
   daisyui: {
-    themes: [ "winter"],
+    themes: [
+      "light",
+     ],
   },
 }
