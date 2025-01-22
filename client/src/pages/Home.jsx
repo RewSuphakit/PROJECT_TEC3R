@@ -5,8 +5,9 @@ import Typed from 'typed.js';
 import bg from '../assets/bg.png';
 import axios from 'axios';
 import { Link } from "react-router-dom";
-
+import useAuth from "../hooks/useAuth";
 function Home() {
+  const { user,run} = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [equipment, setEquipment] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -65,10 +66,11 @@ function Home() {
         console.error('Error fetching equipment:', error);
       }
     };
-
+    
     fetchEquipment();
-  }, []); // Empty dependency array to run once on component mount
-
+  }, []);
+ 
+  
   const filteredEquipment = equipment.filter((item) =>
     item.equipment_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -142,9 +144,9 @@ function Home() {
                   <p className="text-xs text-gray-500 mt-2">อัพเดทเมื่อ: {new Date(item.timeupdate).toLocaleString()}</p>
                   <hr className="w-full max-w-[12rem] h-1 mx-auto my-4 bg-gray-100 border-0 rounded" />
                   <div className="text-center">
-                    <button className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-medium text-white rounded-md shadow-sm bg-[#1B262C] hover:bg-slate-300 focus:ring-offset-2">
+                    <Link to={user?.user_id ? `/RMUTI/equipment/${item.equipment_id}` : "/RMUTI/login"} className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-medium text-white rounded-md shadow-sm bg-[#1B262C] hover:bg-slate-300 focus:ring-offset-2">
                       ยืมอุปกรณ์
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </div>
