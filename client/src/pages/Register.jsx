@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useNavigate} from "react-router-dom";
 
 const Register = () => {
+  const navigate = useNavigate();
   const [student_email, setEmail] = useState('');
   const [student_name, setStudentName] = useState('');
   const [year_of_study, setStudentYear] = useState('');
@@ -9,9 +12,27 @@ const Register = () => {
   const [phone, setStudentPhone] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [emailValid, setEmailValid] = useState(true); // New state for email validation
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    
+    if (!student_email || !student_name || !year_of_study || !student_id || !phone || !password) {
+      toast.warn('กรุณากรอกข้อมูลให้ครบทุกช่อง', {
+        position: "top-center",
+      });
+      return;
+    }
+    if (!student_email.endsWith('@rmuti.ac.th')) {
+      setEmailValid(false);
+      toast.warn('กรุณาใช้อีเมลที่ลงท้ายด้วย @rmuti.ac.th', {
+        position: "top-center",
+      });
+      return;
+    }
+
+    setEmailValid(true); // Reset email validity if correct
+
     try {
       const response = await axios.post('http://localhost:5000/api/users/register', {
         student_email,
@@ -22,8 +43,16 @@ const Register = () => {
         phone,
       });
       setMessage(response.data.message);
+      toast.success('สมัครสมาชิกสำเร็จ!',{
+        position: "top-center",
+      });
+      navigate("/RMUTI/Login")
+
     } catch (error) {
       setMessage('การสมัครสมาชิกไม่สำเร็จ กรุณาลองอีกครั้ง');
+      toast.error('การสมัครสมาชิกไม่สำเร็จ กรุณาลองอีกครั้ง',{
+        position: "top-center",
+      });
     }
   };
 
@@ -38,15 +67,7 @@ const Register = () => {
                 กรุณาสมัครสมาชิกก่อนใช้เข้างาน
               </span>
             </div>
-            {message && (
-              <div
-                className={`text-sm text-center ${
-                  message === 'Registration failed' ? 'text-red-600' : 'text-green-600'
-                } mb-4`}
-              >
-                {message}
-              </div>
-            )}
+            
             <form className="w-full space-y-4" onSubmit={handleRegister}>
               {/* ชื่อจริง */}
               <div className="flex flex-col gap-1">
@@ -118,7 +139,10 @@ const Register = () => {
                     type="email"
                     value={student_email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full border rounded-lg pl-10 pr-4 py-2 text-sm bg-white focus:ring-2 focus:ring-[#0F4C75] focus:outline-none"
+                    className={`w-full border rounded-lg pl-10 pr-4 py-2 text-sm bg-white focus:ring-2 
+                      focus:ring-[#0F4C75] focus:outline-none ${
+                      !emailValid ? 'border-red-500' : ''
+                    }`}
                     placeholder="กรุณากรอกอีเมลนักศึกษา"
                     aria-label="อีเมลนักศึกษา"
                   />
