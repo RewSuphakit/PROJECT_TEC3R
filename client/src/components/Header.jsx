@@ -8,7 +8,7 @@ function Header() {
   const navigate = useNavigate();
   return (
 
-    // ยังไม่ได้ลล็อคอิน
+  
     <section className="w-full bg-white text-gray-700 sticky top-0 z-50">
   <nav className="navbar bg-white shadow-md  border-b border-gray-200 ">
     <div className="container mx-auto flex flex-wrap items-center justify-around">
@@ -43,65 +43,6 @@ function Header() {
     </div>
   </nav>
 </section>
-
-
-
-<section>
-
-
-
-
-
-
-
-
-
-
-
-</section>
-
-
-
-<section>
-
-
-
-
-</section>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   )
 }
