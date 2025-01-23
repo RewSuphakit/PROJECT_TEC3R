@@ -1,4 +1,3 @@
-import React from 'react'; // นำเข้า React
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom"; 
 import useAuth from "../hooks/useAuth";
 import LoginForm from "../pages/Login";
@@ -7,8 +6,6 @@ import HomePage from "../pages/Home";
 import NotFound from "../components/NotFound404";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import Navbar from "../components/Navbar";
-import HomeUser from "../pages/users/home_u";
 import Dashboard from "../pages/admin/Dashboard";
 
 
@@ -48,8 +45,7 @@ const guestRouter = createBrowserRouter([
         </>
       ),
       children: [
-        { index: true, element: <HomeUser /> },
-        { path: "/RMUTI/HomeUser", element: <HomeUser /> },
+        { index: true, element: <HomePage /> },
         { path: "/RMUTI/*", element: <NotFound /> },
         
       ]
@@ -62,8 +58,9 @@ const adminRouter = createBrowserRouter([
     path: "/RMUTI/",
     element: (
       <>
-        <Navbar/>
+        <Header/>
         <Outlet />
+        <Footer />
       </>
     ),
     children: [

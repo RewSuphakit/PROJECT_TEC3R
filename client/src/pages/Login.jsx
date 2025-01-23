@@ -17,7 +17,7 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-  
+
     if (!student_email || !password) {
       toast.warn('กรุณากรอกข้อมูลให้ครบทุกช่อง', { position: 'top-center' });
       return;
@@ -48,7 +48,7 @@ const Login = () => {
   
         // แสดงข้อความต้อนรับ
         toast.success(`ยินดีต้อนรับ, ${payload.student_name}! เข้าสู่ระบบสำเร็จ`, {
-          position: 'top-center',
+          position: 'top-right',
         });
   
         navigate('/RMUTI/');

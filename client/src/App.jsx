@@ -1,5 +1,3 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import useAuth from "./hooks/useAuth";
 import AppRouter from "./router/AppRouter";
