@@ -35,7 +35,7 @@ function Header() {
     </a>
   </li>
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-    <a href="history.php" className="flex items-center gap-3">
+    <a href="/RMUTI/History" className="flex items-center gap-3">
       <img
         className="w-6 h-6"
         src="https://img.icons8.com/?size=100&id=1846&format=png&color=374151"
@@ -44,20 +44,6 @@ function Header() {
       คืนอุปกรณ์
     </a>
    </li>
-   {user?.role === 'admin' && ( 
-   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-   <a href="#" className="flex items-center gap-3">
-   <img
-    className="w-6 h-6"
-    src="https://img.icons8.com/?size=100&id=364&format=png&color=374151"
-   alt="config"
-                    />
-      จัดการหลังบ้าน
-   </a>
- </li>
-   )}
-
-{user?.role === 'user' && ( 
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
     <a href="https://www.facebook.com/ci.r.sakdi.phimph.kha.hil" className="flex items-center gap-3">
       <img
@@ -68,7 +54,7 @@ function Header() {
       ติดต่อแอดมิน
     </a>
   </li>
- )}
+
 
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
     <button   onClick={handleLogout}  className="flex items-center gap-3">
@@ -102,7 +88,7 @@ function Header() {
             {user?.user_id && (
               <>
               <div className=" flex items-center space-x-4">
-               <p className="text-gray-700 text-sm font-medium">ผู้ใช้งาน : {user?.role === "admin" ? "ผู้ดูแลระบบ" : "นักศึกษา"}</p>
+               <p className="text-gray-700 text-sm font-medium">ผู้ใช้งาน : นักศึกษา</p>
                <label
               tabIndex={0}
               className="btn btn-outline btn-sm pr-3 cursor-pointer"

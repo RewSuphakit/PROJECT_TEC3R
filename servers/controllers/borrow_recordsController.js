@@ -6,7 +6,7 @@ const sharp = require('sharp');
 // เพิ่มบันทึกการยืม
 exports.addBorrowRecord = async (req, res) => {
   const { user_id, equipment_id, status } = req.body;
-  const image = req.file?.filename;
+
 
   if (!user_id || !equipment_id) {
     return res.status(400).json({ message: 'Missing required fields' });
@@ -17,10 +17,10 @@ exports.addBorrowRecord = async (req, res) => {
 
     // Insert a new borrow record
     const insertQuery = `
-      INSERT INTO borrow_records (user_id, equipment_id, status, image)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO borrow_records (user_id, equipment_id, status)
+      VALUES (?, ?, ?)
     `;
-    const values = [user_id, equipment_id, status, image];
+    const values = [user_id, equipment_id, status];
     const [insertResult] = await connection.promise().query(insertQuery, values);
 
     // Check if equipment quantity can be updated
@@ -45,7 +45,6 @@ exports.addBorrowRecord = async (req, res) => {
         u.phone,
         e.equipment_name,
         br.borrow_date,
-        br.image
       FROM 
         borrow_records br
       JOIN 
@@ -86,9 +85,7 @@ exports.addBorrowRecord = async (req, res) => {
 - วันที่ยืมอุปกรณ์:
  ${thaiTimeCustom}`;
 
-    const imageUrl = image ? `https://e675-203-158-200-73.ngrok-free.app/image_borrow/${image}` : null;
-    await lineNotify.sendMessage(message, imageUrl);
-
+ 
     // Commit transaction
     await connection.promise().commit();
     res.status(201).json({ message: 'Borrow record added successfully' });

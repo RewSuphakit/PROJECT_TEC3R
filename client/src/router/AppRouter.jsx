@@ -7,8 +7,8 @@ import NotFound from "../components/NotFound404";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Dashboard from "../pages/admin/Dashboard";
-
-
+import History from '../components/History';
+import Herderadmin from '../pages/admin/Herderadmin';
 
 const guestRouter = createBrowserRouter([
     {
@@ -46,6 +46,7 @@ const guestRouter = createBrowserRouter([
       ),
       children: [
         { index: true, element: <HomePage /> },
+        {path: "/RMUTI/History", element: <History />},
         { path: "/RMUTI/*", element: <NotFound /> },
         
       ]
@@ -58,7 +59,7 @@ const adminRouter = createBrowserRouter([
     path: "/RMUTI/",
     element: (
       <>
-        <Header/>
+        <Herderadmin />
         <Outlet />
         <Footer />
       </>

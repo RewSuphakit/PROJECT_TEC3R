@@ -6,13 +6,15 @@ import bg from '../assets/bg.png';
 import axios from 'axios';
 import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import StatsSection from '../components/StatsSection';
+import { CountUp } from "countup.js";
 function Home() {
   const { user} = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [equipment, setEquipment] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Number of items per page
-
+ 
   useEffect(() => {
     AOS.init({
       duration: 1000,
@@ -35,7 +37,7 @@ function Home() {
       typed.destroy();
     };
   }, []);
-  const statss = [
+  const stats = [
     { id: 'borrowCount', count: 30, label: 'การยืมอุปกรณ์ทั้งหมด', unit: 'ครั้ง', icon: "https://img.icons8.com/?size=100&id=8382&format=png&color=0F4C75" },
     { id: 'returnCount', count: 12, label: 'การคืนอุปกรณ์ทั้งหมด', unit: 'ครั้ง', icon: "https://img.icons8.com/?size=100&id=8382&format=png&color=0F4C75" },
     { id: 'userCount', count: 64, label: 'ผู้ใช้งานทั้งหมด', unit: 'คน', icon: "https://img.icons8.com/?size=100&id=98957&format=png&color=0F4C75" },
@@ -182,28 +184,7 @@ function Home() {
    
 
   
-    <section className="flex flex-col  pt-6 pb-8">
-        <p className="text-xl sm:text-2xl md:text-3xl text-gray-600 text-center px-4">จำนวนการยืม-คืนอุปกรณ์ทั้งหมด</p>
-        <div className="mt-6 sm:mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 place-items-center w-full mx-auto max-w-7xl px-4 sm:px-5 pb-16 sm:pb-32 " data-aos="fade-up" data-aos-anchor-placement="center-bottom">
-          {statss.map((stat) => (
-            <div key={stat.id} className="flex flex-col justify-center items-center bg-white px-4 py-6 w-full  rounded-lg border border-gray-300 drop-shadow-md">
-              <div className="flex flex-row justify-center items-center">
-                <img 
-                  className="w-[30px] h-[30px] sm:w-[35px] sm:h-[35px] md:w-[50px] md:h-[50px] object-contain"
-                  src={stat.icon}
-                  alt=""
-                  loading="lazy"
-                />
-                <p className="text-gray-600 text-xl sm:text-2xl lg:text-4xl leading-9 ml-2">
-                  <span>{stat.count}</span> {stat.unit}
-                </p>
-              </div>
-              <p className="font-medium text-sm sm:text-base md:text-lg leading-6 mt-3 md:mt-6 text-center">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
- 
+    <StatsSection stats={stats} />;
 
 
 
