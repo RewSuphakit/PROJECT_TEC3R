@@ -1,12 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ex11 from '../assets/ex11.png';
-function History() {
+import axios from 'axios';
+import useAuth from "../hooks/useAuth";
+
+function Return() {
+    const { borrowedBooks } = useAuth();
+    const [images, setImages] = useState({}); // เก็บภาพตาม record_id
+    const [previewImage, setPreviewImage] = useState(null); // เก็บภาพที่ถูกเลือก
+  
+    // ฟังก์ชันอัพโหลดภาพ
+    const handleUploadImage = (e, recordId) => {
+      const file = e.target.files[0]; // ตรวจสอบว่ามีไฟล์ที่เลือกไหม
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImages((prevImages) => ({
+            ...prevImages,
+            [recordId]: reader.result, // เก็บ URL ของภาพตาม record_id
+          }));
+          setPreviewImage(reader.result); // เก็บภาพที่เลือกสำหรับแสดง
+        };
+        reader.readAsDataURL(file); // แปลงไฟล์เป็น Base64 URL
+      }
+    };
     return (
         <>
         
       
-
-
             <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-6xl mx-auto">
                     {/* Header Section */}
@@ -67,35 +87,37 @@ function History() {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700">
+                                {borrowedBooks.length > 0 ? (
+                                         borrowedBooks.map((item) => (
                                     <tr className="hover:bg-gray-50  transition-colors duration-150">
                                         {/* รหัสอุปกรณ์ */}
-                                        <td className="px-6 py-4 whitespace-nowrap">
+                                       
+                                            <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
                                                 <span className="text-sm font-semibold text-gray-900 ">
-                                                    #INV-1001
+                                                   {item.equipment_id}
                                                 </span>
                                             </div>
                                         </td>
-
                                         {/* รูปภาพอุปกรณ์ */}
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="flex-shrink-0">
-                                                <img
-                                                    src={ex11}
-                                                    className="h-16 w-16 rounded-lg object-cover shadow-sm hover:shadow-md transition-shadow duration-200"
-                                                    alt="อุปกรณ์"
-                                                />
-                                            </div>
-                                        </td>
+    <div className="flex-shrink-0">
+        <img
+            src={images[item.record_id] || (item.image ? `http://localhost:5000/uploads/${item.image.replace(/\\/g, "/")}` : null)}
+            className="h-16 w-16 rounded-lg object-cover shadow-sm hover:shadow-md transition-shadow duration-200"
+            alt="อุปกรณ์"
+        />
+    </div>
+</td>
 
                                         {/* ชื่ออุปกรณ์ */}
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-medium text-gray-900 ">
-                                                    อะไรไม่รู้
+                                                    {item.equipment_name}
                                                 </span>
                                                 <span className="text-xs text-gray-500 ">
-                                                    อะไรไม่รู้
+                                                    {item.description}
                                                 </span>
                                             </div>
                                         </td>
@@ -117,107 +139,118 @@ function History() {
                                                     />
                                                 </svg>
                                                 <span className="text-sm text-gray-500 ">
-                                                    2024-08-01
+                                                    {item.borrow_date }
                                                 </span>
                                             </div>
                                         </td>
+                                        <td className="px-6 py-4 whitespace-nowrap ">
+                                         <div className="flex justify-center space-x-3 ">
+        {/* ปุ่มอัพโหลดรูป */}
+        <div className="relative group hidden md:block">
+      {/* Tooltip ด้านบน */}
+      <div
+        className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
+        opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
+      >
+        <div className="bg-gray-800 text-white text-xs py-1.5 px-3 rounded-md whitespace-nowrap">
+          อัพโหลดรูปภาพ
+          {/* ลูกศรชี้ลง */}
+          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full">
+            <div className="border-x-8 border-t-8 border-x-transparent border-t-gray-800"></div>
+          </div>
+        </div>
+      </div>
 
-                                        {/* ปุ่มจัดการรูปภาพ */}
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="flex justify-center space-x-3">
-                                                {/* ปุ่มอัพโหลดรูป */}
-                                                <div className="relative group">
-                                                    {/* Tooltip ด้านบน */}
-                                                    <div
-                                                        className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
-                                                            opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
-                                                    >
-                                                        <div className="bg-gray-800 text-white text-xs py-1.5 px-3 rounded-md whitespace-nowrap">
-                                                            อัพโหลดรูปภาพ
-                                                            {/* ลูกศรชี้ลง */}
-                                                            <div
-                                                                className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full"
-                                                            >
-                                                                <div
-                                                                    className="border-x-8 border-t-8 border-x-transparent border-t-gray-800"
-                                                                ></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+      {/* ปุ่มอัพโหลด */}
+      {previewImage ? (
+        <img src={item.record_id ? previewImage :'' } alt="Preview" className="w-32 h-32 object-cover" />
+      ) : (
+        <label  htmlFor={`file-upload-${item.record_id}`} className="cursor-pointer">
+          <div
+            className="p-2.5 rounded-lg bg-gray-50 border border-gray-200 
+            hover:bg-blue-50 hover:border-blue-200 
+            dark:border-gray-700 
+            dark:hover:bg-gray-700 
+            transition-all duration-150 group"
+          >
+            <svg
+              className="w-5 h-5 text-gray-500 group-hover:text-blue-500 transition-colors duration-150"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+              />
+            </svg>
+            <input
+                                type="file"
+                                className="hidden"
+                                id={`file-upload-${item.record_id}`}
+                                name="image"
+                                accept="image/*"
+                                onChange={(e) => handleUploadImage(e, item.record_id)} // ส่ง record_id ไป
+                              />
+          </div>
+        </label>
+      )}
+    </div>
 
-                                                    <button
-                                                        className="p-2.5 rounded-lg bg-gray-50 border border-gray-200 
-                                                            hover:bg-blue-50 hover:border-blue-200 
-                                                         dark:border-gray-700 
-                                                            dark:hover:bg-gray-700 
-                                                            transition-all duration-150 group"
-                                                    >
-                                                        <svg
-                                                            className="w-5 h-5 text-gray-500 group-hover:text-blue-500 transition-colors duration-150"
-                                                            fill="none"
-                                                            stroke="currentColor"
-                                                            viewBox="0 0 24 24"
-                                                        >
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                strokeWidth="2"
-                                                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                                                            />
-                                                        </svg>
-                                                    </button>
-                                                </div>
 
-                                                {/* ปุ่มถ่ายภาพ */}
-                                                <div className="relative group">
-                                                    {/* Tooltip ด้านบน */}
-                                                    <div
-                                                        className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
-                                                            opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
-                                                    >
-                                                        <div className="bg-gray-800 text-white text-xs py-1.5 px-3 rounded-md whitespace-nowrap">
-                                                            ถ่ายภาพ
-                                                            {/* ลูกศรชี้ลง */}
-                                                            <div
-                                                                className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full"
-                                                            >
-                                                                <div
-                                                                    className="border-x-8 border-t-8 border-x-transparent border-t-gray-800"
-                                                                ></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+        {/* ปุ่มถ่ายภาพ */}
+        <div className="relative group block md:hidden">
+            {/* Tooltip ด้านบน */}
+            <div
+                className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
+                    opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
+            >
+                <div className="bg-gray-800 text-white text-xs py-1.5 px-3 rounded-md whitespace-nowrap">
+                    ถ่ายภาพ
+                    {/* ลูกศรชี้ลง */}
+                    <div
+                        className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full"
+                    >
+                        <div
+                            className="border-x-8 border-t-8 border-x-transparent border-t-gray-800"
+                        ></div>
+                    </div>
+                </div>
+            </div>
 
-                                                    <button
-                                                        className="p-2.5 rounded-lg bg-gray-50 border border-gray-200 
-                                                            hover:bg-green-50 hover:border-green-200 
-                                                            dark:border-gray-700 
-                                                            dark:hover:bg-gray-700 
-                                                            transition-all duration-150 group"
-                                                    >
-                                                        <svg
-                                                            className="w-5 h-5 text-gray-500 group-hover:text-green-500 transition-colors duration-150"
-                                                            fill="none"
-                                                            stroke="currentColor"
-                                                            viewBox="0 0 24 24"
-                                                        >
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                strokeWidth="2"
-                                                                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                                                            />
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                strokeWidth="2"
-                                                                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                                                            />
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </td>
+            <button
+                className="p-2.5 rounded-lg bg-gray-50 border border-gray-200 
+                    hover:bg-green-50 hover:border-green-200 
+                    dark:border-gray-700 
+                    dark:hover:bg-gray-700 
+                    transition-all duration-150 group"
+            >
+                <svg
+                    className="w-5 h-5 text-gray-500 group-hover:text-green-500 transition-colors duration-150"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                    />
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                </svg>
+            </button>
+        </div>
+    </div>
+</td>
+
                                         {/* ปุ่มคืนอุปกรณ์ */}
                                         <td className="px-6 py-4 whitespace-nowrap text-center">
                                             <button
@@ -242,8 +275,15 @@ function History() {
                                                 <span>คืนอุปกรณ์</span>
                                             </button>
                                         </td>
+                                   
+                                        
                                     </tr>
-
+                                        
+                                    ))
+                                ) : (
+                                  <div className="col-span-full text-center text-gray-500">ไม่พบข้อมูลอุปกรณ์ที่ตรงกับการค้นหา</div>
+                                )}
+                                   
 
                                   
                                
@@ -281,4 +321,4 @@ function History() {
     );
 }
 
-export default History;
+export default Return;

@@ -8,13 +8,74 @@ import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import StatsSection from '../components/StatsSection';
 import { CountUp } from "countup.js";
+import Swal from 'sweetalert2';
 function Home() {
-  const { user} = useAuth();
+  const { user,loading,fetchBorrowRecords} = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [equipment, setEquipment] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Number of items per page
  
+
+
+
+
+  const handleClick = async (equipmentId,title,image) => {
+    try {
+      const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: "bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded ",
+          cancelButton: "bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded ",
+        },
+        buttonsStyling: true,
+      });
+
+      const result = await swalWithBootstrapButtons.fire({
+        title: `ยืมอุปกรณ์ ${title}`,
+        text: "คุณต้องการยืมอุปกรณ์นี้ใช่หรือไม่?",
+        imageUrl: image ? `http://localhost:5000/uploads/${image.replace(/\\/g, "/")}` : 'default-image-url.jpg', 
+        imageWidth: 150, 
+        imageHeight: 150,
+        imageAlt: `${title}`, 
+        showCancelButton: true,
+        confirmButtonText: "ยืมอุปกรณ์!",
+        cancelButtonText: "ยกเลิก!",
+        reverseButtons: true,
+      });
+      
+
+      if (result.isConfirmed) {
+        await axios.post(`http://localhost:5000/api/borrowRecords/add`, {
+          equipment_id: equipmentId,
+          user_id: user?.user_id,
+          
+        });
+        
+        swalWithBootstrapButtons.fire({
+          title:"สำเร็จ!",
+          text:"คุณได้ยืมอุปกรณ์เรียบร้อยแล้ว",
+          icon:"success",
+        });
+        await fetchEquipment();
+        await fetchBorrowRecords();
+      } else {
+        swalWithBootstrapButtons.fire({
+          title:"ยกเลิก!",
+          text:"คุณยกเลิกการยืมอุปกรณ์เรียบร้อยแล้ว",
+          icon:"error",
+        });
+      }
+    } catch (error) {
+      console.error("Error borrowing equipment:", error);
+    }
+  };
+   
+
+
+
+
+
+
   useEffect(() => {
     AOS.init({
       duration: 1000,
@@ -43,32 +104,21 @@ function Home() {
     { id: 'userCount', count: 64, label: 'ผู้ใช้งานทั้งหมด', unit: 'คน', icon: "https://img.icons8.com/?size=100&id=98957&format=png&color=0F4C75" },
     { id: 'equipmentCount', count: 80, label: 'อุปกรณ์ที่มียืมทั้งหมด', unit: 'อุปกรณ์', icon: "https://img.icons8.com/?size=100&id=2866&format=png&color=0F4C75" }
   ];
-  useEffect(() => {
-    // Fetch equipment data
-    const fetchEquipment = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/api/equipment/equipment'); // Replace with your actual API endpoint
-        const data = await response.json();
-        const sortedEquipment = data.equipment || [];
-
-        // Sort equipment based on timeupdate, ensuring the field is valid
-        sortedEquipment.sort((a, b) => {
-          const timeA = new Date(a.timeupdate);
-          const timeB = new Date(b.timeupdate);
-
-          if (timeA.getTime() && timeB.getTime()) {
-            return timeB - timeA; // Sort from latest to oldest
-          }
-
-          return 0; // If invalid timeupdate, no sorting
-        });
-
-        setEquipment(sortedEquipment);
-      } catch (error) {
-        console.error('Error fetching equipment:', error);
-      }
-    };
+  const fetchEquipment = async () => {
     
+    try {
+      const response = await axios.get('http://localhost:5000/api/equipment/equipment'); // Replace fetch with axios
+      const sortedEquipment = response.data.equipment || [];
+  
+      sortedEquipment.sort((a, b) => new Date(b.timeupdate) - new Date(a.timeupdate));
+      setEquipment(sortedEquipment);
+    } catch (error) {
+      console.error('Error fetching equipment:', error);
+    }
+  };
+  
+
+  useEffect(() => {
     fetchEquipment();
   }, []);
  
@@ -134,8 +184,8 @@ function Home() {
                     src={item.image ? `http://localhost:5000/uploads/${item.image.replace(/\\/g, "/")}` : null}
                     alt={item.equipment_id}
                     loading="lazy"
-                    width="1000"  // specify width
-                    height="1000" // specify height
+                    width="200"  
+                    height="200" 
                   />
                 </div>
                 <div className="px-4 pb-3">
@@ -145,10 +195,37 @@ function Home() {
                   <p className="text-sm text-gray-600 break-all">จำนวนคงเหลือ {item.quantity}</p>
                   <p className="text-xs text-gray-500 mt-2">อัพเดทเมื่อ: {new Date(item.timeupdate).toLocaleString()}</p>
                   <hr className="w-full max-w-[12rem] h-1 mx-auto my-4 bg-gray-100 border-0 rounded" />
+                  
                   <div className="text-center">
-                    <Link to={user?.user_id ? `/RMUTI/equipment/${item.equipment_id}` : "/RMUTI/login"} className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-medium text-white rounded-md shadow-sm bg-[#1B262C] hover:bg-slate-300 focus:ring-offset-2">
-                      ยืมอุปกรณ์
-                    </Link>
+                 
+
+
+{item.quantity === 0 ? (
+  <button className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-medium text-white rounded-md shadow-sm bg-red-300 cursor-not-allowed">
+    หมด
+  </button>
+) : (
+  <>
+  {user?.user_id ? (
+    <button
+    onClick={() => handleClick(item.equipment_id, item.equipment_name, item.image)}
+    className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-medium text-white rounded-md shadow-sm bg-[#1B262C] hover:bg-slate-300 focus:ring-offset-2"
+  >
+    ยืมอุปกรณ์
+  </button>
+  ):(
+    <Link to="/RMUTI/login" className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-medium text-white rounded-md shadow-sm bg-[#1B262C] hover:bg-slate-300 focus:ring-offset-2">
+    ยืมอุปกรณ์
+  </Link>
+  )}
+  
+  </>
+)}
+
+
+
+       
+                 
                   </div>
                 </div>
               </div>

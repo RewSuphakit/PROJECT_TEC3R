@@ -5,7 +5,7 @@ const path = require('path');
 const sharp = require('sharp');
 // เพิ่มบันทึกการยืม
 exports.addBorrowRecord = async (req, res) => {
-  const { user_id, equipment_id, status } = req.body;
+  const { user_id, equipment_id } = req.body;
 
 
   if (!user_id || !equipment_id) {
@@ -17,10 +17,10 @@ exports.addBorrowRecord = async (req, res) => {
 
     // Insert a new borrow record
     const insertQuery = `
-      INSERT INTO borrow_records (user_id, equipment_id, status)
-      VALUES (?, ?, ?)
+      INSERT INTO borrow_records (user_id, equipment_id)
+      VALUES (?, ?)
     `;
-    const values = [user_id, equipment_id, status];
+    const values = [user_id, equipment_id];
     const [insertResult] = await connection.promise().query(insertQuery, values);
 
     // Check if equipment quantity can be updated
@@ -44,7 +44,7 @@ exports.addBorrowRecord = async (req, res) => {
         u.year_of_study,
         u.phone,
         e.equipment_name,
-        br.borrow_date,
+        br.borrow_date
       FROM 
         borrow_records br
       JOIN 
@@ -85,8 +85,7 @@ exports.addBorrowRecord = async (req, res) => {
 - วันที่ยืมอุปกรณ์:
  ${thaiTimeCustom}`;
 
- 
-    // Commit transaction
+    lineNotify.sendMessage(message);
     await connection.promise().commit();
     res.status(201).json({ message: 'Borrow record added successfully' });
   } catch (error) {
@@ -188,7 +187,7 @@ ${thai_return_date}
 - สถานะ: ${borrow_status || 'returned'}`;
 
     // Image URL
-    const imageUrl = image_return ? `https://e675-203-158-200-73.ngrok-free.app/image_return/${image_return}` : null;  // Replace with your domain or cloud URL
+    const imageUrl = image_return ? `https://44af-58-11-89-242.ngrok-free.app/image_return/${image_return}` : null;  // Replace with your domain or cloud URL
 
     // Send notification
     try {
@@ -216,6 +215,87 @@ exports.getAllBorrowRecords = async (req, res) => {
     res.status(500).json({ message: 'Error fetching borrow records', error });
   }
 };
+exports.getAllBorrowRecordsByUserId = async (req, res) => {
+  const { user_id } = req.params;
+  if (!user_id) {
+    return res.status(400).json({ message: 'User ID is required' });
+  }
+
+  try {
+    // Query เพื่อดึงจำนวนสถานะ Borrowed และ Returned
+    const [countResults] = await connection
+      .promise()
+      .query(
+        `SELECT 
+          COUNT(CASE WHEN status = 'Borrowed' THEN 1 END) AS borrowed_count,
+          COUNT(CASE WHEN status = 'Returned' THEN 1 END) AS returned_count
+         FROM borrow_records
+         WHERE user_id = ?`,
+        [user_id]
+      );
+
+    // Query เพื่อดึงตารางข้อมูลทั้งหมด
+    const [borrowResults] = await connection.promise().query(`
+      SELECT 
+        e.equipment_id,
+        e.image,
+        e.equipment_name,
+        e.description,
+        br.borrow_date,
+        record_id
+      FROM 
+        borrow_records br
+      JOIN 
+        users u 
+      ON 
+        br.user_id = u.user_id
+      JOIN 
+        equipment e 
+      ON 
+        br.equipment_id = e.equipment_id
+      WHERE 
+        br.user_id = ?
+    `, [user_id]);
+
+    if (borrowResults.length === 0) {
+      return res.status(404).json({ message: 'No borrow records found for this user' });
+    }
+
+    // แปลงฟอร์แมตวันที่ใน borrowResults
+    const formattedBorrowResults = borrowResults.map(record => {
+      const borrowDate = new Date(record.borrow_date);
+
+      // Format วันที่เป็น DD/MM/YYYY HH:mm
+      const formattedDate = borrowDate.toLocaleString('th-TH', {
+        timeZone: 'Asia/Bangkok',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+
+      return {
+        ...record,
+        borrow_date: formattedDate, // ใช้วันที่ที่แปลงแล้ว
+      };
+    });
+
+    res.status(200).json({
+      message: 'Borrow records fetched successfully',
+      data: {
+        borrowed_count: countResults[0]?.borrowed_count || 0,
+        returned_count: countResults[0]?.returned_count || 0,
+        borrow_records: formattedBorrowResults, // ตารางข้อมูลที่แปลงเวลาแล้ว
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching borrow records:', error);
+    res.status(500).json({ message: 'An error occurred while fetching borrow records' });
+  }
+};
+
+
 
 // ลบบันทึกการยืม
 exports.deleteBorrowRecord = async (req, res) => {

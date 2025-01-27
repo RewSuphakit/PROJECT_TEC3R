@@ -5,7 +5,7 @@ import useAuth from '../hooks/useAuth';
 import axios from 'axios';
 function Header() {
   const navigate = useNavigate();
-  const { user, logout} = useAuth();
+  const { user, logout,borrowedCount} = useAuth();
   const handleLogout = () => {
     logout();
     navigate('/RMUTI/');
@@ -35,14 +35,18 @@ function Header() {
     </a>
   </li>
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-    <a href="/RMUTI/History" className="flex items-center gap-3">
+    <a href="/RMUTI/Return" className="flex justify-start  gap-3">
       <img
         className="w-6 h-6"
         src="https://img.icons8.com/?size=100&id=1846&format=png&color=374151"
         alt="history icon"
       />
-      คืนอุปกรณ์
+      <div >คืนอุปกรณ์</div>
+      {borrowedCount < 0  ? null : (
+      <div className="badge badge-error">{borrowedCount}</div>
+      )}
     </a>
+    
    </li>
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
     <a href="https://www.facebook.com/ci.r.sakdi.phimph.kha.hil" className="flex items-center gap-3">
@@ -87,30 +91,36 @@ function Header() {
       <div className="dropdown dropdown-end">
             {user?.user_id && (
               <>
-              <div className=" flex items-center space-x-4">
-               <p className="text-gray-700 text-sm font-medium">ผู้ใช้งาน : นักศึกษา</p>
-               <label
-              tabIndex={0}
-              className="btn btn-outline btn-sm pr-3 cursor-pointer"
-            >
-              
-              <svg
-                className="w-5 h-5"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
-                />
-              </svg>
-              เมนู
-            </label>
-            </div>
+              <div className="flex items-center space-x-4">
+  <p className="text-gray-700 text-sm font-medium">ผู้ใช้งาน : นักศึกษา</p>
+
+  <div className="relative">
+    <label
+      tabIndex={0}
+      className="btn btn-outline btn-sm pr-3 cursor-pointer"
+    >
+      <svg
+        className="w-5 h-5"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
+        />
+      </svg>
+      เมนู
+    </label>
+    {borrowedCount < 0  ? null : (
+      <span className="absolute -top-1 -right-1 block h-3 w-3 rounded-full bg-red-500"></span>
+    )}
+  </div>
+</div>
+
                 <ul className="menu menu-sm dropdown-content mt-3 p-2 shadow bg-white rounded-box w-52 z-10">
                    {userMenu}
                 </ul>
