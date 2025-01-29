@@ -38,13 +38,13 @@ function AuthContextProvider({ children }) {
   // ฟังก์ชันสำหรับนับจำนวน Borrowed และ Returned
   const fetchBorrowRecords = async () => {
     if (!user || !user.user_id) return;
-
+  
     const token = localStorage.getItem('token'); // ดึง token อีกครั้ง
     if (!token) {
       console.error('No token available');
       return;
     }
-
+  
     try {
       const response = await axios.get(
         `http://localhost:5000/api/borrowRecords/all/${user.user_id}`,
@@ -52,20 +52,21 @@ function AuthContextProvider({ children }) {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
+  
       const { data } = response.data;
-
+  
       // ตั้งค่า count สำหรับสถานะ Borrowed และ Returned
       setBorrowedCount(data.borrowed_count);
       setReturnedCount(data.returned_count);
-      setBorrowedBooks(data.borrow_records); 
- 
-      
+  
+      // กรองข้อมูลเฉพาะที่สถานะเป็น Borrowed
+      const borrowedRecords = data.borrow_records.filter(record => record.status === 'Borrowed');
+      setBorrowedBooks(borrowedRecords); // ตั้งค่า borrowedBooks เฉพาะที่สถานะเป็น Borrowed
+  
     } catch (error) {
       console.error('Error fetching borrow records:', error.message);
     }
   };
-
   
   // ดึงข้อมูล Borrow Records เมื่อ user พร้อม
   useEffect(() => {
@@ -73,6 +74,7 @@ function AuthContextProvider({ children }) {
       fetchBorrowRecords();
     }
   }, [user]);
+  
 
   // ฟังก์ชันสำหรับ logout
   const logout = () => {

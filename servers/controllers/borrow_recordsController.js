@@ -187,7 +187,7 @@ ${thai_return_date}
 - สถานะ: ${borrow_status || 'returned'}`;
 
     // Image URL
-    const imageUrl = image_return ? `https://44af-58-11-89-242.ngrok-free.app/image_return/${image_return}` : null;  // Replace with your domain or cloud URL
+    const imageUrl = image_return ? ` https://6e55-58-10-245-35.ngrok-free.app/image_return/${image_return}` : null;  // Replace with your domain or cloud URL
 
     // Send notification
     try {
@@ -222,19 +222,18 @@ exports.getAllBorrowRecordsByUserId = async (req, res) => {
   }
 
   try {
-    // Query เพื่อดึงจำนวนสถานะ Borrowed และ Returned
+    // Query เพื่อดึงจำนวนสถานะ Borrowed
     const [countResults] = await connection
       .promise()
       .query(
         `SELECT 
-          COUNT(CASE WHEN status = 'Borrowed' THEN 1 END) AS borrowed_count,
-          COUNT(CASE WHEN status = 'Returned' THEN 1 END) AS returned_count
+          COUNT(CASE WHEN status = 'Borrowed' THEN 1 END) AS borrowed_count
          FROM borrow_records
-         WHERE user_id = ?`,
+         WHERE user_id = ? AND status = 'Borrowed'`, // เพิ่มเงื่อนไขที่นี่
         [user_id]
       );
 
-    // Query เพื่อดึงตารางข้อมูลทั้งหมด
+    // Query เพื่อดึงตารางข้อมูลทั้งหมดที่มีสถานะ Borrowed
     const [borrowResults] = await connection.promise().query(`
       SELECT 
         e.equipment_id,
@@ -242,6 +241,7 @@ exports.getAllBorrowRecordsByUserId = async (req, res) => {
         e.equipment_name,
         e.description,
         br.borrow_date,
+        br.status,
         record_id
       FROM 
         borrow_records br
@@ -254,7 +254,7 @@ exports.getAllBorrowRecordsByUserId = async (req, res) => {
       ON 
         br.equipment_id = e.equipment_id
       WHERE 
-        br.user_id = ?
+        br.user_id = ? 
     `, [user_id]);
 
     if (borrowResults.length === 0) {
@@ -285,7 +285,6 @@ exports.getAllBorrowRecordsByUserId = async (req, res) => {
       message: 'Borrow records fetched successfully',
       data: {
         borrowed_count: countResults[0]?.borrowed_count || 0,
-        returned_count: countResults[0]?.returned_count || 0,
         borrow_records: formattedBorrowResults, // ตารางข้อมูลที่แปลงเวลาแล้ว
       },
     });

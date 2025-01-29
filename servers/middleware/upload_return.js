@@ -1,9 +1,10 @@
 const multer = require('multer');
 const sharp = require('sharp');
+const fs = require('fs');
 const path = require('path');
 
-// ตั้งค่าในการเก็บไฟล์
-const storage = multer.memoryStorage();  // ใช้ memoryStorage เพื่อเก็บไฟล์ในหน่วยความจำชั่วคราว
+// ตั้งค่าการเก็บไฟล์ในหน่วยความจำ
+const storage = multer.memoryStorage();
 
 // ตรวจสอบชนิดของไฟล์ (รองรับเฉพาะ .jpg, .jpeg, .png)
 const fileFilter = (req, file, cb) => {
@@ -12,42 +13,52 @@ const fileFilter = (req, file, cb) => {
   const mimetype = filetypes.test(file.mimetype);
 
   if (extname && mimetype) {
-    return cb(null, true);  // อนุญาตให้ไฟล์ชนิดนี้
+    cb(null, true);  // อนุญาตให้ไฟล์อัปโหลด
   } else {
-    cb(new Error('Only .jpg, .jpeg, .png files are allowed!'), false);  // ขัดจังหวะการอัพโหลดหากไม่ใช่ไฟล์ที่อนุญาต
+    cb(new Error('Only .jpg, .jpeg, .png files are allowed!'), false);
   }
 };
 
-// สร้าง Multer middleware
+// กำหนด Multer middleware
 const upload_return = multer({
-  storage: storage,       // กำหนดการจัดเก็บไฟล์ในหน่วยความจำ
-  limits: { fileSize: 10 * 1024 * 1024 },  // กำหนดขนาดไฟล์สูงสุด (10MB)
-  fileFilter: fileFilter  // กรองชนิดไฟล์
+  storage: storage, // เก็บไฟล์ใน RAM ก่อนบีบอัด
+  limits: { fileSize: 10 * 1024 * 1024 }, // จำกัดขนาดไฟล์ 10MB
+  fileFilter: fileFilter
 });
 
+// ตรวจสอบและสร้างโฟลเดอร์หากยังไม่มี
+const ensureUploadPath = (folderPath) => {
+  if (!fs.existsSync(folderPath)) {
+    fs.mkdirSync(folderPath, { recursive: true });
+  }
+};
+
 // Middleware สำหรับการบีบอัดไฟล์
-const compressImage_return = (req, res, next) => {
-  if (!req.file) return next(); // ถ้าไม่มีไฟล์ก็ไม่ต้องทำอะไร
+const compressImage_return = async (req, res, next) => {
+  try {
+    if (!req.file) return next(); // ถ้าไม่มีไฟล์ให้ข้ามไป
 
-  const filename = `RMUTI-${Date.now()}.png`;  // ตั้งชื่อไฟล์ใหม่หลังจากบีบอัด
-  const outputPath = path.join(__dirname, '..', 'image_return', filename);  // เส้นทางการเก็บไฟล์ที่บีบอัด
+    const uploadFolder = path.join(__dirname, '..', 'image_return'); // ที่เก็บไฟล์
+    ensureUploadPath(uploadFolder); // สร้างโฟลเดอร์ถ้ายังไม่มี
 
-  // บีบอัดไฟล์
-  sharp(req.file.buffer)  // ใช้ไฟล์ที่เก็บในหน่วยความจำ
-    .resize(800)  // ปรับขนาดถ้าต้องการ
-    .jpeg({ quality: 80 })  // บีบอัดไฟล์ภาพเป็น .jpg พร้อมลดคุณภาพ (80%)
-    .toFile(outputPath, (err, info) => {
-      if (err) {
-        console.error('Error during image compression:', err);
-        return res.status(500).json({ message: 'Error during image compression' });
-      }
+    const filename = `RMUTI-${Date.now()}.jpg`; // ตั้งชื่อไฟล์ใหม่
+    const outputPath = path.join(uploadFolder, filename); // ระบุเส้นทางไฟล์
 
-      // เก็บเส้นทางไฟล์ที่บีบอัดไว้ใน req.file เพื่อใช้ต่อ
-      req.file.path = outputPath;
-      req.file.filename = filename;
+    // ใช้ sharp บีบอัดไฟล์และบันทึกลงดิสก์
+    await sharp(req.file.buffer)
+      .resize(800) // ปรับขนาดภาพ
+      .jpeg({ quality: 80 }) // บีบอัดเป็น .jpg คุณภาพ 80%
+      .toFile(outputPath);
 
-      next();  // ไปยัง middleware ถัดไป
-    });
-};    
+    // เก็บข้อมูลไฟล์ที่บีบอัดไว้ใน req.file
+    req.file.path = outputPath;
+    req.file.filename = filename;
+
+    next(); // ไปยัง middleware ถัดไป
+  } catch (err) {
+    console.error('Error during image compression:', err);
+    res.status(500).json({ message: 'Error during image compression' });
+  }
+};
 
 module.exports = { upload_return, compressImage_return };

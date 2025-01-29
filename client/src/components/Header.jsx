@@ -42,7 +42,7 @@ function Header() {
         alt="history icon"
       />
       <div >คืนอุปกรณ์</div>
-      {borrowedCount < 0  ? null : (
+      {borrowedCount <= 0  ? null : (
       <div className="badge badge-error">{borrowedCount}</div>
       )}
     </a>
@@ -115,7 +115,7 @@ function Header() {
       </svg>
       เมนู
     </label>
-    {borrowedCount < 0  ? null : (
+    {borrowedCount <= 0  ? null : (
       <span className="absolute -top-1 -right-1 block h-3 w-3 rounded-full bg-red-500"></span>
     )}
   </div>
