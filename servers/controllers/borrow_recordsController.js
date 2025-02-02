@@ -5,37 +5,33 @@ const path = require('path');
 const sharp = require('sharp');
 // เพิ่มบันทึกการยืม
 exports.addBorrowRecord = async (req, res) => {
-  const { user_id, equipment_id } = req.body;
+  const { user_id, equipment_id, quantity_borrow } = req.body;
 
-
-  if (!user_id || !equipment_id) {
-    return res.status(400).json({ message: 'Missing required fields' });
+  if (!user_id || !equipment_id || !quantity_borrow || quantity_borrow <= 0) {
+    return res.status(400).json({ message: 'Missing or invalid required fields' });
   }
 
   try {
     await connection.promise().beginTransaction();
 
-    // Insert a new borrow record
     const insertQuery = `
-      INSERT INTO borrow_records (user_id, equipment_id)
-      VALUES (?, ?)
+      INSERT INTO borrow_records (user_id, equipment_id, quantity_borrow)
+      VALUES (?, ?, ?)
     `;
-    const values = [user_id, equipment_id];
+    const values = [user_id, equipment_id, quantity_borrow];
     const [insertResult] = await connection.promise().query(insertQuery, values);
 
-    // Check if equipment quantity can be updated
     const updateQuery = `
       UPDATE equipment
-      SET quantity = GREATEST(quantity - 1, 0)
-      WHERE equipment_id = ? AND quantity > 0
+      SET quantity = quantity - ?
+      WHERE equipment_id = ? AND quantity >= ? AND ? > 0
     `;
-    const [updateResult] = await connection.promise().query(updateQuery, [equipment_id]);
+    const [updateResult] = await connection.promise().query(updateQuery, [quantity_borrow, equipment_id, quantity_borrow, quantity_borrow]);
 
     if (updateResult.affectedRows === 0) {
       throw new Error('Insufficient quantity or equipment not found');
     }
 
-    // Fetch the borrow record based on the record_id just inserted
     const recordId = insertResult.insertId;
     const [userResult] = await connection.promise().query(`
       SELECT 
@@ -47,25 +43,17 @@ exports.addBorrowRecord = async (req, res) => {
         br.borrow_date
       FROM 
         borrow_records br
-      JOIN 
-        users u 
-      ON 
-        br.user_id = u.user_id
-      JOIN 
-        equipment e 
-      ON 
-        br.equipment_id = e.equipment_id
-      WHERE 
-        br.record_id = ?
+      JOIN users u ON br.user_id = u.user_id
+      JOIN equipment e ON br.equipment_id = e.equipment_id
+      WHERE br.record_id = ?
     `, [recordId]);
 
     if (!userResult.length) {
       throw new Error('Borrow record not found after insertion');
     }
 
-    // Extract user and borrow information
     const { student_name, student_id, phone, equipment_name, borrow_date } = userResult[0];
-    const date = new Date(borrow_date); 
+    const date = new Date(borrow_date);
     const thaiTimeCustom = date.toLocaleString('th-TH', {
       timeZone: 'Asia/Bangkok',
       year: 'numeric',
@@ -75,19 +63,21 @@ exports.addBorrowRecord = async (req, res) => {
       minute: '2-digit',
       second: '2-digit',
     });
+
+const message = `📌 มีการยืมอุปกรณ์ใหม่:
+- 👤 ชื่อผู้ยืม: ${student_name}
+- 🎓 รหัสนักศึกษา: ${student_id}
+- 🧰️ ชื่ออุปกรณ์: ${equipment_name}
+- 🔢 จํานวนที่ยืม: ${quantity_borrow}
+- 📞 เบอร์โทร: ${phone}
+- 📅 วันที่ยืมอุปกรณ์: 
+      ${thaiTimeCustom}`;
     
-    // Prepare and send notification
-    const message = `มีการยืมอุปกรณ์ใหม่:
-- ชื่อผู้ยืม: ${student_name}
-- รหัสนักศึกษา: ${student_id}
-- ชื่ออุปกรณ์: ${equipment_name}
-- เบอร์โทร: ${phone}
-- วันที่ยืมอุปกรณ์:
- ${thaiTimeCustom}`;
 
     lineNotify.sendMessage(message);
     await connection.promise().commit();
     res.status(201).json({ message: 'Borrow record added successfully' });
+
   } catch (error) {
     console.error('Error adding borrow record:', error);
     await connection.promise().rollback();
@@ -98,50 +88,55 @@ exports.addBorrowRecord = async (req, res) => {
 exports.updateReturnStatus = async (req, res) => {
   const { record_id } = req.params;
   const { status } = req.body;
-  const image_return  = req.file?.filename;  // ใช้ filename ที่ได้รับจาก multer
+  const image_return = req.file?.filename; // ใช้ filename จาก multer
 
   if (!record_id) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
   try {
-    // Begin transaction
+    // 🔹 เริ่ม Transaction
     await connection.promise().beginTransaction();
 
-    // Update the return status and return_date in borrow_records
-    const query = `
-      UPDATE borrow_records
-      SET return_date = ?, status = ?, image_return = ?
-      WHERE record_id = ?
-    `;
-    const values = [new Date(), status || 'returned', image_return || '', record_id];
-    const [updateResult] = await connection.promise().query(query, values);
-
-    if (updateResult.affectedRows === 0) {
-      throw new Error('Borrow record not found or failed to update');
-    }
-
-    // Get equipment_id from the borrow record
-    const [record] = await connection.promise().query(`SELECT equipment_id FROM borrow_records WHERE record_id = ?`, [record_id]);
+    // 🔹 ดึงข้อมูลอุปกรณ์ที่ถูกยืม
+    const [record] = await connection.promise().query(
+      `SELECT equipment_id, quantity_borrow FROM borrow_records WHERE record_id = ?`,
+      [record_id]
+    );
 
     if (!record.length) {
       throw new Error('Borrow record not found');
     }
 
-    // Update the equipment quantity when the item is returned
-    const updateQuery = `
+    const { equipment_id, quantity_borrow } = record[0];
+
+    // 🔹 อัปเดตสถานะคืนอุปกรณ์ใน borrow_records
+    const updateBorrowQuery = `
+      UPDATE borrow_records
+      SET return_date = ?, status = ?, image_return = ?
+      WHERE record_id = ?
+    `;
+    const values = [new Date(), status || 'returned', image_return || '', record_id];
+    const [updateResult] = await connection.promise().query(updateBorrowQuery, values);
+
+    if (updateResult.affectedRows === 0) {
+      throw new Error('Failed to update borrow record');
+    }
+
+    // 🔹 อัปเดตจำนวนอุปกรณ์ให้เพิ่มกลับตาม quantity_borrow
+    const restoreQuery = `
       UPDATE equipment
-      SET quantity = quantity + 1
+      SET quantity = quantity + ?
       WHERE equipment_id = ?
     `;
-    await connection.promise().query(updateQuery, [record[0].equipment_id]);
+    await connection.promise().query(restoreQuery, [quantity_borrow, equipment_id]);
 
-    // Commit transaction
+    // 🔹 ยืนยันการทำธุรกรรม
     await connection.promise().commit();
 
-    // Get updated return date
-    const [userResult] = await connection.promise().query(`
-      SELECT 
+    // 🔹 ดึงข้อมูลสำหรับแจ้งเตือน LINE Notify
+    const [userResult] = await connection.promise().query(
+      `SELECT 
         u.student_name,
         u.phone,
         e.equipment_name,
@@ -150,24 +145,22 @@ exports.updateReturnStatus = async (req, res) => {
       FROM 
         borrow_records br
       JOIN 
-        users u 
-      ON 
-        br.user_id = u.user_id
+        users u ON br.user_id = u.user_id
       JOIN 
-        equipment e 
-      ON 
-        br.equipment_id = e.equipment_id
+        equipment e ON br.equipment_id = e.equipment_id
       WHERE 
-        br.record_id = ?
-    `, [record_id]);
+        br.record_id = ?`,
+      [record_id]
+    );
 
     if (!userResult.length) {
-      throw new Error('Return date not found');
+      throw new Error('Return record not found after update');
     }
 
     const { student_name, equipment_name, phone, return_date, status: borrow_status } = userResult[0];
-    const date = new Date(return_date);
-    const thai_return_date = date.toLocaleString('th-TH', {
+
+    // 🔹 แปลงวันที่ให้เป็นรูปแบบภาษาไทย
+    const thai_return_date = new Date(return_date).toLocaleString('th-TH', {
       timeZone: 'Asia/Bangkok',
       year: 'numeric',
       month: 'long',
@@ -177,21 +170,21 @@ exports.updateReturnStatus = async (req, res) => {
       second: '2-digit',
     });
 
-    // Prepare message
-    const message = `มีการคืนอุปกรณ์:
-- ชื่อผู้คืน: ${student_name}
-- ชื่ออุปกรณ์: ${equipment_name}
-- เบอร์โทร: ${phone}
-- วันที่คืนอุปกรณ์: 
+      // 🔹 ข้อความแจ้งเตือน
+const message = `📌 มีการคืนอุปกรณ์:
+- 👤 ชื่อผู้คืน: ${student_name}
+- 🎒 อุปกรณ์: ${equipment_name}
+- 📞 เบอร์โทร: ${phone}
+- 📅 วันที่คืน: 
 ${thai_return_date}
-- สถานะ: ${borrow_status || 'returned'}`;
+- 🔄 จำนวนที่คืน: ${quantity_borrow} ชิ้น
+- ✅ สถานะ: ${borrow_status || 'returned'}`;
 
-    // Image URL
-    const imageUrl = image_return ? ` https://6e55-58-10-245-35.ngrok-free.app/image_return/${image_return}` : null;  // Replace with your domain or cloud URL
+    // 🔹 URL ของรูปภาพ (ถ้ามี)
+    const imageUrl = image_return ? `https://yourdomain.com/image_return/${image_return}` : null;
 
-    // Send notification
+    // 🔹 ส่งแจ้งเตือนผ่าน LINE Notify
     try {
-      // If imageUrl is available, send it with the message
       await lineNotify.sendMessage(message, imageUrl);
     } catch (lineError) {
       console.error('Error sending LINE notification:', lineError);
@@ -204,6 +197,8 @@ ${thai_return_date}
     res.status(500).json({ message: 'Error updating return status', error: error.message });
   }
 };
+
+
 
 // ดึงข้อมูลบันทึกการยืมทั้งหมด
 exports.getAllBorrowRecords = async (req, res) => {
@@ -242,6 +237,7 @@ exports.getAllBorrowRecordsByUserId = async (req, res) => {
         e.description,
         br.borrow_date,
         br.status,
+        br.quantity_borrow,
         record_id
       FROM 
         borrow_records br
@@ -254,7 +250,8 @@ exports.getAllBorrowRecordsByUserId = async (req, res) => {
       ON 
         br.equipment_id = e.equipment_id
       WHERE 
-        br.user_id = ? 
+        br.user_id = ?   ORDER BY 
+    br.borrow_date DESC
     `, [user_id]);
 
     if (borrowResults.length === 0) {

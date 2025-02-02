@@ -19,8 +19,7 @@ function Home() {
 
 
 
-
-  const handleClick = async (equipmentId,title,image) => {
+  const handleClick = async (equipmentId, title, image) => {
     try {
       const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
@@ -29,46 +28,62 @@ function Home() {
         },
         buttonsStyling: true,
       });
-
+  
       const result = await swalWithBootstrapButtons.fire({
         title: `ยืมอุปกรณ์ ${title}`,
         text: "คุณต้องการยืมอุปกรณ์นี้ใช่หรือไม่?",
-        imageUrl: image ? `http://localhost:5000/uploads/${image.replace(/\\/g, "/")}` : 'default-image-url.jpg', 
-        imageWidth: 150, 
+        imageUrl: image ? `http://localhost:5000/uploads/${image.replace(/\\/g, "/")}` : 'default-image-url.jpg',
+        imageWidth: 150,
         imageHeight: 150,
-        imageAlt: `${title}`, 
+        imageAlt: `${title}`,
         showCancelButton: true,
         confirmButtonText: "ยืมอุปกรณ์!",
         cancelButtonText: "ยกเลิก!",
         reverseButtons: true,
+        input: 'number',  // เพิ่มช่องกรอกจำนวน
+        inputLabel: 'จำนวนที่ต้องการยืม',  // ป้ายกำกับของช่องกรอก
+        inputPlaceholder: 'กรอกจำนวนอุปกรณ์',
+        inputAttributes: {
+          min: 1,  // กำหนดให้จำนวนต้องมากกว่าหรือเท่ากับ 1
+          step: 1, // กำหนดให้กรอกได้ทีละ 1
+        },
+        inputValidator: (value) => {
+          if (!value || value <= 0) {
+            return 'กรุณากรอกจำนวนที่ถูกต้อง';
+          }
+        },
       });
-      
-
+  
+      // ตรวจสอบหากผู้ใช้ยืนยันและกรอกจำนวน
       if (result.isConfirmed) {
+        const quantity_borrow = result.value;
+  
         await axios.post(`http://localhost:5000/api/borrowRecords/add`, {
           equipment_id: equipmentId,
           user_id: user?.user_id,
-          
+          quantity_borrow: quantity_borrow,
         });
-        
+  
         swalWithBootstrapButtons.fire({
-          title:"สำเร็จ!",
-          text:"คุณได้ยืมอุปกรณ์เรียบร้อยแล้ว",
-          icon:"success",
+          title: "สำเร็จ!",
+          text: "คุณได้ยืมอุปกรณ์เรียบร้อยแล้ว",
+          icon: "success",
         });
+  
         await fetchEquipment();
         await fetchBorrowRecords();
       } else {
         swalWithBootstrapButtons.fire({
-          title:"ยกเลิก!",
-          text:"คุณยกเลิกการยืมอุปกรณ์เรียบร้อยแล้ว",
-          icon:"error",
+          title: "ยกเลิก!",
+          text: "คุณยกเลิกการยืมอุปกรณ์เรียบร้อยแล้ว",
+          icon: "error",
         });
       }
     } catch (error) {
       console.error("Error borrowing equipment:", error);
     }
   };
+  
    
 
 

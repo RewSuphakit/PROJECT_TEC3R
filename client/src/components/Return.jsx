@@ -60,6 +60,7 @@ function Return() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รหัสอุปกรณ์</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รูปภาพ</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่ออุปกรณ์</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">จำนวนการยืม</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">วันที่ยืม</th>
                   <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">จัดการรูปภาพ</th>
                   <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">การดำเนินการ</th>
@@ -78,6 +79,7 @@ function Return() {
           />
         </td>
         <td className="px-6 py-4">{item.equipment_name}</td>
+        <td className="px-6 py-4">{item.quantity_borrow}</td>
         <td className="px-6 py-4">{item.borrow_date}</td>
         <td className="px-6 py-4">
           <CameraCapture onCapture={handleCaptureImage} recordId={item.record_id} />
