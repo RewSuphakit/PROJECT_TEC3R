@@ -57,8 +57,9 @@ function Home() {
       // ตรวจสอบหากผู้ใช้ยืนยันและกรอกจำนวน
       if (result.isConfirmed) {
         const quantity_borrow = result.value;
-  
+        let token = localStorage.getItem('token');
         await axios.post(`http://localhost:5000/api/borrowRecords/add`, {
+          headers: { Authorization: `Bearer ${token}` },
           equipment_id: equipmentId,
           user_id: user?.user_id,
           quantity_borrow: quantity_borrow,
@@ -113,12 +114,7 @@ function Home() {
       typed.destroy();
     };
   }, []);
-  const stats = [
-    { id: 'borrowCount', count: 30, label: 'การยืมอุปกรณ์ทั้งหมด', unit: 'ครั้ง', icon: "https://img.icons8.com/?size=100&id=8382&format=png&color=0F4C75" },
-    { id: 'returnCount', count: 12, label: 'การคืนอุปกรณ์ทั้งหมด', unit: 'ครั้ง', icon: "https://img.icons8.com/?size=100&id=8382&format=png&color=0F4C75" },
-    { id: 'userCount', count: 64, label: 'ผู้ใช้งานทั้งหมด', unit: 'คน', icon: "https://img.icons8.com/?size=100&id=98957&format=png&color=0F4C75" },
-    { id: 'equipmentCount', count: 80, label: 'อุปกรณ์ที่มียืมทั้งหมด', unit: 'อุปกรณ์', icon: "https://img.icons8.com/?size=100&id=2866&format=png&color=0F4C75" }
-  ];
+  
   const fetchEquipment = async () => {
     
     try {
@@ -276,7 +272,7 @@ function Home() {
    
 
   
-    <StatsSection stats={stats} />;
+    <StatsSection />;
 
 
 

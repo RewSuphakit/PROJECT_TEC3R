@@ -8,13 +8,16 @@ const Login = () => {
   const { setUser } = useAuth();
   const [student_email, setStudentEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
-
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -100,7 +103,7 @@ const Login = () => {
                 />
                 <input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full border rounded-lg pl-10 pr-3 py-2 text-sm outline-none"
@@ -108,6 +111,16 @@ const Login = () => {
                   aria-label="รหัสผ่าน"
                 />
               </div>
+              <div className="flex justify-between mt-2">
+                      <div>
+                     <input
+                        type="checkbox"
+                        className="mr-2 cursor-pointer rounded-md checkbox w-4 h-4" 
+                        onChange={togglePasswordVisibility}
+                      />
+                    <label className="text-sm  text-gray-400">Show Password</label>
+                    </div>
+                    </div>
             </div>
 
             <button

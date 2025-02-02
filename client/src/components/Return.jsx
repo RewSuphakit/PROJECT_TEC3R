@@ -34,8 +34,9 @@ function Return() {
   
     try {
       // ส่งข้อมูลกลับไปอัปเดตในฐานข้อมูล
+      let token = localStorage.getItem('token');
       await axios.put(`http://localhost:5000/api/borrowRecords/update/${recordId}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` },
       });
   
       alert('อุปกรณ์ถูกคืนแล้ว');
@@ -54,19 +55,19 @@ function Return() {
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">รายการอุปกรณ์ที่ต้องคืนหลังจากการยืม</p>
           <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 ">
+              <thead className="bg-gray-50 ">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รหัสอุปกรณ์</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รูปภาพ</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่ออุปกรณ์</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">จำนวนการยืม</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">วันที่ยืม</th>
+                  <th className="px-6 py-3 text-center  text-xs font-medium text-gray-500 uppercase tracking-wider">รหัสอุปกรณ์</th>
+                  <th className="px-6 py-3 text-center  text-xs font-medium text-gray-500 uppercase tracking-wider">รูปภาพ</th>
+                  <th className="px-6 py-3 text-center  text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่ออุปกรณ์</th>
+                  <th className="px-6 py-3 text-center  text-xs font-medium text-gray-500 uppercase tracking-wider">จำนวนการยืม</th>
+                  <th className="px-6 py-3 text-center  text-xs font-medium text-gray-500 uppercase tracking-wider">วันที่ยืม</th>
                   <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">จัดการรูปภาพ</th>
                   <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">การดำเนินการ</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700 text-center">
   {borrowedBooks.length > 0 ? (
     borrowedBooks.map((item) => (
       <tr key={item.record_id}>
