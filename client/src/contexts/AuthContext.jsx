@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { createContext, useState, useEffect } from 'react';
+const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
 const AuthContext = createContext();
 
@@ -18,7 +19,7 @@ function AuthContextProvider({ children }) {
 
       setLoading(true);
 
-      const response = await axios.get(`http://localhost:5000/api/users/profile`, {
+      const response = await axios.get(`${apiUrl}/api/users/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -47,7 +48,7 @@ function AuthContextProvider({ children }) {
   
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/borrowRecords/all/${user.user_id}`,
+        `${apiUrl}/api/borrowRecords/all/${user.user_id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

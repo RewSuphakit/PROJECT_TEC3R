@@ -43,12 +43,12 @@ function Herderadmin() {
             <p className="px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">เมนูหลัก</p>
           </div>
           
-          <Link to="/" className="flex items-center gap-3 px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group">
+          <Link to="/RMUTI/Dashboard" className="flex items-center gap-3 px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group">
             <i className="fas fa-home w-5 transition-transform group-hover:scale-110" />
             <span className="font-medium">แดชบอร์ด</span>
           </Link>
 
-          <Link to="/ManageTools" className="flex items-center gap-3 px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group">
+          <Link to="/RMUTI/ManageTools" className="flex items-center gap-3 px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group">
             <i className="fas fa-box w-5 transition-transform group-hover:scale-110" />
             <span>จัดการอุปกรณ์</span>
           </Link>
@@ -66,18 +66,18 @@ function Herderadmin() {
             </button>
             
             <div className={`${isDropdownOpen ? 'block' : 'hidden'} pl-11 mt-1 space-y-1`}>
-              <Link to="/historyboxin" className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200">
+              <Link to="/RMUTI/ListBorrow" className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200">
                 <i className="fas fa-users w-5" />
                 <span>รายชื่อคนยืมอุปกรณ์</span>
               </Link>
-              <Link to="/historyboxout" className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200">
+              <Link to="/RMUTI/ListReturn" className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200">
                 <i className="fas fa-undo w-5" />
                 <span>รายชื่อคนคืนอุปกรณ์</span>
               </Link>
             </div>
           </div>
 
-          <Link to="/ManageUsers" className="flex items-center gap-3 px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group">
+          <Link to="/RMUTI/ManageUsers" className="flex items-center gap-3 px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group">
             <i className="fas fa-users w-5 transition-transform group-hover:scale-110" />
             <span>จัดการผู้ใช้</span>
           </Link>

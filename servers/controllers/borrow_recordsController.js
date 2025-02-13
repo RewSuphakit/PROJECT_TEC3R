@@ -203,7 +203,19 @@ ${thai_return_date}
 // ดึงข้อมูลบันทึกการยืมทั้งหมด
 exports.getAllBorrowRecords = async (req, res) => {
   try {
-    const [results] = await connection.promise().query('SELECT * FROM borrow_records');
+    const [results] = await connection.promise().query(`
+      SELECT 
+        br.borrow_date,
+        br.return_date,
+        br.status,
+        u.student_name
+      FROM 
+        borrow_records br
+      JOIN 
+        users u 
+      ON 
+        br.user_id = u.user_id
+    `);
     res.status(200).json({ borrow_records: results });
   } catch (error) {
     console.error('Error fetching borrow records:', error);

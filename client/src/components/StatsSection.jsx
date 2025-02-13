@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CountUp } from "countup.js";
 import axios from 'axios';
+const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
 const StatsSection = () => {
   const sectionRef = useRef(null); // Reference to the section we want to observe
@@ -9,7 +10,7 @@ const StatsSection = () => {
   useEffect(() => {
     
     
-    axios.get("http://localhost:5000/api/stats/stats/")
+    axios.get(`${apiUrl}/api/stats/stats/`)
       .then((response) => {
         // Assuming the response contains the correct structure, map it properly
         const fetchedStats = [

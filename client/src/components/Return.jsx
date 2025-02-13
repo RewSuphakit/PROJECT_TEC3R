@@ -3,12 +3,13 @@ import  useAuth  from '../hooks/useAuth';
 import axios from 'axios';
 import CameraCapture from '../components/CameraCapture';
 import ImageUpload from '../components/ImageUpload';
-
+import { toast } from 'react-toastify';
 function Return() {
   const { borrowedBooks, fetchBorrowRecords } = useAuth();
   const [images, setImages] = useState({});
   const [capturedImage, setCapturedImage] = useState({});
   const [captureMode, setCaptureMode] = useState(false);
+  const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
   const handleCaptureImage = (capturedImage, recordId) => {
     setImages((prevCapturedImages) => ({
@@ -33,19 +34,19 @@ function Return() {
     }
   
     try {
-      // ส่งข้อมูลกลับไปอัปเดตในฐานข้อมูล
+      
       let token = localStorage.getItem('token');
-      await axios.put(`http://localhost:5000/api/borrowRecords/update/${recordId}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` },
+      await axios.put(`${apiUrl}/api/borrowRecords/update/${recordId}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
   
-      alert('อุปกรณ์ถูกคืนแล้ว');
+      toast.success('อุปกรณ์ถูกคืนแล้ว');
   
       // เรียก fetchBorrowRecords เพื่อดึงข้อมูลใหม่มาจากฐานข้อมูล
       await fetchBorrowRecords();
     } catch (error) {
       console.error('Error returned equipment:', error);
-      alert('ไม่สามารถคืนอุปกรณ์ได้');
+      toast.warn('ไม่สามารถคืนอุปกรณ์ได้');
     }
   };
 

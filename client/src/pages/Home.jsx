@@ -9,6 +9,7 @@ import useAuth from "../hooks/useAuth";
 import StatsSection from '../components/StatsSection';
 import { CountUp } from "countup.js";
 import Swal from 'sweetalert2';
+import ScrollToTopButton from '../components/ScrollToTopButton';
 function Home() {
   const { user,loading,fetchBorrowRecords} = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
@@ -146,6 +147,7 @@ function Home() {
 
   return (
     <div className="bg-white min-h-screen">
+            <ScrollToTopButton />
     <div
       className="relative bg-fixed bg-center bg-no-repeat bg-cover min-h-[500px]"
       style={{

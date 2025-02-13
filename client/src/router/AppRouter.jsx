@@ -9,6 +9,10 @@ import Footer from "../components/Footer";
 import Dashboard from "../pages/admin/Dashboard";
 import Return from '../components/Return';
 import Herderadmin from '../pages/admin/Herderadmin';
+import ManageTools from '../pages/admin/ManageTools';
+import ListBorrow from'../pages/admin/ListBorrow';
+import ListReturn from'../pages/admin/ListReturn';
+import ManageUsers from '../pages/admin/ManageUsers';
 
 const guestRouter = createBrowserRouter([
     {
@@ -68,6 +72,11 @@ const adminRouter = createBrowserRouter([
       // หน้าหลักสำหรับผู้ใช้ที่เป็น Admin
       { index: true, element: <Dashboard /> },
       { path: "/RMUTI/Dashboard", element: <Dashboard /> },
+      { path: "/RMUTI/ManageTools", element: <ManageTools /> },
+      { path: "/RMUTI/ListBorrow", element: <ListBorrow /> },
+      { path: "/RMUTI/ListReturn", element: <ListReturn /> },
+      { path: "/RMUTI/ManageUsers", element: <ManageUsers /> },
+      // เพิ่มเส้นทา��สำหรับ 404 Not Found
       { path: "/RMUTI/*", element: <NotFound /> }
       // อื่น ๆ ที่เฉพาะสำหรับผู้ใช้ที่เป็น Admin
     ]

@@ -13,7 +13,7 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const [emailValid, setEmailValid] = useState(true); // New state for email validation
-
+  const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
   const handleRegister = async (e) => {
     e.preventDefault();
     
@@ -34,7 +34,7 @@ const Register = () => {
     setEmailValid(true); // Reset email validity if correct
 
     try {
-      const response = await axios.post('http://localhost:5000/api/users/register', {
+      const response = await axios.post(`${apiUrl}/api/users/register`, {
         student_email,
         password,
         student_name,

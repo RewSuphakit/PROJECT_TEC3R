@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import useAuth from "../hooks/useAuth";
-
+const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 const Login = () => {
   const { setUser } = useAuth();
   const [student_email, setStudentEmail] = useState('');
@@ -32,7 +32,7 @@ const Login = () => {
     }
   
     try {
-      const response = await axios.post('http://localhost:5000/api/users/login', {
+      const response = await axios.post(`${apiUrl}/api/users/login`, {
         student_email,
         password,
       });
@@ -64,9 +64,9 @@ const Login = () => {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-50">
+    <div className="h-screen flex items-center justify-center bg-gray-5">
       <div className="w-full max-w-md px-4">
-        <div className="bg-white p-8 rounded-lg shadow-md">
+        <div className="bg-white p-8 rounded-lg shadow-md ">
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="text-center">
               <h1 className="text-2xl font-semibold text-[#0F4C75]">เข้าสู่ระบบ</h1>
