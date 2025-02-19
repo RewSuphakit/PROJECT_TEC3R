@@ -13,7 +13,8 @@ import ManageTools from '../pages/admin/ManageTools';
 import ListBorrow from'../pages/admin/ListBorrow';
 import ListReturn from'../pages/admin/ListReturn';
 import ManageUsers from '../pages/admin/ManageUsers';
-
+import ReportResults from '../pages/admin/ReportResults';
+import ReportDetails from '../pages/admin/ReportDetails';
 const guestRouter = createBrowserRouter([
     {
       path: "/RMUTI/",
@@ -76,6 +77,8 @@ const adminRouter = createBrowserRouter([
       { path: "/RMUTI/ListBorrow", element: <ListBorrow /> },
       { path: "/RMUTI/ListReturn", element: <ListReturn /> },
       { path: "/RMUTI/ManageUsers", element: <ManageUsers /> },
+      { path: "/RMUTI/ReportResults", element: <ReportResults /> },
+      { path: "/RMUTI/ReportDetails/:transaction_id", element: <ReportDetails /> },
       // เพิ่มเส้นทา��สำหรับ 404 Not Found
       { path: "/RMUTI/*", element: <NotFound /> }
       // อื่น ๆ ที่เฉพาะสำหรับผู้ใช้ที่เป็น Admin

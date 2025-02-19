@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
+
 function Herderadmin() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { user, logout} = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate(); // ใช้ useNavigate ที่นี่
+
   const handleLogout = () => {
-    logout();
-    navigate('/RMUTI/');
-  }
+    logout(); // ออกจากระบบ
+    navigate('/RMUTI/'); // หลังจาก logout ให้เปลี่ยนเส้นทางไปที่หน้า /RMUTI/
+  };
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -22,7 +25,7 @@ function Herderadmin() {
     <div className="bg-gray-50 font-[Kanit]">
       {/* Overlay */}
       {isSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={toggleSidebar}
         />
@@ -33,7 +36,7 @@ function Herderadmin() {
         <div className="p-6 border-b border-gray-100">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-              <i className="fas fa-boxes text-lg" style={{color: '#0F4C75'}} />
+              <i className="fas fa-boxes text-lg" style={{ color: '#0F4C75' }} />
             </div>
             <span className="text-xl font-semibold text-gray-800">จัดการหลังบ้าน</span>
           </div>
@@ -42,7 +45,7 @@ function Herderadmin() {
           <div className="pb-2">
             <p className="px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">เมนูหลัก</p>
           </div>
-          
+
           <Link to="/RMUTI/Dashboard" className="flex items-center gap-3 px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group">
             <i className="fas fa-home w-5 transition-transform group-hover:scale-110" />
             <span className="font-medium">แดชบอร์ด</span>
@@ -54,7 +57,7 @@ function Herderadmin() {
           </Link>
 
           <div className="relative">
-            <button 
+            <button
               onClick={toggleDropdown}
               className="w-full flex items-center justify-between px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group"
             >
@@ -64,7 +67,7 @@ function Herderadmin() {
               </div>
               <i className={`fas fa-chevron-down transform transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
-            
+
             <div className={`${isDropdownOpen ? 'block' : 'hidden'} pl-11 mt-1 space-y-1`}>
               <Link to="/RMUTI/ListBorrow" className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200">
                 <i className="fas fa-users w-5" />
@@ -82,7 +85,7 @@ function Herderadmin() {
             <span>จัดการผู้ใช้</span>
           </Link>
 
-          <Link to="/reportresults" className="flex items-center gap-3 px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group">
+          <Link to="/RMUTI/ReportResults" className="flex items-center gap-3 px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group">
             <i className="fas fa-chart-bar w-5 transition-transform group-hover:scale-110" />
             <span>รายงาน</span>
           </Link>
@@ -90,11 +93,11 @@ function Herderadmin() {
           <div className="pt-4 pb-2">
             <p className="px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">บัญชี</p>
           </div>
-          
+
           <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-3 text-red-600 rounded-lg hover:bg-red-50 transition-all duration-200 group">
             <i className="fas fa-sign-out-alt w-5 transition-transform group-hover:scale-110" />
             <span>ออกจากระบบ</span>
-            </button>
+          </button>
         </nav>
       </aside>
 
@@ -104,7 +107,7 @@ function Herderadmin() {
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center gap-6">
-                <button 
+                <button
                   onClick={toggleSidebar}
                   className="text-gray-500 hover:text-gray-600 lg:hidden focus:outline-none"
                 >

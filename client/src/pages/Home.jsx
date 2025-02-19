@@ -24,8 +24,8 @@ function Home() {
     try {
       const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
-          confirmButton: "bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded ",
-          cancelButton: "bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded ",
+          confirmButton: "bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded",
+          cancelButton: "bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded",
         },
         buttonsStyling: true,
       });
@@ -33,7 +33,7 @@ function Home() {
       const result = await swalWithBootstrapButtons.fire({
         title: `ยืมอุปกรณ์ ${title}`,
         text: "คุณต้องการยืมอุปกรณ์นี้ใช่หรือไม่?",
-        imageUrl: image ? `http://localhost:5000/uploads/${image.replace(/\\/g, "/")}` : 'default-image-url.jpg',
+        imageUrl: image ? `http://localhost:5000/uploads/${image.replace(/\\/g, "/")}` : "default-image-url.jpg",
         imageWidth: 150,
         imageHeight: 150,
         imageAlt: `${title}`,
@@ -41,52 +41,69 @@ function Home() {
         confirmButtonText: "ยืมอุปกรณ์!",
         cancelButtonText: "ยกเลิก!",
         reverseButtons: true,
-        input: 'number',  // เพิ่มช่องกรอกจำนวน
-        inputLabel: 'จำนวนที่ต้องการยืม',  // ป้ายกำกับของช่องกรอก
-        inputPlaceholder: 'กรอกจำนวนอุปกรณ์',
+        input: "number",
+        inputLabel: "จำนวนที่ต้องการยืม",
+        inputPlaceholder: "กรอกจำนวนอุปกรณ์",
         inputAttributes: {
-          min: 1,  // กำหนดให้จำนวนต้องมากกว่าหรือเท่ากับ 1
-          step: 1, // กำหนดให้กรอกได้ทีละ 1
+          min: 1,
+          step: 1,
         },
         inputValidator: (value) => {
           if (!value || value <= 0) {
-            return 'กรุณากรอกจำนวนที่ถูกต้อง';
+            return "กรุณากรอกจำนวนที่ถูกต้อง";
           }
         },
       });
   
-      // ตรวจสอบหากผู้ใช้ยืนยันและกรอกจำนวน
       if (result.isConfirmed) {
-        const quantity_borrow = result.value;
-        let token = localStorage.getItem('token');
-        await axios.post(`http://localhost:5000/api/borrowRecords/add`, {
-          headers: { Authorization: `Bearer ${token}` },
-          equipment_id: equipmentId,
-          user_id: user?.user_id,
-          quantity_borrow: quantity_borrow,
+        const quantity_borrow = parseInt(result.value, 10);
+        let token = localStorage.getItem("token");
+  
+        if (!user || !user.user_id) {
+          return swalWithBootstrapButtons.fire({
+            title: "เกิดข้อผิดพลาด!",
+            text: "ไม่พบข้อมูลผู้ใช้ กรุณาล็อกอินใหม่",
+            icon: "error",
+          });
+        }
+  
+        // ✅ เก็บอุปกรณ์ที่เลือกใน Local Storage
+        let items = JSON.parse(localStorage.getItem("borrowItems")) || [];
+        items.push({ equipment_id: equipmentId, quantity_borrow });
+  
+        // บันทึกลง Local Storage
+        localStorage.setItem("borrowItems", JSON.stringify(items));
+  
+        // ✅ ถามว่าต้องการยืมทั้งหมดไหม?
+        const confirmBorrow = await swalWithBootstrapButtons.fire({
+          title: "ยืนยันการยืมทั้งหมด?",
+          text: "คุณต้องการยืมอุปกรณ์ทั้งหมดในรายการหรือไม่?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "ยืมทั้งหมด!",
+          cancelButtonText: "เพิ่มต่อ",
         });
   
-        swalWithBootstrapButtons.fire({
-          title: "สำเร็จ!",
-          text: "คุณได้ยืมอุปกรณ์เรียบร้อยแล้ว",
-          icon: "success",
-        });
+        if (confirmBorrow.isConfirmed) {
+          await axios.post(
+            `http://localhost:5000/api/borrowRecords/add`,
+            { user_id: user.user_id, items },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
   
-        await fetchEquipment();
-        await fetchBorrowRecords();
-      } else {
-        swalWithBootstrapButtons.fire({
-          title: "ยกเลิก!",
-          text: "คุณยกเลิกการยืมอุปกรณ์เรียบร้อยแล้ว",
-          icon: "error",
-        });
+          swalWithBootstrapButtons.fire({ title: "สำเร็จ!", text: "คุณได้ยืมอุปกรณ์เรียบร้อยแล้ว", icon: "success" });
+  
+          // ล้าง Local Storage และรีโหลดข้อมูล
+          localStorage.removeItem("borrowItems");
+          await fetchEquipment();
+          await fetchBorrowRecords();
+        }
       }
     } catch (error) {
       console.error("Error borrowing equipment:", error);
     }
   };
   
-   
 
 
 

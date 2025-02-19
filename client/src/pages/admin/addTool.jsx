@@ -110,6 +110,7 @@ function AddTool() {
                   placeholder="จำนวน"
                   className="p-2 text-sm w-full"
                   required
+                  min="1"
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
                 />
