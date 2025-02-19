@@ -59,7 +59,16 @@ function ReportResults() {
 
   return (
     <div className="container lg:pl-72 mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-4">รายงาน</h1>
+
+      <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">📅 รายงาน</h1>
+              <p className="text-sm text-gray-500 mt-1">
+                ดูรายงานการยืมอุปกรณ์ทั้งหมด
+              </p>
+            </div>
+           
+          </div>
       <div className="flex items-center space-x-2 mb-4 px-4">
         <label htmlFor="month-select" className="font-semibold">
           เลือกเดือน:
@@ -88,10 +97,10 @@ function ReportResults() {
           <table className="min-w-full">
             <thead>
               <tr className="bg-gray-200">
-                <th className="py-2 px-4 border-b">Report ID</th>
-                <th className="py-2 px-4 border-b">Report Name</th>
-                <th className="py-2 px-4 border-b">Date</th>
-                <th className="py-2 px-4 border-b">Details</th>
+                <th className="py-2 px-4 border-b">รหัสรายงาน</th>
+                <th className="py-2 px-4 border-b">ชื่อผู้ยืม</th>
+                <th className="py-2 px-4 border-b">วันที่คืน</th>
+                <th className="py-2 px-4 border-b">รายละเอียด</th>
               </tr>
             </thead>
             <tbody>

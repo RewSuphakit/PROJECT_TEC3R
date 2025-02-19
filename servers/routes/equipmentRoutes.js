@@ -9,5 +9,5 @@ router.get('/equipment', equipmentController.getAllEquipment);  // ดึงข�
 router.get('/equipment/:id', equipmentController.getEquipmentById);  // ดึงข้อมูลอุปกรณ์ตาม ID
 router.put('/equipment/:id',upload.single('image'),compressImage,equipmentController.updateEquipment);  // อัพเดตข้อมูลอุปกรณ์
 router.delete('/equipment/:id', equipmentController.deleteEquipment);  // ลบอุปกรณ์
-
+router.put('/equipment/:id/status', equipmentController.updateEquipmentStatus);
 module.exports = router;

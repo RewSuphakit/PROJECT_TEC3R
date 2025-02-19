@@ -138,9 +138,11 @@ function Home() {
     try {
       const response = await axios.get('http://localhost:5000/api/equipment/equipment'); // Replace fetch with axios
       const sortedEquipment = response.data.equipment || [];
-  
+   // กรองข้อมูลเฉพาะที่สถานะเป็น Borrowed
+   const EquipmentAvailable = sortedEquipment.filter(record => record.status === 'Available');
+      setEquipment(EquipmentAvailable); 
       sortedEquipment.sort((a, b) => new Date(b.timeupdate) - new Date(a.timeupdate));
-      setEquipment(sortedEquipment);
+    
     } catch (error) {
       console.error('Error fetching equipment:', error);
     }

@@ -78,8 +78,15 @@ function ManageUsers() {
   return (
     <div className="min-h-screen container mx-auto py-8">
       <div className="lg:pl-72">
-        <h1 className="text-4xl font-extrabold text-primary mb-8">👤 จัดการผู้ใช้</h1>
-
+        <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">⚙️ จัดการผู้ใช้</h1>
+              <p className="text-sm text-gray-500 mt-1">
+                 คุณสามารถดูและจัดการผู้ใช้ทั้งหมดในระบบได้ที่นี่
+              </p>
+            </div>
+           
+          </div>
         {/* ตารางข้อมูล */}
         <div className="overflow-auto shadow-lg rounded-lg bg-white p-4">
           <table className="table w-full">

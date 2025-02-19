@@ -113,7 +113,16 @@ function ListReturn() {
   return (
     <div className="min-h-screen container mx-auto py-8">
       <div className="lg:pl-72">
-        <h1 className="text-4xl mb-8">📦 รายชื่อคนคืนอุปกรณ์</h1>
+      <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">📦 รายชื่อคนคืนอุปกรณ์</h1>
+              <p className="text-sm text-gray-500 mt-1">
+                หมายเหตุ: ต้องคืนอุปกร์ทั้งหมดที่ยืมถึงจะถือว่าคืนเรียบร้อย
+              </p>
+            </div>
+           
+          </div>
+        
         {loading ? (
           <p className="text-center text-lg text-gray-600">กำลังโหลดข้อมูล...</p>
         ) : (
