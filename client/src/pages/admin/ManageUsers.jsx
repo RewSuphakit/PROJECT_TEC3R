@@ -113,7 +113,18 @@ function ManageUsers() {
                     <td className="py-4 px-2 text-center">{user.student_email}</td>
                     <td className="py-4 px-2 text-center">{user.password}</td>
                     <td className="py-4 px-2 text-center">{user.phone}</td>
-                    <td className="py-4 px-2 text-center">{user.role}</td>
+                    <td className="py-4 px-2 text-center">
+                   
+  <div className={`badge ${user.role === "admin" ? "badge-error gap-2" : "badge-success gap-2"}`}>
+    {user.role === "admin"? "ผู้ดูแลระบบ" : "ผู้ใช้ทั่วไป"}
+  </div>
+ 
+
+                      {/* <div className="  ">
+                        {user.role === "admin" ?  "ผู้ดูแลระบบ" : "ผู้ใช้ทั่วไป"}
+                      </div> */}
+                      
+                      </td>
                     <td className="py-4 px-2 text-center">
                       <button 
                         onClick={() => openEditModal(user)}

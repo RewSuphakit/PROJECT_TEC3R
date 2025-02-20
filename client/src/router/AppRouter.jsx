@@ -66,7 +66,6 @@ const adminRouter = createBrowserRouter([
       <>
         <Herderadmin />
         <Outlet />
-        <Footer />
       </>
     ),
     children: [

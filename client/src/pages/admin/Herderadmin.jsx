@@ -32,7 +32,7 @@ function Herderadmin() {
       )}
 
       {/* Sidebar */}
-      <aside className={`w-72 bg-white shadow-xl fixed h-full transition-all duration-300 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 z-50`}>
+      <aside className={`w-72 bg-white shadow-xl fixed h-full transition-all duration-300 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 z-10`}>
         <div className="p-6 border-b border-gray-100">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">

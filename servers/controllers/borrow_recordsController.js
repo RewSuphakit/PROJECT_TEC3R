@@ -32,20 +32,31 @@ exports.addBorrowRecord = async (req, res) => {
     ]);
     await connection.promise().query(insertRecordQuery, [borrowData]);
 
-    // 3. อัปเดตจำนวนอุปกรณ์ในตาราง equipment
+    // 3. ตรวจสอบและอัปเดตจำนวนอุปกรณ์ในตาราง equipment
+    const checkEquipmentQuery = `SELECT quantity FROM equipment WHERE equipment_id = ?`;
     const updateEquipmentQuery = `
       UPDATE equipment
       SET quantity = quantity - ?
       WHERE equipment_id = ? AND quantity >= ?
     `;
     for (const { equipment_id, quantity_borrow } of items) {
+      // ตรวจสอบว่ามีอุปกรณ์นี้อยู่หรือไม่
+      const [equipmentResult] = await connection.promise().query(checkEquipmentQuery, [equipment_id]);
+      if (equipmentResult.length === 0) {
+        throw new Error(`Equipment with id ${equipment_id} not found`);
+      }
+      // ตรวจสอบจำนวนอุปกรณ์เพียงพอหรือไม่
+      if (equipmentResult[0].quantity < quantity_borrow) {
+        throw new Error(`Insufficient quantity for equipment id ${equipment_id}`);
+      }
+      // อัปเดตจำนวนอุปกรณ์
       const [updateResult] = await connection.promise().query(updateEquipmentQuery, [
         quantity_borrow,
         equipment_id,
         quantity_borrow,
       ]);
       if (updateResult.affectedRows === 0) {
-        throw new Error("Insufficient quantity or equipment not found");
+        throw new Error(`Failed to update equipment id ${equipment_id}`);
       }
     }
 

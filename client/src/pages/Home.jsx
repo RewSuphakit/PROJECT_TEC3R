@@ -19,94 +19,226 @@ function Home() {
  
 
 
+// ฟังก์ชันสำหรับกดยืมอุปกรณ์แต่ละชิ้น
+const handleClick = async (equipmentId, title, image, quantity) => {
+  try {
+    // แปลง equipmentId เป็น Number ให้แน่ใจว่าประเภทตรงกัน
+    equipmentId = Number(equipmentId);
 
-  const handleClick = async (equipmentId, title, image) => {
-    try {
-      const swalWithBootstrapButtons = Swal.mixin({
-        customClass: {
-          confirmButton: "bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded",
-          cancelButton: "bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded",
-        },
-        buttonsStyling: true,
-      });
-  
-      const result = await swalWithBootstrapButtons.fire({
-        title: `ยืมอุปกรณ์ ${title}`,
-        text: "คุณต้องการยืมอุปกรณ์นี้ใช่หรือไม่?",
-        imageUrl: image ? `http://localhost:5000/uploads/${image.replace(/\\/g, "/")}` : "default-image-url.jpg",
-        imageWidth: 150,
-        imageHeight: 150,
-        imageAlt: `${title}`,
-        showCancelButton: true,
-        confirmButtonText: "ยืมอุปกรณ์!",
-        cancelButtonText: "ยกเลิก!",
-        reverseButtons: true,
-        input: "number",
-        inputLabel: "จำนวนที่ต้องการยืม",
-        inputPlaceholder: "กรอกจำนวนอุปกรณ์",
-        inputAttributes: {
-          min: 1,
-          step: 1,
-        },
-        inputValidator: (value) => {
-          if (!value || value <= 0) {
-            return "กรุณากรอกจำนวนที่ถูกต้อง";
-          }
-        },
-      });
-  
-      if (result.isConfirmed) {
-        const quantity_borrow = parseInt(result.value, 10);
-        let token = localStorage.getItem("token");
-  
-        if (!user || !user.user_id) {
-          return swalWithBootstrapButtons.fire({
-            title: "เกิดข้อผิดพลาด!",
-            text: "ไม่พบข้อมูลผู้ใช้ กรุณาล็อกอินใหม่",
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton:
+          "bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded", // ยืมอุปกรณ์!
+        denyButton:
+          "bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded", // ที่ยืมค้างอยู่
+        cancelButton:
+          "bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded",  // ยกเลิก!
+      },
+      buttonsStyling: true,
+    });
+
+    // ดึงรายการค้างอยู่จาก Local Storage และคำนวณจำนวนทั้งหมด
+    const pendingItems = JSON.parse(localStorage.getItem("borrowItems")) || [];
+    const pendingCount = pendingItems.reduce(
+      (sum, item) => sum + item.quantity_borrow,
+      0
+    );
+
+    // popup หลักที่มี 3 ปุ่ม: ยืมอุปกรณ์!, ที่ยืมค้างอยู่ (พร้อมแสดงจำนวน), ยกเลิก!
+    const result = await swalWithBootstrapButtons.fire({
+      title: `ยืมอุปกรณ์ ${title}`,
+      text: "คุณต้องการยืมอุปกรณ์นี้หรือดำเนินการกับรายการค้างอยู่?",
+      imageUrl: image
+        ? `http://localhost:5000/uploads/${image.replace(/\\/g, "/")}`
+        : "default-image-url.jpg",
+      imageWidth: 150,
+      imageHeight: 150,
+      imageAlt: `${title}`,
+      showCancelButton: true,
+      showDenyButton: true,
+      confirmButtonText: "ยืมอุปกรณ์!",
+      denyButtonText:
+        pendingCount > 0 ? `ที่ยืมค้างอยู่ (${pendingCount})` : "ที่ยืมค้างอยู่",
+      cancelButtonText: "ยกเลิก!",
+      reverseButtons: true,
+      input: "number",
+      inputLabel: "จำนวนที่ต้องการยืม",
+      inputPlaceholder: "กรอกจำนวนอุปกรณ์",
+      inputAttributes: {
+        min: 1,
+        max: quantity,
+        step: 1,
+      },
+      inputValidator: (value) => {
+        if (!value || value <= 0) {
+          return "กรุณากรอกจำนวนที่ถูกต้อง";
+        }
+      },
+    });
+
+    if (result.isConfirmed) {
+      // กรณีเลือก "ยืมอุปกรณ์!" (เพิ่มรายการใหม่)
+      const quantityToBorrow = parseInt(result.value, 10);
+      let token = localStorage.getItem("token");
+
+      if (!user || !user.user_id) {
+        return await swalWithBootstrapButtons.fire({
+          title: "เกิดข้อผิดพลาด!",
+          text: "ไม่พบข้อมูลผู้ใช้ กรุณาล็อกอินใหม่",
+          icon: "error",
+        });
+      }
+
+      // ดึงรายการที่มีอยู่จาก Local Storage
+      let items = JSON.parse(localStorage.getItem("borrowItems")) || [];
+
+      // ตรวจสอบว่ามีรายการอุปกรณ์นี้อยู่แล้วหรือไม่
+      const existingItemIndex = items.findIndex(
+        (item) => Number(item.equipment_id) === equipmentId
+      );
+
+      if (existingItemIndex !== -1) {
+        const currentQuantity = items[existingItemIndex].quantity_borrow;
+        const newTotal = currentQuantity + quantityToBorrow;
+        if (newTotal > quantity) {
+          await swalWithBootstrapButtons.fire({
+            title: "จำนวนเกิน!",
+            text: `คุณไม่สามารถยืมได้เกิน ${quantity} ชิ้น`,
             icon: "error",
           });
+          return;
         }
-  
-        // ✅ เก็บอุปกรณ์ที่เลือกใน Local Storage
-        let items = JSON.parse(localStorage.getItem("borrowItems")) || [];
-        items.push({ equipment_id: equipmentId, quantity_borrow });
-  
-        // บันทึกลง Local Storage
-        localStorage.setItem("borrowItems", JSON.stringify(items));
-  
-        // ✅ ถามว่าต้องการยืมทั้งหมดไหม?
-        const confirmBorrow = await swalWithBootstrapButtons.fire({
-          title: "ยืนยันการยืมทั้งหมด?",
-          text: "คุณต้องการยืมอุปกรณ์ทั้งหมดในรายการหรือไม่?",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonText: "ยืมทั้งหมด!",
-          cancelButtonText: "เพิ่มต่อ",
-        });
-  
-        if (confirmBorrow.isConfirmed) {
-          await axios.post(
-            `http://localhost:5000/api/borrowRecords/add`,
-            { user_id: user.user_id, items },
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-  
-          swalWithBootstrapButtons.fire({ title: "สำเร็จ!", text: "คุณได้ยืมอุปกรณ์เรียบร้อยแล้ว", icon: "success" });
-  
-          // ล้าง Local Storage และรีโหลดข้อมูล
-          localStorage.removeItem("borrowItems");
-          await fetchEquipment();
-          await fetchBorrowRecords();
+        items[existingItemIndex].quantity_borrow = newTotal;
+      } else {
+        if (quantityToBorrow > quantity) {
+          await swalWithBootstrapButtons.fire({
+            title: "จำนวนเกิน!",
+            text: `คุณไม่สามารถยืมได้เกิน ${quantity} ชิ้น`,
+            icon: "error",
+          });
+          return;
         }
+        items.push({ equipment_id: equipmentId, quantity_borrow: quantityToBorrow });
       }
-    } catch (error) {
-      console.error("Error borrowing equipment:", error);
+
+      // บันทึกรายการลง Local Storage
+      localStorage.setItem("borrowItems", JSON.stringify(items));
+
+      // หลังจากเพิ่มรายการใหม่แล้วให้แสดง popup เพื่อยืนยันการยืมรายการทั้งหมดใน Local Storage
+      const confirmBorrow = await swalWithBootstrapButtons.fire({
+        title: "ยืนยันการยืมทั้งหมด?",
+        text: "คุณต้องการยืมอุปกรณ์ทั้งหมดในรายการค้างอยู่หรือไม่?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "ยืมทั้งหมด!",
+        cancelButtonText: "เพิ่มต่อ",
+        reverseButtons: true,
+      });
+
+      if (confirmBorrow.isConfirmed) {
+        await axios.post(
+          `http://localhost:5000/api/borrowRecords/add`,
+          { user_id: user.user_id, items },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        await swalWithBootstrapButtons.fire({
+          title: "สำเร็จ!",
+          text: "คุณได้ยืมอุปกรณ์เรียบร้อยแล้ว",
+          icon: "success",
+        });
+        localStorage.removeItem("borrowItems");
+        await fetchEquipment();
+        await fetchBorrowRecords();
+      }
+      // หากเลือก "เพิ่มต่อ" ก็จะเก็บรายการไว้ใน Local Storage (ไม่ดำเนินการยืมทันที)
+    } else if (result.isDenied) {
+      // กรณีเลือก "ที่ยืมค้างอยู่" ให้เรียกฟังก์ชันดำเนินการยืมรายการค้างอยู่
+      await confirmBorrowFromStorage();
     }
-  };
-  
+    // หากเลือก "ยกเลิก!" (dismiss) ไม่ดำเนินการใด ๆ
+  } catch (error) {
+    console.error("Error borrowing equipment:", error);
+  }
+};
 
+// ฟังก์ชันสำหรับดำเนินการยืมรายการค้างอยู่ใน Local Storage
+const confirmBorrowFromStorage = async () => {
+  try {
+    const items = JSON.parse(localStorage.getItem("borrowItems")) || [];
+    const pendingCount = items.reduce(
+      (sum, item) => sum + item.quantity_borrow,
+      0
+    );
 
+    if (items.length === 0) {
+      return Swal.fire({
+        title: "ไม่มีรายการ",
+        text: "คุณยังไม่มีรายการอุปกรณ์ในรายการค้าง",
+        icon: "info",
+      });
+    }
 
+    let token = localStorage.getItem("token");
+    if (!user || !user.user_id) {
+      return Swal.fire({
+        title: "เกิดข้อผิดพลาด!",
+        text: "ไม่พบข้อมูลผู้ใช้ กรุณาล็อกอินใหม่",
+        icon: "error",
+      });
+    }
+
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton:
+          "bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded", // ยืมทั้งหมด!
+        denyButton:
+          "bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded",  // ลบรายการค้าง
+        cancelButton:
+          "bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded",    // ยกเลิก
+      },
+      buttonsStyling: true,
+    });
+
+    const result = await swalWithBootstrapButtons.fire({
+      title: `ยืนยันการยืมทั้งหมด (${pendingCount} ชิ้น)`,
+      text: "คุณต้องการยืมอุปกรณ์ทั้งหมดในรายการค้างหรือไม่?",
+      icon: "warning",
+      showCancelButton: true,
+      showDenyButton: true,
+      confirmButtonText: "ยืมทั้งหมด!",
+      denyButtonText: "ลบรายการค้าง",
+      cancelButtonText: "ยกเลิก",
+      reverseButtons: true,
+    });
+
+    if (result.isConfirmed) {
+      await axios.post(
+        `http://localhost:5000/api/borrowRecords/add`,
+        { user_id: user.user_id, items },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      await swalWithBootstrapButtons.fire({
+        title: "สำเร็จ!",
+        text: "คุณได้ยืมอุปกรณ์เรียบร้อยแล้ว",
+        icon: "success",
+      });
+      localStorage.removeItem("borrowItems");
+      await fetchEquipment();
+      await fetchBorrowRecords();
+    } else if (result.isDenied) {
+      // กรณีเลือก "ลบรายการค้าง"
+      localStorage.removeItem("borrowItems");
+      await swalWithBootstrapButtons.fire({
+        title: "ลบรายการค้างเรียบร้อยแล้ว",
+        text: "รายการอุปกรณ์ที่ยืมค้างถูกลบแล้ว",
+        icon: "success",
+      });
+    }
+    // หากเลือก "ยกเลิก" จะไม่ดำเนินการใดๆ
+  } catch (error) {
+    console.error("Error borrowing stored equipment:", error);
+  }
+};
 
 
 
@@ -165,7 +297,7 @@ function Home() {
   const totalPages = Math.ceil(filteredEquipment.length / itemsPerPage);
 
   return (
-    <div className="bg-white min-h-screen">
+    <div >
             <ScrollToTopButton />
     <div
       className="relative bg-fixed bg-center bg-no-repeat bg-cover min-h-[500px]"
@@ -240,7 +372,7 @@ function Home() {
   <>
   {user?.user_id ? (
     <button
-    onClick={() => handleClick(item.equipment_id, item.equipment_name, item.image)}
+    onClick={() => handleClick(item.equipment_id, item.equipment_name, item.image,item.quantity)}
     className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-medium text-white rounded-md shadow-sm bg-[#1B262C] hover:bg-slate-300 focus:ring-offset-2"
   >
     ยืมอุปกรณ์

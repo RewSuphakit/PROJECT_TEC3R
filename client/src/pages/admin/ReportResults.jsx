@@ -14,8 +14,17 @@ function ReportResults() {
     const fetchReports = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/stats/reports');
-        // หาก key จริงใน response เป็น borrow_transactions ให้แก้ไขตรงนี้
-        setReports(response.data.borrow_transactions || []);
+        let filteredTransactions = [];
+        if (response.data && Array.isArray(response.data.borrow_transactions)) {
+          // กรองเฉพาะ transaction ที่อุปกรณ์ทั้งหมดถูกคืน (status = "Returned")
+          filteredTransactions = response.data.borrow_transactions.filter(
+            (transaction) =>
+              transaction.borrow_records.every(
+                (record) => record.status.toLowerCase() === "returned"
+              )
+          );
+        }
+        setReports(filteredTransactions);
       } catch (err) {
         console.error("Error fetching report results:", err);
         setError("Failed to load report results. Please try again later.");
@@ -24,9 +33,10 @@ function ReportResults() {
         setLoading(false);
       }
     };
-
+  
     fetchReports();
   }, []);
+  
 
   // กรองรายงานตามเดือนที่เลือก
   // ถ้า selectedMonth เป็นค่าว่าง แสดงทั้งหมด
@@ -58,8 +68,8 @@ function ReportResults() {
   }
 
   return (
-    <div className="container lg:pl-72 mx-auto py-8">
-
+    <div className="min-h-screen container mx-auto py-8">
+      <div className="lg:pl-72">
       <div className="flex justify-between items-center mb-8">
             <div>
               <h1 className="text-2xl font-bold text-gray-800">📅 รายงาน</h1>
@@ -99,7 +109,7 @@ function ReportResults() {
               <tr className="bg-gray-200">
                 <th className="py-2 px-4 border-b">รหัสรายงาน</th>
                 <th className="py-2 px-4 border-b">ชื่อผู้ยืม</th>
-                <th className="py-2 px-4 border-b">วันที่คืน</th>
+                <th className="py-2 px-4 border-b">สถานะ</th>
                 <th className="py-2 px-4 border-b">รายละเอียด</th>
               </tr>
             </thead>
@@ -107,16 +117,9 @@ function ReportResults() {
               {filteredReports.map(report => (
                 <tr key={report.transaction_id} className="hover:bg-gray-100">
                   <td className="py-2 px-4 border-b text-center">{report.transaction_id}</td>
-                  <td className="py-2 px-4 border-b">{report.student_name}</td>
+                  <td className="py-2 px-4 border-b text-center">{report.student_name}</td>
                   <td className="py-2 px-4 border-b text-center">
-                    {new Date(report.return_date).toLocaleString('th-TH', {
-                      timeZone: 'Asia/Bangkok',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
+                    {(report.return_date) ? <span className="text-green-500">คืนแล้ว</span> : <span className="text-red-500">ยังไม่คืน</span>}
                   </td>
                   <td className="py-2 px-4 border-b text-center">
                     <Link
@@ -132,6 +135,7 @@ function ReportResults() {
           </table>
         </div>
       )}
+    </div>
     </div>
   );
 }

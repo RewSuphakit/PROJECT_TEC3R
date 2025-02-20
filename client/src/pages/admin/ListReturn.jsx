@@ -203,7 +203,7 @@ function ListReturn() {
                             hiddenItems.map((item) => (
                               <tr key={item.record_id}>
                                 <td className="py-4 px-2 text-center">
-                                  {item.student_name}
+                                  {/* {item.student_name} */}
                                 </td>
                                 <td className="py-4 px-2 text-center">
                                   {item.equipment_name}
