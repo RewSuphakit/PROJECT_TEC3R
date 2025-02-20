@@ -121,7 +121,7 @@ exports.login = async (req, res) => {
   exports.getUserProfile = async (req, res) => {
     try {
       const { user_id, student_id, student_name, year_of_study, student_email, password, phone, role } = req.user;
-  
+    
       // ตรวจสอบว่า role มีอยู่ในข้อมูลหรือไม่
       if (!role) {
         return res.status(400).json({ error: 'Role is missing in the user profile' });
@@ -197,32 +197,44 @@ exports.deleteUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { user_id } = req.params;
-    const { student_id, student_name, year_of_study, student_email, password, phone } = req.body;
-    const { role } = req.user;
+    const { student_id, student_name, year_of_study, student_email, password, phone,role } = req.body;
+  
 
-    // ตรวจสอบ role
-    if (role !== 'admin') {
-      return res.status(403).json({ error: 'Unauthorized: Invalid user role' });
+    let updateQuery = `
+      UPDATE users
+      SET student_id = ?,
+          student_name = ?,
+          year_of_study = ?,
+          student_email = ?,
+          phone = ?,
+          role = ?
+    `;
+    const values = [student_id, student_name, year_of_study, student_email, phone,role];
+
+    // หากมีการส่ง password เข้ามา ให้แฮชและรวมลงใน query
+    if (password && password.trim() !== '') {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updateQuery += `, password = ? `;
+      values.push(hashedPassword);
     }
 
-    connection.query(
-      'UPDATE users SET student_id = ?, student_name = ?, year_of_study = ?, student_email = ?, password = ?, phone = ? WHERE user_id = ?',
-      [student_id, student_name, year_of_study, student_email, password, phone, user_id],
-      (err, results) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).json({ error: 'Internal Server Error' });
-        }
+    updateQuery += `WHERE user_id = ?`;
+    values.push(user_id);
 
-        if (results.affectedRows === 0) {
-          return res.status(404).json({ error: 'User not found' });
-        }
-
-        res.status(200).json({ message: 'User updated successfully' });
+    connection.query(updateQuery, values, (err, results) => {
+      if (err) {
+        console.error('Update query error:', err);
+        return res.status(500).json({ error: 'Internal Server Error' });
       }
-    );
+
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      res.status(200).json({ message: 'User updated successfully' });
+    });
   } catch (error) {
-    console.error(error);
+    console.error('Error in updateUser:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };

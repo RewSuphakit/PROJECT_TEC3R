@@ -35,6 +35,7 @@ module.exports = async (req, res, next) => {
 
     // ✅ เพิ่มข้อมูลผู้ใช้ใน req.user
     req.user = rows[0];
+
     next();
   } catch (err) {
     console.error('Error in authentication middleware:', err.message || err);

@@ -26,14 +26,14 @@ function Herderadmin() {
       {/* Overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-10 lg:hidden"
           onClick={toggleSidebar}
         />
       )}
 
       {/* Sidebar */}
       <aside className={`w-72 bg-white shadow-xl fixed h-full transition-all duration-300 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 z-10`}>
-        <div className="p-6 border-b border-gray-100">
+        <div className="p-6 border-b ">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
               <i className="fas fa-boxes text-lg" style={{ color: '#0F4C75' }} />
@@ -105,7 +105,7 @@ function Herderadmin() {
       <div className="lg:pl-72">
         <nav className="bg-white shadow-sm sticky top-0 z-40">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="flex items-center justify-between h-16">
+            <div className="flex items-center justify-between h-16  ">
               <div className="flex items-center gap-6">
                 <button
                   onClick={toggleSidebar}

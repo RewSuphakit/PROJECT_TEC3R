@@ -153,8 +153,9 @@ function ManageTools() {
   const totalPages = Math.ceil(tools.length / toolsPerPage);
 
   return (
-    <div className="min-h-screen container mx-auto py-8">
+    <div className="min-h-screen bg-gray-50 font-[Kanit]">
       <div className="lg:pl-72">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">🧰 จัดการอุปกรณ์</h1>
@@ -298,6 +299,7 @@ function ManageTools() {
           />
         )}
       </div>
+    </div>
     </div>
   );
 }

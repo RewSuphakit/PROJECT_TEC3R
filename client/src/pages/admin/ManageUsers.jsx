@@ -11,10 +11,10 @@ function ManageUsers() {
   const [userToDelete, setUserToDelete] = useState(null);
   const [userToEdit, setUserToEdit] = useState(null);
 
-  useEffect(() => {
+
     const fetchUsers = async () => {
       try {
-        let token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         const response = await axios.get("http://localhost:5000/api/users/users", {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -22,18 +22,20 @@ function ManageUsers() {
       } catch (error) {
         console.error("Error fetching users:", error);
         toast.error("เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้");
-        setUsers([]); 
+        setUsers([]);
       }
-    };
+    }; 
+     useEffect(() => {
     fetchUsers();
   }, []);
+
   const deleteUser = async (userId) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       await axios.delete(`http://localhost:5000/api/users/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setUsers(users.filter(user => user.user_id !== userId));
+      setUsers(users.filter((user) => user.user_id !== userId));
       toast.success("ลบผู้ใช้สำเร็จ");
       setDeleteModalOpen(false);
     } catch (error) {
@@ -50,7 +52,52 @@ function ManageUsers() {
       }
     }
   };
-  
+
+  const updateUser = async (userId, userData) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(`http://localhost:5000/api/users/users/${userId}`, userData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // อัปเดตข้อมูลใน state หากต้องการให้ข้อมูลบนหน้าจอเปลี่ยนแปลงทันที
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.user_id === userId ? { ...user, ...userData } : user
+        )
+      );
+      fetchUsers();
+      toast.success("แก้ไขผู้ใช้สำเร็จ");
+      setEditModalOpen(false);
+      setUserToEdit(null);
+    } catch (error) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          toast.error("ไม่ได้รับอนุญาต: กรุณาเข้าสู่ระบบใหม่");
+        } else if (error.response.status === 403) {
+          toast.error("ไม่มีสิทธิ์ในการแก้ไขผู้ใช้นี้");
+        } else {
+          toast.error(`เกิดข้อผิดพลาด: ${error.response.data.error}`);
+        }
+      } else {
+        toast.error("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์");
+      }
+    }
+  };
+
+  // ฟังก์ชันสำหรับจัดการ submit ของแบบฟอร์มแก้ไข
+  const handleEditSubmit = (e) => {
+    e.preventDefault();
+    const updatedUser = {
+      student_id: e.target.student_id.value,
+      year_of_study: e.target.year_of_study.value,
+      student_name: e.target.student_name.value,
+      student_email: e.target.student_email.value,
+      password: e.target.password.value,
+      phone: e.target.phone.value,
+      role: e.target.role.value,
+    };
+    updateUser(userToEdit.user_id, updatedUser);
+  };
 
   const openDeleteModal = (user) => {
     setUserToDelete(user);
@@ -72,21 +119,24 @@ function ManageUsers() {
     setUserToEdit(null);
   };
 
-  const currentUsers = (users ?? []).slice((currentPage - 1) * usersPerPage, currentPage * usersPerPage);
+  const currentUsers = (users ?? []).slice(
+    (currentPage - 1) * usersPerPage,
+    currentPage * usersPerPage
+  );
   const totalPages = Math.ceil(users.length / usersPerPage);
 
   return (
-    <div className="min-h-screen container mx-auto py-8">
+    <div className="min-h-screen bg-gray-50 font-[Kanit]">
       <div className="lg:pl-72">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">⚙️ จัดการผู้ใช้</h1>
-              <p className="text-sm text-gray-500 mt-1">
-                 คุณสามารถดูและจัดการผู้ใช้ทั้งหมดในระบบได้ที่นี่
-              </p>
-            </div>
-           
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">⚙️ จัดการผู้ใช้</h1>
+            <p className="text-sm text-gray-500 mt-1">
+              คุณสามารถดูและจัดการผู้ใช้ทั้งหมดในระบบได้ที่นี่
+            </p>
           </div>
+        </div>
         {/* ตารางข้อมูล */}
         <div className="overflow-auto shadow-lg rounded-lg bg-white p-4">
           <table className="table w-full">
@@ -105,8 +155,11 @@ function ManageUsers() {
             </thead>
             <tbody>
               {currentUsers.length ? (
-                currentUsers.map(user => (
-                  <tr key={user.user_id} className="hover:bg-gray-100 transition-colors duration-300  ">
+                currentUsers.map((user) => (
+                  <tr
+                    key={user.user_id}
+                    className="hover:bg-gray-100 transition-colors duration-300"
+                  >
                     <td className="py-4 px-2 text-center">{user.student_id}</td>
                     <td className="py-4 px-2">{user.student_name}</td>
                     <td className="py-4 px-2 text-center">{user.year_of_study}</td>
@@ -114,19 +167,20 @@ function ManageUsers() {
                     <td className="py-4 px-2 text-center">{user.password}</td>
                     <td className="py-4 px-2 text-center">{user.phone}</td>
                     <td className="py-4 px-2 text-center">
-                   
-  <div className={`badge ${user.role === "admin" ? "badge-error gap-2" : "badge-success gap-2"}`}>
-    {user.role === "admin"? "ผู้ดูแลระบบ" : "ผู้ใช้ทั่วไป"}
-  </div>
- 
-
-                      {/* <div className="  ">
-                        {user.role === "admin" ?  "ผู้ดูแลระบบ" : "ผู้ใช้ทั่วไป"}
-                      </div> */}
-                      
-                      </td>
+                      <div
+                        className={`badge ${
+                          user.role === "admin"
+                            ? "badge-error "
+                            : "badge-info "
+                        }`}
+                      >
+                        {user.role === "admin"
+                          ? "admin "
+                          : "user"  }
+                      </div>
+                    </td>
                     <td className="py-4 px-2 text-center">
-                      <button 
+                      <button
                         onClick={() => openEditModal(user)}
                         className="btn btn-sm btn-info rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-300"
                       >
@@ -134,7 +188,7 @@ function ManageUsers() {
                       </button>
                     </td>
                     <td className="py-4 px-2 text-center">
-                      <button 
+                      <button
                         onClick={() => openDeleteModal(user)}
                         className="btn btn-sm btn-error rounded-lg shadow-md hover:bg-red-600 transition-colors duration-300"
                       >
@@ -145,7 +199,10 @@ function ManageUsers() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="9" className="text-center py-4 text-lg text-gray-500">
+                  <td
+                    colSpan="9"
+                    className="text-center py-4 text-lg text-gray-500"
+                  >
                     ไม่มีข้อมูลผู้ใช้
                   </td>
                 </tr>
@@ -188,16 +245,18 @@ function ManageUsers() {
           <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
             <div className="bg-white p-6 rounded-lg max-w-md w-full shadow-lg">
               <h2 className="text-xl font-semibold mb-4">ยืนยันการลบ</h2>
-              <p>คุณต้องการลบผู้ใช้ {userToDelete?.student_name} ใช่หรือไม่?</p>
+              <p>
+                คุณต้องการลบผู้ใช้ {userToDelete?.student_name} ใช่หรือไม่?
+              </p>
               <div className="mt-4 flex justify-end">
-                <button 
-                  onClick={closeDeleteModal} 
+                <button
+                  onClick={closeDeleteModal}
                   className="btn btn-outline btn-sm mr-2"
                 >
                   ยกเลิก
                 </button>
-                <button 
-                  onClick={() => deleteUser(userToDelete?.user_id)} 
+                <button
+                  onClick={() => deleteUser(userToDelete?.user_id)}
                   className="btn btn-error btn-sm"
                 >
                   ลบ
@@ -208,27 +267,91 @@ function ManageUsers() {
         )}
 
         {/* Edit Modal */}
-        {editModalOpen && (
+        {editModalOpen && userToEdit && (
           <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
             <div className="bg-white p-6 rounded-lg max-w-md w-full shadow-lg">
               <h2 className="text-xl font-semibold mb-4">แก้ไขผู้ใช้</h2>
-              <form>
+              <form onSubmit={handleEditSubmit}>
                 <div className="mb-4">
-                  <label className="block text-sm font-semibold">ชื่อนักศึกษา</label>
+                  <label className="block text-sm font-semibold">
+                    รหัสนักศึกษา
+                  </label>
+                  <input
+                  type="text"
+                  name="student_id"
+                  defaultValue={userToEdit?.student_id}
+                  className="input input-bordered w-full py-2 px-3 rounded-lg border border-gray-300"
+                />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-semibold">
+                    ชื่อนักศึกษา
+                  </label>
                   <input
                     type="text"
+                    name="student_name"
                     defaultValue={userToEdit?.student_name}
                     className="input input-bordered w-full py-2 px-3 rounded-lg border border-gray-300"
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-semibold">อีเมลนักศึกษา</label>
+                  <label className="block text-sm font-semibold">
+                    ระดับชั้น
+                  </label>
+                  <input
+                    type="text"
+                    name="year_of_study"
+                    defaultValue={userToEdit?.year_of_study}
+                    className="input input-bordered w-full py-2 px-3 rounded-lg border border-gray-300"
+                  />
+                </div>
+                
+                <div className="mb-4">
+                  <label className="block text-sm font-semibold">
+                    อีเมลนักศึกษา
+                  </label>
                   <input
                     type="email"
+                    name="student_email"
                     defaultValue={userToEdit?.student_email}
                     className="input input-bordered w-full py-2 px-3 rounded-lg border border-gray-300"
                   />
                 </div>
+                <div className="mb-4">
+                <label className="block text-sm font-semibold">
+                  รหัสผ่าน
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    defaultValue={userToEdit?.password}
+                    className="input input-bordered w-full py-2 px-3 rounded-lg border border-gray-300"
+                  />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-semibold">
+                      เบอร์ติดต่อ
+                    </label>
+                    <input
+                      type="text"
+                      name="phone"
+                      defaultValue={userToEdit?.phone}
+                      className="input input-bordered w-full py-2 px-3 rounded-lg border border-gray-300"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-semibold">
+                      ระดับผู้ใช้
+                    </label>
+                    <select
+                    name="role"
+                    defaultValue={userToEdit?.role}
+                    className="select select-bordered w-full py-2 px-3 rounded-lg border border-gray-300"
+                  >
+                    <option value="user">นักศึกษา</option>
+                    <option value="admin">ดูแลระบบ</option>
+                    </select>
+                  </div>
                 <div className="flex justify-end">
                   <button
                     onClick={closeEditModal}
@@ -237,10 +360,7 @@ function ManageUsers() {
                   >
                     ยกเลิก
                   </button>
-                  <button
-                    type="submit"
-                    className="btn btn-primary btn-sm"
-                  >
+                  <button type="submit" className="btn btn-primary btn-sm">
                     บันทึก
                   </button>
                 </div>
@@ -248,8 +368,8 @@ function ManageUsers() {
             </div>
           </div>
         )}
-
       </div>
+    </div>
     </div>
   );
 }
