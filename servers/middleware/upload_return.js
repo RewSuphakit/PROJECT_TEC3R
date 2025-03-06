@@ -46,7 +46,7 @@ const compressImage_return = async (req, res, next) => {
 
     // ใช้ sharp บีบอัดไฟล์และบันทึกลงดิสก์
     await sharp(req.file.buffer)
-      .resize(800) // ปรับขนาดภาพ
+      .resize(774, 776, { fit: 'fill' }) // ปรับขนาดภาพ
       .jpeg({ quality: 80 }) // บีบอัดเป็น .jpg คุณภาพ 80%
       .toFile(outputPath);
 

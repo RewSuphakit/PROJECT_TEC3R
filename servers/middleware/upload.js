@@ -34,13 +34,14 @@ const compressImage = (req, res, next) => {
 
   // บีบอัดไฟล์
   sharp(req.file.buffer)  // ใช้ไฟล์ที่เก็บในหน่วยความจำ
-    .resize(800)  // ปรับขนาดถ้าต้องการ
+    .resize(774, 776, { fit: 'fill' })  // ปรับขนาดภาพให้ตรงตามที่กำหนด (774x776)
     .jpeg({ quality: 80 })  // บีบอัดไฟล์ภาพเป็น .jpg พร้อมลดคุณภาพ (80%)
     .toFile(outputPath, (err, info) => {
       if (err) {
         console.error('Error during image compression:', err);
         return res.status(500).json({ message: 'Error during image compression' });
       }
+
 
       // เก็บเส้นทางไฟล์ที่บีบอัดไว้ใน req.file เพื่อใช้ต่อ
       req.file.path = outputPath;

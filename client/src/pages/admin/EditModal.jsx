@@ -35,7 +35,6 @@ const EditModal = ({ tool, onSubmit, onCancel }) => {
               name="equipment_name"
               defaultValue={tool?.equipment_name}
               className="input input-bordered w-full"
-              required
             />
           </div>
           <div className="form-control mb-4">
@@ -47,7 +46,6 @@ const EditModal = ({ tool, onSubmit, onCancel }) => {
               name="description"
               defaultValue={tool?.description}
               className="input input-bordered w-full"
-              required
             />
           </div>
           <div className="form-control mb-4">
@@ -60,7 +58,6 @@ const EditModal = ({ tool, onSubmit, onCancel }) => {
               defaultValue={tool?.quantity}
               className="input input-bordered w-full"
               min="1"
-              required
             />
           </div>
          
@@ -72,7 +69,7 @@ const EditModal = ({ tool, onSubmit, onCancel }) => {
                       type="file"
                       accept="image/*"
                       className="file-input file-input-bordered w-full"
-                      required
+                      name="image"
                       onChange={handleFileChange}
                     />
                   </div>

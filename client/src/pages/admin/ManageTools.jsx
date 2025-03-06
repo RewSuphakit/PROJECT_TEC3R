@@ -85,7 +85,7 @@ function ManageTools() {
           description: e.target.description.value,
           quantity: e.target.quantity.value,
           // Optionally, update image if needed. If no new image selected, currentTool.image remains.
-          image: e.target.image.files[0] ? currentTool.image : currentTool.image,
+          image: e.target.image ? currentTool.image : currentTool.image,
         };
       }
       fetchTools();

@@ -62,7 +62,9 @@ function ReportDetails() {
 
   return (
 
-    <div className=" container lg:pl-72 mx-auto py-9  pb-3.5 space-y-4 ">
+<div className="min-h-screen bg-gray-50 font-[Kanit]">
+      <div className="lg:pl-72">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <h1 className="text-3xl font-bold text-gray-800 text-center">รายงานหมายเลข {transaction_id}</h1>
       <div className="flex flex-col sm:flex-row justify-between  mb-6">
       <div className=" p-4 ">
@@ -145,6 +147,8 @@ function ReportDetails() {
           </Link>
         </div>
       </div>
+    </div>
+    </div>
     </div>
   );
 }

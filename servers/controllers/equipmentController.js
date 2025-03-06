@@ -72,9 +72,8 @@ exports.updateEquipmentStatus = (req, res) => {
 exports.updateEquipment = (req, res) => {
   const { id } = req.params;
   const { equipment_name, description, quantity } = req.body;
-  const image = req.file ? req.file.filename : '';
+  const newImage = req.file ? req.file.filename : null;
 
-  // ดึงข้อมูลอุปกรณ์เดิมจากฐานข้อมูล
   const query = 'SELECT * FROM equipment WHERE equipment_id = ?';
   connection.query(query, [id], (err, results) => {
     if (err) return res.status(500).json({ message: 'Server error' });
@@ -82,20 +81,14 @@ exports.updateEquipment = (req, res) => {
       return res.status(404).json({ message: 'Equipment not found' });
     }
 
-    const oldImage = results[0].image; // เก็บชื่อไฟล์เก่าไว้
+    const oldImage = results[0].image;
 
-    // ถ้ามีการอัปเดตไฟล์ภาพ (มีไฟล์ใหม่) และมีไฟล์เก่าอยู่
-    if (image && oldImage) {
+    // ถ้ามีการอัปโหลดไฟล์ใหม่ ให้ลบรูปเก่า
+    if (newImage && oldImage) {
       const filePath = path.join(__dirname, '..', 'uploads', oldImage);
-      // ใช้ fs.access ตรวจสอบว่าไฟล์มีอยู่หรือไม่
       fs.access(filePath)
-        .then(() => {
-          // ถ้ามีอยู่ ให้ลบไฟล์
-          return fs.unlink(filePath);
-        })
-        .then(() => {
-          console.log('Old image deleted successfully');
-        })
+        .then(() => fs.unlink(filePath))
+        .then(() => console.log('Old image deleted successfully'))
         .catch((err) => {
           if (err.code === 'ENOENT') {
             console.log('File does not exist, skipping deletion.');
@@ -105,13 +98,15 @@ exports.updateEquipment = (req, res) => {
         });
     }
 
-    // อัปเดตข้อมูลอุปกรณ์ในฐานข้อมูล
+    // ใช้รูปเดิมถ้าไม่มีการอัปโหลดใหม่
+    const updatedImage = newImage || oldImage;
+
     const updateQuery = `
       UPDATE equipment
       SET equipment_name = ?, description = ?, quantity = ?, image = ?
       WHERE equipment_id = ?
     `;
-    connection.query(updateQuery, [equipment_name, description, quantity, image, id], (err, results) => {
+    connection.query(updateQuery, [equipment_name, description, quantity, updatedImage, id], (err, results) => {
       if (err) {
         console.error(err);
         return res.status(500).json({ message: 'Server error' });
@@ -120,6 +115,7 @@ exports.updateEquipment = (req, res) => {
     });
   });
 };
+
 
 // อัปเดตสถานะของอุปกรณ์ (เฉพาะ status)
 // Endpoint นี้จะใช้สำหรับ toggle สถานะ โดยไม่กระทบกับข้อมูลอื่น ๆ
