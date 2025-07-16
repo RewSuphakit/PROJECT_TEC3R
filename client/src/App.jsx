@@ -6,7 +6,7 @@ function App() {
   const { loading } = useAuth();
   return (
    
-    <div>
+    <>
     {loading ? (
       <span className="loading loading-bars loading-lg"></span>
     ) : (
@@ -15,7 +15,7 @@ function App() {
         <AppRouter />
       </>
     )}
-  </div>
+  </>
 
   );
 }

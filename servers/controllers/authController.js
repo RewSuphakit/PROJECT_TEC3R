@@ -157,7 +157,9 @@ exports.login = async (req, res) => {
           console.error(err);
           return res.status(500).json({ error: 'Internal Server Error' });
         }
-        // ✅ ส่งข้อมูลแบบมี key "users" ให้ React
+        if (results.length === 0) {
+          return res.status(404).json({ message: 'No users found' });
+        }
         res.status(200).json({ users: results });
       });
     } catch (error) {

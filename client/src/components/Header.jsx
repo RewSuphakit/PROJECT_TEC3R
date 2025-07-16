@@ -1,5 +1,6 @@
 import logofix from '../assets/logofix.png'
 import register from '../assets/register.png'
+import icon from '../assets/rmutikkc.png'
 import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import axios from 'axios';
@@ -83,7 +84,21 @@ function Header() {
       {/* Logo Section */}
       <div className="flex items-center">
         <a href="/RMUTI/" className="flex items-center">
-          <img className="rounded-md " src={logofix} alt="logo" />
+        <div className="flex flex-col ">
+        <div>
+          <div className="text-5xl font-bold text-orange-500">RMUTI</div>
+          {/* <div><img className="rounded-md w-16 h-16" src={icon} alt="logo" /></div> */}
+        </div>
+      
+        
+          <div className="flex items-center space-x-2">   
+            <p className="text-sm text-black-100 font-bold">ระบบการยืม-คืนอุปกรณ์ชุดฝึกการเรียนการสอน</p>
+            </div>
+         <div className="flex items-center space-x-2">
+          <p className="text-sm text-black-100 font-bold">ใช้งานในสาขาครุศาสตร์อุตสาหกรรมคอมพิวเตอร์</p>
+          </div>
+         </div>
+          {/* <img className="rounded-md " src={logofix} alt="logo" /> */}
         </a>
       </div>
       

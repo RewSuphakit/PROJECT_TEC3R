@@ -7,6 +7,8 @@ import EditModal from "./EditModal";
 
 function ManageTools() {
   const [tools, setTools] = useState([]);
+  const [popupImage, setPopupImage] = useState(null);
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [currentPage, setCurrentPage] = useState(1);
   const toolsPerPage = 5;
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -152,8 +154,18 @@ function ManageTools() {
   );
   const totalPages = Math.ceil(tools.length / toolsPerPage);
 
+  // ฟังก์ชันสำหรับ mouse events
+  const handleImageMouseEnter = (e, imageUrl) => {
+    const rect = e.target.getBoundingClientRect();
+    setPopupImage(imageUrl);
+    setPopupPosition({ x: rect.right + 10, y: rect.top });
+  };
+  const handleImageMouseLeave = () => {
+    setPopupImage(null);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 font-[Kanit]">
+    <div className="relative">
       <div className="lg:pl-72">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
@@ -218,7 +230,9 @@ function ManageTools() {
                       <img
                         src={`http://localhost:5000/uploads/${tool.image}`}
                         alt={tool.equipment_name}
-                        className="w-16 h-16 rounded-lg object-cover border"
+                        className="w-16 h-16 rounded-lg object-cover border cursor-pointer"
+                        onMouseEnter={(e) => handleImageMouseEnter(e, `http://localhost:5000/uploads/${tool.image}`)}
+                        onMouseLeave={handleImageMouseLeave}
                       />
                     </td>
                     <td className="py-4 px-2 text-center">
@@ -280,6 +294,30 @@ function ManageTools() {
             »
           </button>
         </div>
+
+        {/* Popup Image Preview */}
+        {popupImage && (
+          <div
+            style={{
+              position: "fixed",
+              left: popupPosition.x,
+              top: popupPosition.y,
+              zIndex: 1000,
+              background: "rgba(255,255,255,0.95)",
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+              padding: "8px"
+            }}
+            onMouseLeave={handleImageMouseLeave}
+          >
+            <img
+              src={popupImage}
+              alt="popup"
+              style={{ width: "320px", height: "320px", objectFit: "contain", borderRadius: "8px" }}
+            />
+          </div>
+        )}
 
         {/* Render DeleteModal if open */}
         {deleteModalOpen && toolToDelete && (

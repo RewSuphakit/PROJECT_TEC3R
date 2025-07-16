@@ -16,6 +16,7 @@ app.use('/api/equipment', equipmentRoutes);
 app.use('/api/borrowRecords', borrowRecordsRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/stats', StatsSection);
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

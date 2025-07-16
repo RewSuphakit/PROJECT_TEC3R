@@ -7,7 +7,6 @@ function ReportDetails() {
   const [borrowRecords, setBorrowRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   // useRef เพื่ออ้างอิงส่วนที่ต้องการพิมพ์ (สำหรับ Export as PDF)
   const printRef = useRef();
 
@@ -62,7 +61,7 @@ function ReportDetails() {
 
   return (
 
-<div className="min-h-screen bg-gray-50 font-[Kanit]">
+<div className=" ">
       <div className="lg:pl-72">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <h1 className="text-3xl font-bold text-gray-800 text-center">รายงานหมายเลข {transaction_id}</h1>
@@ -118,7 +117,7 @@ function ReportDetails() {
                 <td className="py-2  border-b  flex justify-center"><img
                                 src={`http://localhost:5000/image_return/${record.image_return}`}
                                 alt="Returned"
-                                className="h-16 w-16 rounded-lg object-cover"  
+                                className="h-16 w-16 rounded-lg object-cover "  
                               /></td>
 
                 <td className="py-2 px-4 border-b text-center">
