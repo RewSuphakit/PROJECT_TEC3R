@@ -157,7 +157,6 @@ function ManageUsers() {
                   <th>ชื่อนักศึกษา</th>
                   <th>ระดับชั้น</th>
                   <th>อีเมลนักศึกษา</th>
-                  <th>รหัส</th>
                   <th>เบอร์</th>
                   <th>ระดับผู้ใช้</th>
                   <th>แก้ไข</th>
@@ -181,7 +180,7 @@ function ManageUsers() {
                       <td className="py-4 px-2 text-center">
                         {user.student_email}
                       </td>
-                      <td className="py-4 px-2 text-center">{user.password}</td>
+                     
                       <td className="py-4 px-2 text-center">{user.phone}</td>
                       <td className="py-4 px-2 text-center">
                         <div
@@ -343,8 +342,8 @@ function ManageUsers() {
                   </div>
 
                   {/* รหัสผ่าน */}
-                  <div className="flex flex-col">
-                    <label className="block text-sm font-semibold">
+                  <div className="flex flex-col ">
+                    <label className="block text-sm font-semibold ">
                       รหัสผ่าน
                     </label>
                     <input
