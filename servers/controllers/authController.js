@@ -172,7 +172,7 @@ exports.login = async (req, res) => {
 // Backend: Controller
 exports.deleteUser = async (req, res) => {
   try {
-    const { user_id } = req.params; // ✅ ดึงจาก req.params ตรง ๆ
+    const { user_id } = req.params; 
     
     connection.query(
       'DELETE FROM users WHERE user_id = ?', 

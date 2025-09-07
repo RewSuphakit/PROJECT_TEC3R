@@ -183,9 +183,8 @@ function ManageTools() {
               <tr className="text-sm font-semibold text-gray-700 text-center">
                 <th>รหัส</th>
                 <th>ชื่อ</th>
-                <th>รายละเอียด</th>
                 <th>มีอยู่</th>
-                <th>สถานะ</th>
+                <th>สถานะ ไม่พร้อมใช้งาน-พร้อมใช้งาน</th>
                 <th>รูป</th>
                 <th>จัดการ</th>
               </tr>
@@ -199,7 +198,6 @@ function ManageTools() {
                   >
                     <td className="py-4 px-2 text-center">{tool.equipment_id}</td>
                     <td className="py-4 px-2 text-center">{tool.equipment_name}</td>
-                    <td className="py-4 px-2 text-center">{tool.description}</td>
                     <td className="py-4 px-2 text-center">{tool.quantity}</td>
                     <td className="py-4 px-2 text-center">
                       <div

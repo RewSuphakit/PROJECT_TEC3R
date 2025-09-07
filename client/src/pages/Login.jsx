@@ -64,7 +64,7 @@ const Login = () => {
   };
 
   return (
-        <div className="flex items-center justify-center bg-gray-100" style={{ minHeight: '80vh' }}>
+        <div className="flex items-center justify-center " style={{ minHeight: '80vh', backgroundColor: '#F5F5F5' }}>
       <div className="w-full max-w-md px-4">
         <div className="bg-white p-8 rounded-lg shadow-md ">
           <form onSubmit={handleLogin} className="space-y-6">

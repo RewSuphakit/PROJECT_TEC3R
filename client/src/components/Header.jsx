@@ -16,24 +16,24 @@ function Header() {
   const userMenu = user?.user_id && (
     <>
      <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2 ">
-    <a href="#" className="flex items-center gap-3 truncate">
+    <Link to="/RMUTI/EditProfile" className="flex items-center gap-3 truncate">
       <img
         className="w-6 h-6"
         src="https://img.icons8.com/?size=100&id=98957&format=png&color=374151"
         alt="user icon"
       />
       ชื่อผู้ใช้: {user?.student_name}
-    </a>
+    </Link>
   </li>
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-    <a href="#" className="flex items-center gap-3">
+    <Link to ="#" className="flex items-center gap-3">
       <img
         className="w-6 h-6"
         src="https://img.icons8.com/?size=100&id=59835&format=png&color=374151"
         alt="email icon"
       />
       อีเมลผู้ใช้งาน: {user?.student_email}
-    </a>
+    </Link>
   </li>
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
     <a href="/RMUTI/Return" className="flex justify-start  gap-3">

@@ -389,6 +389,7 @@ function ManageUsers() {
                     >
                       <option value="user">นักศึกษา</option>
                       <option value="admin">ดูแลระบบ</option>
+                      <option value="teacher">อาจารย์</option>
                     </select>
                   </div>
 

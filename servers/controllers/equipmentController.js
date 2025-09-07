@@ -5,11 +5,11 @@ const sharp = require('sharp');
 
 // เพิ่มอุปกรณ์
 exports.addEquipment = (req, res) => {
-  const { equipment_name, description, quantity } = req.body;
+  const { equipment_name,  quantity } = req.body;
   const image = req.file ? req.file.filename : '';  // ใช้ไฟล์ที่อัพโหลดหรือค่าว่าง
 
-  const query = 'INSERT INTO equipment (equipment_name, description, quantity, image) VALUES (?, ?, ?, ?)';
-  connection.query(query, [equipment_name, description, quantity, image], (err, result) => {
+  const query = 'INSERT INTO equipment (equipment_name,  quantity, image) VALUES (?, ?, ?, ?)';
+  connection.query(query, [equipment_name,  quantity, image], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Server error' });
@@ -71,7 +71,7 @@ exports.updateEquipmentStatus = (req, res) => {
 // อัปเดตข้อมูลอุปกรณ์ (รวมการอัปเดตไฟล์ภาพ)
 exports.updateEquipment = (req, res) => {
   const { id } = req.params;
-  const { equipment_name, description, quantity } = req.body;
+  const { equipment_name,  quantity } = req.body;
   const newImage = req.file ? req.file.filename : null;
 
   const query = 'SELECT * FROM equipment WHERE equipment_id = ?';
@@ -103,10 +103,10 @@ exports.updateEquipment = (req, res) => {
 
     const updateQuery = `
       UPDATE equipment
-      SET equipment_name = ?, description = ?, quantity = ?, image = ?
+      SET equipment_name = ?,  quantity = ?, image = ?
       WHERE equipment_id = ?
     `;
-    connection.query(updateQuery, [equipment_name, description, quantity, updatedImage, id], (err, results) => {
+    connection.query(updateQuery, [equipment_name,  quantity, updatedImage, id], (err, results) => {
       if (err) {
         console.error(err);
         return res.status(500).json({ message: 'Server error' });
