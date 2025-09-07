@@ -299,7 +299,6 @@ exports.getAllBorrowRecordsByUserId = async (req, res) => {
         e.equipment_id,
         e.image,
         e.equipment_name,
-        e.description,
         br.borrow_date,
         br.status,
         br.quantity_borrow,
@@ -390,7 +389,7 @@ exports.getAllBorrowRecordsID = async (req, res) => {
   try {
     const query = `
       SELECT br.record_id, u.student_id, u.student_name, u.student_email, 
-             e.equipment_name, e.description, br.borrow_date, br.return_date, 
+             e.equipment_name,  br.borrow_date, br.return_date, 
              br.status, br.quantity_borrow, br.image_return
       FROM borrow_records br
       JOIN users u ON br.user_id = u.user_id

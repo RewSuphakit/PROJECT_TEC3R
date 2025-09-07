@@ -3,7 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 
-function ReportResults() {
+function ReportBorrow() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,11 +16,11 @@ function ReportResults() {
         const response = await axios.get('http://localhost:5000/api/stats/reports');
         let filteredTransactions = [];
         if (response.data && Array.isArray(response.data.borrow_transactions)) {
-          // กรองเฉพาะ transaction ที่อุปกรณ์ทั้งหมดถูกคืน (status = "Returned")
+          // กรองเฉพาะ transaction ที่อุปกรณ์ทั้งหมดถูกคืน (status = "Borrowed")
           filteredTransactions = response.data.borrow_transactions.filter(
             (transaction) =>
               transaction.borrow_records.every(
-                (record) => record.status.toLowerCase() === "returned"
+                (record) => record.status.toLowerCase() === "borrowed"
               )
           );
         }
@@ -36,13 +36,14 @@ function ReportResults() {
   
     fetchReports();
   }, []);
+  console.log(reports);
   
 
   // กรองรายงานตามเดือนที่เลือก
   // ถ้า selectedMonth เป็นค่าว่าง แสดงทั้งหมด
   const filteredReports = selectedMonth
     ? reports.filter(report => {
-        const reportDate = new Date(report.return_date);
+        const reportDate = new Date(report.borrow_date);
         const [selectedYear, selectedMonthNumber] = selectedMonth.split('-');
         return (
           reportDate.getFullYear() === parseInt(selectedYear, 10) &&
@@ -73,9 +74,9 @@ function ReportResults() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">📅 รายงานคนคืนอุปกรณ์</h1>
+              <h1 className="text-2xl font-bold text-gray-800">📅 รายงานคนยืมอุปกรณ์</h1>
               <p className="text-sm text-gray-500 mt-1">
-                ดูรายงานการคืนอุปกรณ์ทั้งหมด
+                ดูรายงานการยืมอุปกรณ์ทั้งหมด
               </p>
             </div>
            
@@ -142,4 +143,4 @@ function ReportResults() {
   );
 }
 
-export default ReportResults;
+export default ReportBorrow;

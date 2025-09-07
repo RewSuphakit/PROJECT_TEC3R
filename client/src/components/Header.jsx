@@ -1,5 +1,6 @@
 import logofix from '../assets/logofix.png'
 import register from '../assets/register.png'
+import icon from '../assets/rmutikkc.png'
 import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import axios from 'axios';
@@ -15,24 +16,24 @@ function Header() {
   const userMenu = user?.user_id && (
     <>
      <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2 ">
-    <a href="#" className="flex items-center gap-3 truncate">
+    <Link to="/RMUTI/EditProfile" className="flex items-center gap-3 truncate">
       <img
         className="w-6 h-6"
         src="https://img.icons8.com/?size=100&id=98957&format=png&color=374151"
         alt="user icon"
       />
       ชื่อผู้ใช้: {user?.student_name}
-    </a>
+    </Link>
   </li>
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-    <a href="#" className="flex items-center gap-3">
+    <Link to ="#" className="flex items-center gap-3">
       <img
         className="w-6 h-6"
         src="https://img.icons8.com/?size=100&id=59835&format=png&color=374151"
         alt="email icon"
       />
       อีเมลผู้ใช้งาน: {user?.student_email}
-    </a>
+    </Link>
   </li>
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
     <a href="/RMUTI/Return" className="flex justify-start  gap-3">
@@ -83,7 +84,21 @@ function Header() {
       {/* Logo Section */}
       <div className="flex items-center">
         <a href="/RMUTI/" className="flex items-center">
-          <img className="rounded-md " src={logofix} alt="logo" />
+        <div className="flex flex-col ">
+        <div>
+          <div className="text-5xl font-bold text-orange-500">RMUTI</div>
+          {/* <div><img className="rounded-md w-16 h-16" src={icon} alt="logo" /></div> */}
+        </div>
+      
+        
+          <div className="flex items-center space-x-2">   
+            <p className="text-sm text-black-100 font-bold">ระบบการยืม-คืนอุปกรณ์ชุดฝึกการเรียนการสอน</p>
+            </div>
+         <div className="flex items-center space-x-2">
+          <p className="text-sm text-black-100 font-bold">ใช้งานในสาขาครุศาสตร์อุตสาหกรรมคอมพิวเตอร์</p>
+          </div>
+         </div>
+          {/* <img className="rounded-md " src={logofix} alt="logo" /> */}
         </a>
       </div>
       

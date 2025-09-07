@@ -4,6 +4,17 @@ import { toast } from "react-toastify";
 
 function ListReturn() {
   const [tools, setTools] = useState([]); // รายการ flattened ของการคืนอุปกรณ์
+  const [popupImage, setPopupImage] = useState(null);
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+  // ฟังก์ชัน mouse events สำหรับ popup รูป
+  const handleImageMouseEnter = (e, imageUrl) => {
+    const rect = e.target.getBoundingClientRect();
+    setPopupImage(imageUrl);
+    setPopupPosition({ x: rect.right + 10, y: rect.top });
+  };
+  const handleImageMouseLeave = () => {
+    setPopupImage(null);
+  };
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const groupsPerPage = 5; // จำนวนกลุ่มที่แสดงต่อหน้า
@@ -111,7 +122,7 @@ function ListReturn() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 font-[Kanit]">
+    <div className="">
       <div className="lg:pl-72">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex justify-between items-center mb-8">
@@ -120,10 +131,11 @@ function ListReturn() {
               <p className="text-sm text-gray-500 mt-1">
                 หมายเหตุ: ต้องคืนอุปกร์ทั้งหมดที่ยืมถึงจะถือว่าคืนเรียบร้อย
               </p>
+               <p>
+                <span className="text-green-500 font-semibold">*  Returned = คืนแล้ว</span>
+              </p>
             </div>
-           
           </div>
-        
         {loading ? (
           <p className="text-center text-lg text-gray-600">กำลังโหลดข้อมูล...</p>
         ) : (
@@ -156,7 +168,9 @@ function ListReturn() {
                             <img
                               src={`http://localhost:5000/image_return/${item.image_return}`}
                               alt="Returned"
-                              className="w-16 h-16 rounded-lg object-cover border mx-1"
+                              className="w-16 h-16 rounded-lg object-cover border mx-1 cursor-pointer"
+                              onMouseEnter={(e) => handleImageMouseEnter(e, `http://localhost:5000/image_return/${item.image_return}`)}
+                              onMouseLeave={handleImageMouseLeave}
                             />
                           </td>
                           <td className="py-4 px-2 text-center">
@@ -193,7 +207,9 @@ function ListReturn() {
                               <img
                                 src={`http://localhost:5000/image_return/${firstItem.image_return}`}
                                 alt="Returned"
-                                className="w-16 h-16 rounded-lg object-cover border mx-1"
+                                className="w-16 h-16 rounded-lg object-cover border mx-1 cursor-pointer"
+                                onMouseEnter={(e) => handleImageMouseEnter(e, `http://localhost:5000/image_return/${firstItem.image_return}`)}
+                                onMouseLeave={handleImageMouseLeave}
                               />
                             </td>
                             <td className="py-4 px-2 text-center">
@@ -219,7 +235,9 @@ function ListReturn() {
                                   <img
                                     src={`http://localhost:5000/image_return/${item.image_return}`}
                                     alt="Returned"
-                                    className="w-16 h-16 rounded-lg object-cover border mx-1"
+                                    className="w-16 h-16 rounded-lg object-cover border mx-1 cursor-pointer"
+                                    onMouseEnter={(e) => handleImageMouseEnter(e, `http://localhost:5000/image_return/${item.image_return}`)}
+                                    onMouseLeave={handleImageMouseLeave}
                                   />
                                 </td>
                                 <td className="py-4 px-2 text-center">
@@ -240,6 +258,30 @@ function ListReturn() {
                 )}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Popup Image Preview */}
+        {popupImage && (
+          <div
+            style={{
+              position: "fixed",
+              left: popupPosition.x,
+              top: popupPosition.y,
+              zIndex: 1000,
+              background: "rgba(255,255,255,0.95)",
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+              padding: "8px"
+            }}
+            onMouseLeave={handleImageMouseLeave}
+          >
+            <img
+              src={popupImage}
+              alt="popup"
+              style={{ width: "320px", height: "320px", objectFit: "contain", borderRadius: "8px" }}
+            />
           </div>
         )}
 

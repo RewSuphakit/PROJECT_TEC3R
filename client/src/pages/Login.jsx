@@ -66,13 +66,13 @@ const Login = () => {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-5">
+        <div className="flex items-center justify-center " style={{ minHeight: '80vh', backgroundColor: '#F5F5F5' }}>
       <div className="w-full max-w-md px-4">
         <div className="bg-white p-8 rounded-lg shadow-md ">
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="text-center">
               <h1 className="text-2xl font-semibold text-[#0F4C75]">เข้าสู่ระบบ</h1>
-              <p className="text-sm text-gray-500 mt-2">กรุณาเข้าสู่ระบบก่อนใช้งาน &gt;</p>
+              <p className="text-sm text-gray-500 mt-2">กรุณาเข้าสู่ระบบก่อนใช้งาน </p>
             </div>
 
             <div>

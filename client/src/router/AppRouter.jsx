@@ -15,6 +15,8 @@ import ListReturn from'../pages/admin/ListReturn';
 import ManageUsers from '../pages/admin/ManageUsers';
 import ReportResults from '../pages/admin/ReportResults';
 import ReportDetails from '../pages/admin/ReportDetails';
+import ReportBorrow from '../pages/admin/Reportborrow';
+import EditProfile from "../pages/user/EditProfile";
 const guestRouter = createBrowserRouter([
     {
       path: "/RMUTI/",
@@ -52,6 +54,7 @@ const guestRouter = createBrowserRouter([
       children: [
         { index: true, element: <HomePage /> },
         {path: "/RMUTI/Return", element: <Return />},
+        {path: "/RMUTI/EditProfile", element: <EditProfile />},
         { path: "/RMUTI/*", element: <NotFound /> },
         
       ]
@@ -77,6 +80,7 @@ const adminRouter = createBrowserRouter([
       { path: "/RMUTI/ListReturn", element: <ListReturn /> },
       { path: "/RMUTI/ManageUsers", element: <ManageUsers /> },
       { path: "/RMUTI/ReportResults", element: <ReportResults /> },
+      { path: "/RMUTI/ReportBorrow", element: <ReportBorrow /> },
       { path: "/RMUTI/ReportDetails/:transaction_id", element: <ReportDetails /> },
       // เพิ่มเส้นทา��สำหรับ 404 Not Found
       { path: "/RMUTI/*", element: <NotFound /> }
