@@ -13,7 +13,7 @@ function EditProfile() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [userToEdit, setUserToEdit] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
-  
+  const [users, setUsers] = useState([]); // State to hold all users
 
   // Load current user data when component mounts
   useEffect(() => {
@@ -58,7 +58,7 @@ function EditProfile() {
     };
 
     // Remove empty password field if not changed
-    if (!userData.password || userData.password === userToEdit?.password) {
+    if (!userData.password) {
       delete userData.password;
     }
 
@@ -70,7 +70,7 @@ function EditProfile() {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/api/users/users/${userId}`,
+        `http://localhost:5000/api/users/${userId}`,
         userData,
         {
           headers: { Authorization: `Bearer ${token}` }
@@ -145,7 +145,7 @@ function EditProfile() {
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg max-w-2xl w-full mx-4 shadow-lg max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-semibold mb-4">แก้ไขผู้ใช้</h2>
-            <form
+            <form 
               onSubmit={handleEditSubmit}
               className="grid grid-cols-1 md:grid-cols-2 gap-4"
             >

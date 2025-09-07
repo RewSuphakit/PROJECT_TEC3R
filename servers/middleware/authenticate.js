@@ -3,14 +3,13 @@ const jwt = require('jsonwebtoken');
 
 module.exports = async (req, res, next) => {
   try {
-    const authorization = req.headers.authorization;
-    if (!authorization || !authorization.startsWith('Bearer ')) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'Unauthorized: Missing or invalid Authorization header' });
     }
 
-    const token = authorization.split(' ')[1];
+    const token = authHeader.split(' ')[1];
 
-    // ✅ ตรวจสอบ JWT
     let payload;
     try {
       payload = jwt.verify(token, process.env.JWT_SECRET);
@@ -18,12 +17,12 @@ module.exports = async (req, res, next) => {
       return res.status(401).json({ error: 'Unauthorized: Invalid or expired token' });
     }
 
-    // ✅ ตรวจสอบ payload ว่ามี student_email หรือไม่
-    if (!payload || !payload.user || !payload.user.student_email) {
+    // ตรวจสอบ payload มี user_id และ student_email
+    if (!payload?.user?.user_id || !payload.user.student_email) {
       return res.status(401).json({ error: 'Unauthorized: Invalid token payload' });
     }
 
-    // ✅ ดึงข้อมูลผู้ใช้จากฐานข้อมูล
+    // ดึงข้อมูลผู้ใช้จาก DB
     const [rows] = await connection.promise().query(
       'SELECT * FROM users WHERE student_email = ? LIMIT 1',
       [payload.user.student_email]
@@ -33,8 +32,11 @@ module.exports = async (req, res, next) => {
       return res.status(404).json({ error: 'Unauthorized: User not found' });
     }
 
-    // ✅ เพิ่มข้อมูลผู้ใช้ใน req.user
-    req.user = rows[0];
+    // เพิ่ม user_id ลง req.user
+      req.user = {
+        ...rows[0],
+        user_id: rows[0].user_id, // ใช้ชื่อ field ที่ถูกต้อง
+      };
 
     next();
   } catch (err) {

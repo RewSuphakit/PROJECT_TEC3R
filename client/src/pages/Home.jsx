@@ -297,14 +297,27 @@ const confirmBorrowFromStorage = async () => {
   const totalPages = Math.ceil(filteredEquipment.length / itemsPerPage);
 
   return (
-    <div >
+    <div  style={{
+    backgroundImage: "linear-gradient(to top, #f3e7e9 0%, #e3eeff 100%)"
+  }}>
             <ScrollToTopButton />
     <div
-      className="relative bg-fixed bg-center bg-no-repeat bg-cover min-h-[500px]"
-      style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${bg})`,
-      }}
-    >
+  className="relative bg-fixed min-h-[800px]"
+  style={{
+    backgroundImage: `linear-gradient(
+      to bottom, 
+      rgba(0, 0, 0, 1), 
+      rgba(0, 0, 0, 0.4), 
+      rgba(0, 0, 0, 0.4), 
+      rgba(0, 0, 0, 0.4), 
+      rgba(0, 0, 0, 0.4)
+    ), url(https://www.fte.rmuti.ac.th/main/sites/default/files/2567-logoheader_new.jpg)`,
+    backgroundSize: 'cover',       // ขยายเต็มพื้นที่
+    backgroundRepeat: 'no-repeat', // ไม่ซ้ำ
+    backgroundPosition: 'center',  // จัดกึ่งกลาง
+    backgroundAttachment: 'fixed',  // คงที่เมื่อ scroll
+  }}
+>
       <div className="absolute inset-0 bg-black bg-opacity-30" />
       <div className="absolute inset-0 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
         <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white font-bold text-center transition-all duration-300">
@@ -317,7 +330,9 @@ const confirmBorrowFromStorage = async () => {
     </div>
   
     {/* Search Section */}
-    <section className="px-4 md:px-8 bg-white pb-8 mt-5">
+    <section
+  className="px-4 md:px-8 pb-8 mt-5"
+>
       <div className="container max-w-6xl mx-auto">
         <div className="px-4 sm:px-8">
           <h1 className="pl-2 text-lg sm:text-xl border-l-4 border-teal-400 text-black">อุปกรณ์ที่มียืมทั้งหมด</h1>

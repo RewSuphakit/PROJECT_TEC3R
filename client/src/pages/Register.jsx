@@ -63,7 +63,7 @@ const Register = () => {
   };
 
   return (
-    <div className="flex items-center justify-center bg-gray-100" style={{ minHeight: '80vh' }}>
+    <div className="flex items-center justify-center bg-gray-100" style={{ minHeight: '81vh' ,backgroundImage: "linear-gradient(to top, #f3e7e9 0%, #e3eeff 100%)" }}>
       <div className="relative w-full max-w-lg mx-auto">
         <div className="w-full px-8 py-8 bg-white rounded-xl shadow-lg mb-10">
           <div className="flex flex-col justify-center items-center">

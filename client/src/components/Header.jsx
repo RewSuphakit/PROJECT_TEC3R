@@ -78,8 +78,8 @@ function Header() {
   return (
 
   
-    <section className="w-full bg-white text-gray-700 sticky top-0 z-50">
-  <nav className="navbar bg-white shadow-md  border-b border-gray-200 ">
+    <section className="w-full  text-gray-700 sticky top-0 z-50" style={{backgroundColor: '#e3eeff'}}>
+  <nav className="navbar e shadow-md  border-b border-gray-200 ">
     <div className="container mx-auto flex flex-wrap items-center justify-around">
       {/* Logo Section */}
       <div className="flex items-center">

@@ -120,28 +120,27 @@ exports.login = async (req, res) => {
 
   exports.getUserProfile = async (req, res) => {
     try {
-      const { user_id, student_id, student_name, year_of_study, student_email, password, phone, role } = req.user;
-    
+      const { user_id, student_id, student_name, year_of_study, student_email, phone, role } = req.user;
+
       // ตรวจสอบว่า role มีอยู่ในข้อมูลหรือไม่
       if (!role) {
         return res.status(400).json({ error: 'Role is missing in the user profile' });
       }
-  
+
       if (role !== 'admin' && role !== 'user') {
         return res.status(403).json({ error: 'Unauthorized: Invalid user role' });
       }
-  
+
       const userProfile = {
         user_id,
         student_id,
         student_name,
         year_of_study,
         student_email,
-        password,
         phone,
         role
       };
-  
+
       res.status(200).json(userProfile);
     } catch (error) {
       console.error(error);
@@ -199,7 +198,7 @@ exports.deleteUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { user_id } = req.params;
-    const { student_id, student_name, year_of_study, student_email, password, phone,role } = req.body;
+    const { student_id, student_name, year_of_study, student_email, password, phone } = req.body;
   
 
     let updateQuery = `
@@ -208,10 +207,10 @@ exports.updateUser = async (req, res) => {
           student_name = ?,
           year_of_study = ?,
           student_email = ?,
-          phone = ?,
-          role = ?
+          phone = ?
+        
     `;
-    const values = [student_id, student_name, year_of_study, student_email, phone,role];
+    const values = [student_id, student_name, year_of_study, student_email, phone];
 
     // หากมีการส่ง password เข้ามา ให้แฮชและรวมลงใน query
     if (password && password.trim() !== '') {
