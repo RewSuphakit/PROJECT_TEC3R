@@ -198,29 +198,18 @@ exports.deleteUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { user_id } = req.params;
-    const { student_id, student_name, year_of_study, student_email, password, phone } = req.body;
-  
+    const { student_id, student_name, year_of_study, phone } = req.body;
 
-    let updateQuery = `
+    const updateQuery = `
       UPDATE users
       SET student_id = ?,
           student_name = ?,
           year_of_study = ?,
-          student_email = ?,
           phone = ?
-        
+      WHERE user_id = ?
     `;
-    const values = [student_id, student_name, year_of_study, student_email, phone];
 
-    // หากมีการส่ง password เข้ามา ให้แฮชและรวมลงใน query
-    if (password && password.trim() !== '') {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      updateQuery += `, password = ? `;
-      values.push(hashedPassword);
-    }
-
-    updateQuery += `WHERE user_id = ?`;
-    values.push(user_id);
+    const values = [student_id, student_name, year_of_study, phone, user_id];
 
     connection.query(updateQuery, values, (err, results) => {
       if (err) {
@@ -240,4 +229,48 @@ exports.updateUser = async (req, res) => {
   }
 };
 
+exports.updateEmailPassword = async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const { student_email, password } = req.body;
 
+    let updateQuery = `UPDATE users SET `;
+    const values = [];
+
+    // ถ้ามีการส่ง email มา
+    if (student_email && student_email.trim() !== "") {
+      updateQuery += `student_email = ? `;
+      values.push(student_email);
+    }
+
+    // ถ้ามีการส่ง password มา
+    if (password && password.trim() !== "") {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      if (values.length > 0) updateQuery += `, `;
+      updateQuery += `password = ? `;
+      values.push(hashedPassword);
+    }
+
+    updateQuery += `WHERE user_id = ?`;
+    values.push(user_id);
+
+    connection.query(updateQuery, values, (err, results) => {
+      if (err) {
+        console.error("Update query error:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // หลังแก้ไขสำเร็จ ต้องให้ frontend logout
+      res.status(200).json({
+        message: "User email/password updated successfully. Please log in again.",
+      });
+    });
+  } catch (error) {
+    console.error("Error in updateEmailOrPassword:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};

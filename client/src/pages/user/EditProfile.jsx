@@ -1,35 +1,24 @@
-import React from 'react'
+import React, { useState, useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
 import axios from "axios";
-import { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function EditProfile() {
-  const { user,fetchUserProfile } = useAuth();
-  const userId = user.user_id;
-  
-  // State variables
+  const { user, fetchUserProfile,logout } = useAuth();
+  const userId = user?.user_id;
+
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [userToEdit, setUserToEdit] = useState(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [users, setUsers] = useState([]); // State to hold all users
+  const [users, setUsers] = useState([]); // เผื่อไว้ถ้ามีการเก็บ users list
 
-  // Load current user data when component mounts
   useEffect(() => {
     if (user) {
       setUserToEdit(user);
     }
   }, [user]);
 
-
-
-  // Function to toggle password visibility
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  // Function to open edit modal
+  // เปิดปิด modal
   const openEditModal = () => {
     if (user) {
       setUserToEdit(user);
@@ -37,57 +26,41 @@ function EditProfile() {
     }
   };
 
-  // Function to close edit modal
   const closeEditModal = () => {
     setEditModalOpen(false);
     setUserToEdit(null);
-    setShowPassword(false);
   };
 
-  // Function to handle form submission
+  // submit form
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const userData = {
-      student_id: formData.get('student_id'),
-      student_name: formData.get('student_name'),
-      year_of_study: formData.get('year_of_study'),
-      student_email: formData.get('student_email'),
-      password: formData.get('password'),
-      phone: formData.get('phone')
+      student_id: formData.get("student_id"),
+      student_name: formData.get("student_name"),
+      year_of_study: formData.get("year_of_study"),
+      phone: formData.get("phone"),
     };
-
-    // Remove empty password field if not changed
-    if (!userData.password) {
-      delete userData.password;
-    }
 
     await updateUser(userId, userData);
   };
 
-  // Function to update user
+  // update user API
   const updateUser = async (userId, userData) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:5000/api/users/${userId}`,
-        userData,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-      
-      // Update users state if it exists
+      await axios.put(`http://localhost:5000/api/users/${userId}`, userData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       setUsers((prevUsers) =>
-        prevUsers.map((user) =>
-          user.user_id === userId ? { ...user, ...userData } : user
+        prevUsers.map((u) =>
+          u.user_id === userId ? { ...u, ...userData } : u
         )
       );
       fetchUserProfile();
-      toast.success("แก้ไขผู้ใช้สำเร็จ");
-      setEditModalOpen(false);
-      setUserToEdit(null);
-      setShowPassword(false);
+      toast.success("แก้ไขข้อมูลสำเร็จ");
+      closeEditModal();
     } catch (error) {
       if (error.response) {
         if (error.response.status === 401) {
@@ -123,20 +96,13 @@ function EditProfile() {
               {user.year_of_study}
             </div>
             <div>
-              <span className="font-semibold">อีเมล: </span>
-              {user.student_email}
-            </div>
-            <div>
               <span className="font-semibold">เบอร์ติดต่อ: </span>
               {user.phone}
             </div>
           </div>
         )}
-        <button
-          onClick={openEditModal}
-          className="btn btn-primary mt-4"
-        >
-          แก้ไขโปรไฟล์
+        <button onClick={openEditModal} className="btn btn-primary mt-4">
+          แก้ไขข้อมูลส่วนตัว
         </button>
       </div>
 
@@ -144,8 +110,8 @@ function EditProfile() {
       {editModalOpen && userToEdit && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg max-w-2xl w-full mx-4 shadow-lg max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-semibold mb-4">แก้ไขผู้ใช้</h2>
-            <form 
+            <h2 className="text-xl font-semibold mb-4">แก้ไขข้อมูลส่วนตัว</h2>
+            <form
               onSubmit={handleEditSubmit}
               className="grid grid-cols-1 md:grid-cols-2 gap-4"
             >
@@ -191,46 +157,6 @@ function EditProfile() {
                 />
               </div>
 
-              {/* อีเมลนักศึกษา */}
-              <div className="flex flex-col">
-                <label className="block text-sm font-semibold mb-1">
-                  อีเมลนักศึกษา
-                </label>
-                <input
-                  type="email"
-                  name="student_email"
-                  defaultValue={userToEdit?.student_email}
-                  className="input input-bordered w-full py-2 px-3 rounded-lg border border-gray-300"
-                  required
-                />
-              </div>
-
-              {/* รหัสผ่าน */}
-              <div className="flex flex-col">
-                <label className="block text-sm font-semibold mb-1">
-                  รหัสผ่าน (เว้นว่างหากไม่ต้องการเปลี่ยน)
-                </label>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  placeholder="เว้นว่างหากไม่ต้องการเปลี่ยน"
-                  className="input input-bordered w-full py-2 px-3 rounded-lg border border-gray-300"
-                />
-                <div className="mt-2">
-                  <label className="flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="mr-2 cursor-pointer"
-                      checked={showPassword}
-                      onChange={togglePasswordVisibility}
-                    />
-                    <span className="text-sm text-gray-600">
-                      แสดงรหัสผ่าน
-                    </span>
-                  </label>
-                </div>
-              </div>
-
               {/* เบอร์ติดต่อ */}
               <div className="flex flex-col">
                 <label className="block text-sm font-semibold mb-1">
@@ -264,17 +190,7 @@ function EditProfile() {
       )}
 
       {/* Toast Container */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }

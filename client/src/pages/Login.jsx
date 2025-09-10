@@ -52,9 +52,18 @@ const Login = () => {
         setUser(payload);
   
         // แสดงข้อความต้อนรับ
-        toast.success(`ยินดีต้อนรับ, ${payload.student_name}! เข้าสู่ระบบสำเร็จ`, {
-          position: 'top-right',
-        });
+        toast(
+  <div>
+    <div>ยินดีต้อนรับ,</div>
+    <div className="font-bold">{payload.student_name}</div>
+    <div>เข้าสู่ระบบสำเร็จ</div>
+  </div>,
+  {
+    position: "top-center",
+    autoClose: 3000,
+    type: "success",
+  }
+);
   
         navigate('/RMUTI/');
       } else {

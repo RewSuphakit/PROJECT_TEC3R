@@ -311,7 +311,7 @@ const confirmBorrowFromStorage = async () => {
       rgba(0, 0, 0, 0.4), 
       rgba(0, 0, 0, 0.4), 
       rgba(0, 0, 0, 0.4)
-    ), url(https://www.fte.rmuti.ac.th/main/sites/default/files/2567-logoheader_new.jpg)`,
+    ), url(https://media.discordapp.net/attachments/745663262699421737/1415188943766552596/IMG_20250909_122818.jpg?ex=68c24ce9&is=68c0fb69&hm=92e57482be2b3054d91742d8795cc7b76d9829590cba76b807e69430cc9fcedc&=&format=webp&width=1145&height=859)`,
     backgroundSize: 'cover',       // ขยายเต็มพื้นที่
     backgroundRepeat: 'no-repeat', // ไม่ซ้ำ
     backgroundPosition: 'center',  // จัดกึ่งกลาง

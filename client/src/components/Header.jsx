@@ -26,7 +26,7 @@ function Header() {
     </Link>
   </li>
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-    <Link to ="#" className="flex items-center gap-3">
+    <Link to ="/RMUTI/EditEmail" className="flex items-center gap-3">
       <img
         className="w-6 h-6"
         src="https://img.icons8.com/?size=100&id=59835&format=png&color=374151"

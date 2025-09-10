@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom"; 
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import LoginForm from "../pages/Login";
 import RegisterForm from "../pages/Register";
@@ -17,91 +17,44 @@ import ReportResults from '../pages/admin/ReportResults';
 import ReportDetails from '../pages/admin/ReportDetails';
 import ReportBorrow from '../pages/admin/Reportborrow';
 import EditProfile from "../pages/user/EditProfile";
-const guestRouter = createBrowserRouter([
-    {
-      path: "/RMUTI/",
-      element: (
-        <>
-          <Header />
-          <Outlet />
-          <Footer />
-        </>
-      ),
-      children: [
-        // หน้าหลัก
-        { index: true, element: <HomePage /> },
-        // หน้าเข้าสู่ระบบ
-        { path: "/RMUTI/login", element: <LoginForm /> },
-        // หน้าลงทะเบียน
-        { path: "/RMUTI/register", element: <RegisterForm /> },
-        // เพิ่มเส้นทางสำหรับ 404 Not Found
-        { path: "*", element: <NotFound /> }
-      ]
-    }
-  ]);
-  
-  // สร้าง Router สำหรับผู้ใช้ที่เข้าสู่ระบบแล้ว
-  const userRouter = createBrowserRouter([
-    {
-      path: "/RMUTI/",
-      element: (
-        <>
-          <Header />
-          <Outlet />
-          <Footer />
-        </>
-      ),
-      children: [
-        { index: true, element: <HomePage /> },
-        {path: "/RMUTI/Return", element: <Return />},
-        {path: "/RMUTI/EditProfile", element: <EditProfile />},
-        { path: "/RMUTI/*", element: <NotFound /> },
-        
-      ]
-    }
-  ]);
-  
- // สร้าง Router สำหรับผู้ใช้ที่เป็น Admin
-const adminRouter = createBrowserRouter([
-  {
-    path: "/RMUTI/",
-    element: (
-      <>
-        <Herderadmin />
-        <Outlet />
-      </>
-    ),
-    children: [
-      // หน้าหลักสำหรับผู้ใช้ที่เป็น Admin
-      { index: true, element: <Dashboard /> },
-      { path: "/RMUTI/Dashboard", element: <Dashboard /> },
-      { path: "/RMUTI/ManageTools", element: <ManageTools /> },
-      { path: "/RMUTI/ListBorrow", element: <ListBorrow /> },
-      { path: "/RMUTI/ListReturn", element: <ListReturn /> },
-      { path: "/RMUTI/ManageUsers", element: <ManageUsers /> },
-      { path: "/RMUTI/ReportResults", element: <ReportResults /> },
-      { path: "/RMUTI/ReportBorrow", element: <ReportBorrow /> },
-      { path: "/RMUTI/ReportDetails/:transaction_id", element: <ReportDetails /> },
-      // เพิ่มเส้นทา��สำหรับ 404 Not Found
-      { path: "/RMUTI/*", element: <NotFound /> }
-      // อื่น ๆ ที่เฉพาะสำหรับผู้ใช้ที่เป็น Admin
-    ]
-  }
-]);
+import EditEmail from "../pages/user/EditEmail";
 
-// สร้าง Router สำหรับผู้ใช้ที่เข้าสู่ระบบแล้ว
 export default function AppRouter() {
   const { user } = useAuth();
-
-  // เช็คว่ามีข้อมูลผู้ใช้และมี role เป็น Admin หรือไม่
   const isAdmin = user?.role === "admin";
 
-  // เลือก Router ตามสถานะการเข้าสู่ระบบและบทบาทของผู้ใช้
-  const finalRouter = user ? (isAdmin ? adminRouter : userRouter) : guestRouter;
+  const router = createBrowserRouter([
+    {
+      path: "/RMUTI",
+      element: user ? (isAdmin ? <Herderadmin /> : <><Header /><Outlet /><Footer /></>) : <><Header /><Outlet /><Footer /></>,
+      children: [
+        { index: true, element: <HomePage /> },
 
-  // ส่ง Router ที่เลือกไปยัง RouterProvider เพื่อให้ระบบทำงาน
-  return <RouterProvider router={finalRouter} />;
+        // Guest only
+        !user && { path: "login", element: <LoginForm /> },
+        !user && { path: "register", element: <RegisterForm /> },
+
+        // User only
+        user && !isAdmin && { path: "Return", element: <Return /> },
+        user && !isAdmin && { path: "EditProfile", element: <EditProfile /> },
+        user && !isAdmin && { path: "EditEmail", element: <EditEmail /> },
+
+        // Admin only
+        user && isAdmin && { path: "Dashboard", element: <Dashboard /> },
+        user && isAdmin && { path: "ManageTools", element: <ManageTools /> },
+        user && isAdmin && { path: "ListBorrow", element: <ListBorrow /> },
+        user && isAdmin && { path: "ListReturn", element: <ListReturn /> },
+        user && isAdmin && { path: "ManageUsers", element: <ManageUsers /> },
+        user && isAdmin && { path: "ReportResults", element: <ReportResults /> },
+        user && isAdmin && { path: "ReportBorrow", element: <ReportBorrow /> },
+        user && isAdmin && { path: "ReportDetails/:transaction_id", element: <ReportDetails /> },
+
+        // Redirect if unauthorized
+        !user && { path: "*", element: <Navigate to="/RMUTI/login" replace /> },
+        user && { path: "*", element: <NotFound /> },
+      ].filter(Boolean)
+    }
+  ]);
+
+  return <RouterProvider router={router} />;
 }
-
-
-  
