@@ -37,7 +37,7 @@ function ManageUsers() {
   const deleteUser = async (userId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/users/users/${userId}`, {
+      await axios.delete(`http://localhost:5000/api/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsers(users.filter((user) => user.user_id !== userId));
@@ -62,7 +62,7 @@ function ManageUsers() {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/api/users/users/${userId}`,
+        `http://localhost:5000/api/users/admin/${userId}`,
         userData,
         {
           headers: { Authorization: `Bearer ${token}` }

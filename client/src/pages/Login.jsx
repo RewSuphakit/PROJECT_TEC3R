@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import useAuth from "../hooks/useAuth";
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
-console.log(`API URL: ${apiUrl}`);
+
 
 const Login = () => {
   const { setUser } = useAuth();

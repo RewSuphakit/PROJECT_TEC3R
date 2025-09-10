@@ -125,15 +125,20 @@ const handleClick = async (equipmentId, title, image, quantity) => {
       localStorage.setItem("borrowItems", JSON.stringify(items));
 
       // หลังจากเพิ่มรายการใหม่แล้วให้แสดง popup เพื่อยืนยันการยืมรายการทั้งหมดใน Local Storage
-      const confirmBorrow = await swalWithBootstrapButtons.fire({
-        title: "ยืนยันการยืมทั้งหมด?",
-        text: "คุณต้องการยืมอุปกรณ์ทั้งหมดในรายการค้างอยู่หรือไม่?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "ยืมทั้งหมด!",
-        cancelButtonText: "เพิ่มต่อ",
-        reverseButtons: true,
-      });
+   const confirmBorrow = await swalWithBootstrapButtons.fire({
+  title: "ยืนยันการยืมทั้งหมด?",
+  text: "คุณต้องการยืมอุปกรณ์ทั้งหมดในรายการค้างอยู่หรือไม่?",
+  icon: "warning",
+  showCancelButton: true,
+  confirmButtonText: "ยืมทั้งหมด!",
+  cancelButtonText: "เพิ่มต่อ",
+  reverseButtons: true,
+  customClass: {
+    cancelButton: 'btn btn-outline btn-primary mr-2', // เปลี่ยนปุ่ม cancel เป็นสีฟ้า (Bootstrap)
+    confirmButton: 'btn btn-outline btn-success'  // ปุ่ม confirm เป็นสีแดง
+  },
+  buttonsStyling: false // ต้องปิด styling ของ Swal เพื่อให้ใช้ class ของ Bootstrap
+});
 
       if (confirmBorrow.isConfirmed) {
         await axios.post(

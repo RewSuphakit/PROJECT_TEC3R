@@ -15,7 +15,7 @@ function Header() {
   
   const userMenu = user?.user_id && (
     <>
-     <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2 ">
+     <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2 text-wrap">
     <Link to="/RMUTI/EditProfile" className="flex items-center gap-3 truncate">
       <img
         className="w-6 h-6"
@@ -25,7 +25,7 @@ function Header() {
       ชื่อผู้ใช้: {user?.student_name}
     </Link>
   </li>
-  <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
+  <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2 text-wrap">
     <Link to ="/RMUTI/EditEmail" className="flex items-center gap-3">
       <img
         className="w-6 h-6"
@@ -47,8 +47,17 @@ function Header() {
       <div className="badge badge-error">{borrowedCount}</div>
       )}
     </a>
-    
    </li>
+    <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
+    <a href="#" className="flex justify-start  gap-3">
+      <img
+        className="w-6 h-6"
+        src="https://img.icons8.com/?size=100&id=6904&format=png&color=000000"
+        alt="history icon"
+      />
+      <div >ประวัติการยืม/คืน</div>
+    </a>
+     </li>
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
     <a href="https://www.facebook.com/ci.r.sakdi.phimph.kha.hil" className="flex items-center gap-3">
       <img
