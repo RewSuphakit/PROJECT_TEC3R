@@ -15,14 +15,14 @@ function Header() {
   
   const userMenu = user?.user_id && (
     <>
-     <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2 text-wrap">
-    <Link to="/RMUTI/EditProfile" className="flex items-center gap-3 truncate">
+     <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2 ">
+    <Link to="/RMUTI/EditProfile" className="flex items-center gap-3  ">
       <img
         className="w-6 h-6"
         src="https://img.icons8.com/?size=100&id=98957&format=png&color=374151"
         alt="user icon"
       />
-      ชื่อผู้ใช้: {user?.student_name}
+      <p className='text-wrap'>ชื่อผู้ใช้: {user?.student_name}</p>
     </Link>
   </li>
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2 text-wrap">
@@ -49,7 +49,7 @@ function Header() {
     </a>
    </li>
     <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-    <a href="#" className="flex justify-start  gap-3">
+    <a href="/RMUTI/History" className="flex justify-start  gap-3">
       <img
         className="w-6 h-6"
         src="https://img.icons8.com/?size=100&id=6904&format=png&color=000000"
@@ -116,7 +116,13 @@ function Header() {
             {user?.user_id && (
               <>
               <div className="flex items-center space-x-4">
-  <p className="text-gray-700 text-sm font-medium">ผู้ใช้งาน : นักศึกษา</p>
+  <p className="text-gray-700 text-sm font-medium">
+  ผู้ใช้งาน : {user?.role === "user" 
+    ? "นักเรียน" 
+    : user?.role === "teacher" 
+      ? "ครู" 
+      : "ไม่ทราบ"}
+</p>
 
   <div className="relative">
     <label

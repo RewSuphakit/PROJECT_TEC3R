@@ -1,3 +1,43 @@
+// =========================
+// 7. ดึงประวัติการยืม-คืนทั้งหมดของผู้ใช้ (History)
+// =========================
+exports.getHistoryByUserId = async (req, res) => {
+  const { user_id } = req.params;
+  if (!user_id) return res.status(400).json({ message: "user_id is required" });
+
+  try {
+    const query = `
+      SELECT br.record_id, e.equipment_name, br.quantity_borrow, br.borrow_date, br.return_date, br.status
+      FROM borrow_records br
+      JOIN equipment e ON br.equipment_id = e.equipment_id
+      WHERE br.user_id = ?
+      ORDER BY br.borrow_date DESC
+    `;
+    const [results] = await connection.promise().query(query, [user_id]);
+
+    // Format date to Thai locale
+    const formattedResults = results.map(record => ({
+      ...record,
+      borrow_date: record.borrow_date ? new Date(record.borrow_date).toLocaleString("th-TH", {
+        timeZone: "Asia/Bangkok",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }) : null,
+      return_date: record.return_date ? new Date(record.return_date).toLocaleString("th-TH", {
+        timeZone: "Asia/Bangkok",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }) : null,
+    }));
+
+    res.status(200).json({ history: formattedResults });
+  } catch (error) {
+    console.error("Error fetching history:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
 const connection = require('../config/db');
 const lineNotify = require('../utils/lineNotify');
 
@@ -289,7 +329,7 @@ exports.getAllBorrowRecordsByUserId = async (req, res) => {
     const countQuery = `
       SELECT COUNT(CASE WHEN status = 'Borrowed' THEN 1 END) AS borrowed_count
       FROM borrow_records
-      WHERE user_id = ? AND status = 'Borrowed'
+      WHERE user_id = ? AND status = 'Borrowed' 
     `;
     const [countResults] = await connection.promise().query(countQuery, [user_id]);
 

@@ -4,7 +4,7 @@ const connection = require('../config/db'); // การเชื่อมต่
 
 // การสมัครสมาชิก
 exports.register = async (req, res) => {
-  const { student_id, student_name, year_of_study, student_email, password,phone } = req.body;
+  const { student_id, student_name, year_of_study, student_email, password,phone,role } = req.body;
 
   // ตรวจสอบว่าอีเมลมีโดเมน @rmuti.ac.th หรือไม่
   const emailRegex = /^[a-zA-Z0-9._%+-]+@rmuti\.ac\.th$/;
@@ -31,8 +31,8 @@ exports.register = async (req, res) => {
 
         // แทรกผู้ใช้งานใหม่
         connection.query(
-          'INSERT INTO users (student_id, student_name, year_of_study, student_email, password,phone) VALUES (?, ?, ?, ?, ?,?)',
-          [student_id, student_name, year_of_study, student_email, hashedPassword,phone],
+          'INSERT INTO users (student_id, student_name, year_of_study, student_email, password,phone,role) VALUES (?, ?, ?, ?, ?,?,?)',
+          [student_id, student_name, year_of_study, student_email, hashedPassword,phone,role],
           (err, results) => {
             if (err) {
               console.error(err);
@@ -127,7 +127,7 @@ exports.login = async (req, res) => {
         return res.status(400).json({ error: 'Role is missing in the user profile' });
       }
 
-      if (role !== 'admin' && role !== 'user') {
+      if (role !== 'admin' && role !== 'user' && role !== 'teacher')  {
         return res.status(403).json({ error: 'Unauthorized: Invalid user role' });
       }
 

@@ -5,6 +5,7 @@ import HomePage from "../pages/Home";
 import Return from "../components/Return";
 import EditProfile from "../pages/user/EditProfile";
 import EditEmail from "../pages/user/EditEmail";
+import History from "../pages/user/History";
 import NotFound from "../components/NotFound404";
 
 export default function UserLayout() {
@@ -22,5 +23,6 @@ export const userRoutes = [
   { path: "Return", element: <Return /> },
   { path: "EditProfile", element: <EditProfile /> },
   { path: "EditEmail", element: <EditEmail /> },
+  {path: "History", element: <History /> },
   { path: "*", element: <NotFound /> },
 ];

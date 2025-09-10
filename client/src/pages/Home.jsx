@@ -380,7 +380,7 @@ const confirmBorrowFromStorage = async () => {
                   <p className="text-xs text-gray-500 mt-2">อัพเดทเมื่อ: {new Date(item.timeupdate).toLocaleString()}</p>
                   <hr className="w-full max-w-[12rem] h-1 mx-auto my-4 bg-gray-100 border-0 rounded" />
                   
-                  <div className="text-center">
+                  <div className="text-center pb-2 ">
                  
 
 
@@ -393,7 +393,7 @@ const confirmBorrowFromStorage = async () => {
   {user?.user_id ? (
     <button
     onClick={() => handleClick(item.equipment_id, item.equipment_name, item.image,item.quantity)}
-    className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-medium text-white rounded-md shadow-sm bg-[#1B262C] hover:bg-slate-300 focus:ring-offset-2"
+    className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-medium text-white  rounded-md shadow-sm bg-[#1B262C] hover:bg-slate-300 focus:ring-offset-2"
   >
     ยืมอุปกรณ์
   </button>
@@ -412,6 +412,7 @@ const confirmBorrowFromStorage = async () => {
                  
                   </div>
                 </div>
+               
               </div>
             ))
           ) : (
