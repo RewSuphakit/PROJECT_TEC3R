@@ -8,7 +8,7 @@ exports.addEquipment = (req, res) => {
   const { equipment_name,  quantity } = req.body;
   const image = req.file ? req.file.filename : '';  // ใช้ไฟล์ที่อัพโหลดหรือค่าว่าง
 
-  const query = 'INSERT INTO equipment (equipment_name,  quantity, image) VALUES (?, ?, ?, ?)';
+  const query = 'INSERT INTO equipment (equipment_name,  quantity, image) VALUES (?, ?, ?)';
   connection.query(query, [equipment_name,  quantity, image], (err, result) => {
     if (err) {
       console.error(err);

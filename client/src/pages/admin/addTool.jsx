@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 function AddTool() {
   const [showModal, setShowModal] = useState(false);
   const [equipmentName, setEquipmentName] = useState("");
-  const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState("");
   const [image, setImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
@@ -15,7 +14,6 @@ function AddTool() {
 
     const formData = new FormData();
     formData.append("equipment_name", equipmentName);
-    formData.append("description", description);
     formData.append("quantity", quantity);
     formData.append("image", image);
 
@@ -28,7 +26,6 @@ function AddTool() {
       setShowModal(false);
       // Reset the form only after a successful submission
       setEquipmentName("");
-      setDescription("");
       setQuantity("");
       setImage(null);
       setPreviewImage(null);
@@ -68,7 +65,6 @@ function AddTool() {
     setShowModal(false);
     // Reset the form fields when the modal is closed
     setEquipmentName("");
-    setDescription("");
     setQuantity("");
     setImage(null);
     setPreviewImage(null);
@@ -91,17 +87,7 @@ function AddTool() {
                 />
               </label>
 
-              <label className="input input-bordered flex items-center gap-2 mt-4">
-                <i className="fas fa-align-left" />
-                <input
-                  type="text"
-                  placeholder="รายละเอียด"
-                  className="p-2 text-sm w-full"
-                  required
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </label>
+            
 
               <label className="input input-bordered flex items-center   gap-2 mt-4">
                 <i className="fas fa-sort-numeric-up" />

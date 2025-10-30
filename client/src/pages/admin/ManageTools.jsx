@@ -49,7 +49,7 @@ function ManageTools() {
     }
   };
 
-  // แก้ไขอุปกรณ์ (update equipment_name และ description)
+  // แก้ไขอุปกรณ์ (update equipment_name และ )
   const updateTool = async (e) => {
     e.preventDefault();
   
@@ -63,7 +63,6 @@ function ManageTools() {
     try {
       const formData = new FormData();
       formData.append("equipment_name", e.target.equipment_name.value);
-      formData.append("description", e.target.description.value);
       formData.append("quantity", e.target.quantity.value);
   
       // Check if a new file was selected
@@ -84,7 +83,6 @@ function ManageTools() {
         updatedTool = {
           ...currentTool,
           equipment_name: e.target.equipment_name.value,
-          description: e.target.description.value,
           quantity: e.target.quantity.value,
           // Optionally, update image if needed. If no new image selected, currentTool.image remains.
           image: e.target.image ? currentTool.image : currentTool.image,

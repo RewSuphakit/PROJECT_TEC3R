@@ -3,14 +3,12 @@ import React, { useState, useEffect } from "react";
 
 const EditModal = ({ tool, onSubmit, onCancel }) => {
   const [preview, setPreview] = useState("");
-
   // เมื่อ component ถูกโหลดหรือค่า tool เปลี่ยน ให้ตั้งค่า preview จากรูปเดิมของ tool
   useEffect(() => {
     if (tool && tool.image) {
       setPreview(`http://localhost:5000/uploads/${tool.image}`);
     }
   }, [tool]);
-
   // เมื่อมีการเลือกไฟล์ใหม่ให้เปลี่ยน preview
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -37,20 +35,10 @@ const EditModal = ({ tool, onSubmit, onCancel }) => {
               className="input input-bordered w-full"
             />
           </div>
+         
           <div className="form-control mb-4">
             <label className="label">
-              <span className="label-text font-semibold">รายละเอียด</span>
-            </label>
-            <input
-              type="text"
-              name="description"
-              defaultValue={tool?.description}
-              className="input input-bordered w-full"
-            />
-          </div>
-          <div className="form-control mb-4">
-            <label className="label">
-              <span className="label-text font-semibold">จำนวน</span>
+              <span className="label-text font-semibold">จำนวน</span>  
             </label>
             <input
               type="number"
