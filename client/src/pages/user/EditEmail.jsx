@@ -176,7 +176,7 @@ function EditEmail() {
       {confirmModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-sm w-full shadow-lg">
-            <h3 className="text-lg font-semibold mb-4 text-center text-red-600">
+            <h3 className="text-lg font-semibold mb-4 text-center text-yellow-300">
               ยืนยันการแก้ไข
             </h3>
             <p className="text-center mb-6">
@@ -191,7 +191,7 @@ function EditEmail() {
               </button>
               <button
                 onClick={handleConfirm}
-                className="btn btn-outline btn-error w-24"
+                className="btn btn-outline btn-success w-24"
               >
                 ยืนยัน
               </button>
