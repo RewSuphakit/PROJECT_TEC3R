@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
+import bg2 from '../../assets/bg2.png';
 
 function ReportBorrow() {
   const [reports, setReports] = useState([]);
@@ -69,8 +70,14 @@ function ReportBorrow() {
   }
 
   return (
-    <div className="">
-      <div className="lg:pl-72">
+    <div style={{ 
+      minHeight: '100vh', 
+      backgroundImage: `url(${bg2})`,
+      backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed'
+    }}>      <div className="lg:pl-72">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex justify-between items-center mb-8">
             <div>

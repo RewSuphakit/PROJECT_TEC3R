@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import useAuth from "../hooks/useAuth";
-
+import bg2 from '../assets/bg2.png';
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
 
@@ -76,13 +76,23 @@ const Login = () => {
   };
 
   return (
-        <div className="flex items-center justify-center " style={{ minHeight: '81vh', backgroundImage: "linear-gradient(to top, #f3e7e9 0%, #e3eeff 100%)" }}>
+    <div 
+      className="flex items-center justify-center" 
+      style={{ 
+        minHeight: '81vh', 
+        backgroundImage: `url(${bg2})`,
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       <div className="w-full max-w-md px-4">
-        <div className="bg-white p-8 rounded-lg shadow-md ">
+        <div className="bg-white p-8 rounded-lg shadow-md">
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="text-center">
               <h1 className="text-2xl font-semibold text-[#0F4C75]">เข้าสู่ระบบ</h1>
-              <p className="text-sm text-gray-500 mt-2">กรุณาเข้าสู่ระบบก่อนใช้งาน </p>
+              <p className="text-sm text-gray-500 mt-2">กรุณาเข้าสู่ระบบก่อนใช้งาน</p>
             </div>
 
             <div>
@@ -124,15 +134,15 @@ const Login = () => {
                 />
               </div>
               <div className="flex justify-between mt-2">
-                      <div>
-                     <input
-                        type="checkbox"
-                        className="mr-2 cursor-pointer rounded-md checkbox w-4 h-4" 
-                        onChange={togglePasswordVisibility}
-                      />
-                    <label className="text-sm  text-gray-400">Show Password</label>
-                    </div>
-                    </div>
+                <div>
+                  <input
+                    type="checkbox"
+                    className="mr-2 cursor-pointer rounded-md checkbox w-4 h-4" 
+                    onChange={togglePasswordVisibility}
+                  />
+                  <label className="text-sm text-gray-400">Show Password</label>
+                </div>
+              </div>
             </div>
 
             <button

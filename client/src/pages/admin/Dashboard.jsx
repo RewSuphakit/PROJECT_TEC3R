@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Activity from "../admin/Activity";
 import AddTool from '../admin/addTool';
+import bg2 from '../../assets/bg2.png';
+
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function Dashboard() {
   const [statsData, setStatsData] = useState({});
@@ -17,7 +19,14 @@ function Dashboard() {
   }, []);
 
   return (
-    <div className=" ">
+    <div style={{ 
+      minHeight: '100vh', 
+      backgroundImage: `url(${bg2})`,
+      backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed'
+    }}>
       <div className="lg:pl-72">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex justify-between items-center mb-8">

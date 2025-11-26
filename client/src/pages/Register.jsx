@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import bg2 from '../assets/bg2.png';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -13,8 +14,9 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("user");
   const [message, setMessage] = useState("");
-  const [emailValid, setEmailValid] = useState(true); // New state for email validation
+  const [emailValid, setEmailValid] = useState(true);
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
+  
   const handleRegister = async (e) => {
     e.preventDefault();
 
@@ -40,7 +42,7 @@ const Register = () => {
       return;
     }
 
-    setEmailValid(true); // Reset email validity if correct
+    setEmailValid(true);
 
     try {
       const response = await axios.post(`${apiUrl}/api/users/register`, {
@@ -66,7 +68,17 @@ const Register = () => {
   };
 
   return (
-    <div className="flex items-center justify-center bg-gray-100" style={{ minHeight: '81vh' ,backgroundImage: "linear-gradient(to top, #f3e7e9 0%, #e3eeff 100%)" }}>
+    <div 
+      className="flex items-center justify-center bg-gray-100" 
+      style={{ 
+        minHeight: '81vh',
+        backgroundImage: `url(${bg2})`,
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       <div className="relative w-full max-w-lg mx-auto">
         <div className="w-full px-8 py-8 bg-white rounded-xl shadow-lg mb-10">
           <div className="flex flex-col justify-center items-center">
@@ -188,7 +200,7 @@ const Register = () => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className=" w-full border rounded-lg pl-10 pr-4 py-2 text-sm bg-white focus:ring-2 focus:ring-[#0F4C75] focus:outline-none "
+                    className="w-full border rounded-lg pl-10 pr-4 py-2 text-sm bg-white focus:ring-2 focus:ring-[#0F4C75] focus:outline-none"
                     placeholder="กรุณากรอกรหัสผ่าน"
                     aria-label="รหัสผ่าน"
                   />
@@ -217,45 +229,43 @@ const Register = () => {
                 </div>
               </div>
 
- {/* บทบาท */}
-           <div className="flex flex-col gap-1">
-  <label className="text-sm font-medium text-gray-600">บทบาท</label>
-  <div className="relative">
-    <img
-      src="https://img.icons8.com/?size=100&id=23265&format=png&color=CDCDCD"
-      className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5"
-      alt="role-icon"
-    />
-    <select
-      name="role"
-      id="role"
-      value={role}
-      required
-      onChange={(e) => setRole(e.target.value)}
-      className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm text-gray-700 bg-white shadow-sm focus:ring-2 focus:ring-[#0F4C75] focus:border-[#0F4C75] focus:outline-none appearance-none"
-    >
-      <option className="text-gray-400" value="user">
-        นักศึกษา
-      </option>
-      <option className="text-gray-600" value="teacher">
-        อาจารย์
-      </option>
-    </select>
-    {/* เพิ่ม icon ลูกศร dropdown ด้านขวา */}
-    <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-      <svg
-        className="w-4 h-4 text-gray-400"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        viewBox="0 0 24 24"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-      </svg>
-    </div>
-  </div>
-</div>
-
+              {/* บทบาท */}
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-gray-600">บทบาท</label>
+                <div className="relative">
+                  <img
+                    src="https://img.icons8.com/?size=100&id=23265&format=png&color=CDCDCD"
+                    className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5"
+                    alt="role-icon"
+                  />
+                  <select
+                    name="role"
+                    id="role"
+                    value={role}
+                    required
+                    onChange={(e) => setRole(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm text-gray-700 bg-white shadow-sm focus:ring-2 focus:ring-[#0F4C75] focus:border-[#0F4C75] focus:outline-none appearance-none"
+                  >
+                    <option className="text-gray-400" value="user">
+                      นักศึกษา
+                    </option>
+                    <option className="text-gray-600" value="teacher">
+                      อาจารย์
+                    </option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                    <svg
+                      className="w-4 h-4 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
 
               {/* ปุ่มสมัครสมาชิก */}
               <div className="col-span-full">

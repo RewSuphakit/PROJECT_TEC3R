@@ -87,15 +87,16 @@ function Header() {
   return (
 
   
-    <section className="w-full  text-gray-700 sticky top-0 z-50" style={{backgroundColor: '#e3eeff'}}>
+    <section className="w-full  text-gray-700 sticky top-0 z-50" style={{backgroundColor: '#eaeaeaff'}}>
   <nav className="navbar e shadow-md  border-b border-gray-200 ">
     <div className="container mx-auto flex flex-wrap items-center justify-around">
       {/* Logo Section */}
       <div className="flex items-center">
         <a href="/RMUTI/" className="flex items-center">
         <div className="flex flex-col ">
-        <div>
+        <div className="flex items-center space-x-2 mb-1">
           <div className="text-5xl font-bold text-orange-500">RMUTI</div>
+          <div className="text-5xl font-bold text-blue-900">KKC</div>
           {/* <div><img className="rounded-md w-16 h-16" src={icon} alt="logo" /></div> */}
         </div>
       
@@ -160,10 +161,10 @@ function Header() {
             {!user?.user_id && (
              <div className="flex space-x-4">
              {/* Login Button */}
-             <Link to="/RMUTI/Login" className="btn btn-ghost text-gray-600  flex items-center space-x-2">
+             <Link to="/RMUTI/Login" className="btn btn-ghost text-orange-500 hover:bg-white-100 flex items-center space-x-2">
                <img
                  className="rounded-md w-5 h-5"
-                 src="https://img.icons8.com/?size=100&id=98957&format=png&color=0F4C75"
+                 src="https://img.icons8.com/?size=100&id=98957&format=png&color=F97316"
                  alt="login-icon"
                />
                <span>เข้าสู่ระบบ</span>
@@ -172,7 +173,7 @@ function Header() {
              {/* Register Button */}
              <Link
                to="/RMUTI/Register"
-               className="btn bg-[#0F4C75] text-white hover:bg-teal-500 border-0 flex items-center space-x-2"
+               className="btn bg-orange-500 text-white hover:bg-orange-600 border-0 flex items-center space-x-2"
              >
                <img className="w-5 h-5" src={register} alt="register-icon" />
                <span>สมัครใช้งาน</span>

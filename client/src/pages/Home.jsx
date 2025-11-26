@@ -2,7 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import Typed from 'typed.js';
-import bg from '../assets/ระบบขอใช้บริการ.jpg';
+import bg from '../assets/bg.png';
+import bg2 from '../assets/bg2.png';
 import axios from 'axios';
 import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
@@ -260,12 +261,17 @@ function Home() {
   const totalPages = Math.ceil(filteredEquipment.length / itemsPerPage);
   const loadingData = equipment.length === 0;
   return (
-    <div style={{ backgroundImage: "linear-gradient(to top, #f3e7e9 0%, #e3eeff 100%)" }}>
+    <div style={{ backgroundImage: `url(${bg2})`,
+      backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed',
+      minHeight: '100vh'}}>
       <ScrollToTopButton />
 
       {/* Hero Section */}
       <div
-        className="relative bg-fixed min-h-[800px]"
+        className="relative bg-fixed min-h-screen flex items-center justify-center"
         style={{
           backgroundImage: `linear-gradient(
             to bottom, 
@@ -296,7 +302,7 @@ function Home() {
       <section className="px-4 md:px-8 pb-8 mt-5">
         <div className="container max-w-6xl mx-auto">
           <div className="px-4 sm:px-8">
-            <h1 className="pl-2 text-lg sm:text-xl border-l-4 border-teal-400 text-black">
+            <h1 className="pl-2 text-lg sm:text-xl border-l-4 border-blue-500 text-black">
               อุปกรณ์ที่สามารถยืมได้
             </h1>
             <div className="mt-4 sm:mt-6 flex items-center justify-center">

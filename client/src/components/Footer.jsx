@@ -1,19 +1,59 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 function Footer() {
+  const footerRef = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (footerRef.current) {
+      observer.observe(footerRef.current);
+    }
+
+    return () => {
+      if (footerRef.current) observer.unobserve(footerRef.current);
+    };
+  }, []);
+
   return (
-    <footer className="fixed bottom-0 w-full  py-8 px-4 shadow-md rounded-t-md" style={{backgroundColor: '#f3e7e9'}}> 
-      <div className="container mx-auto flex justify-between items-center">
-        <div className="text-sm text-gray-600">
-          Copyright © 2024 by Jirasak & Supakit
+    <footer
+      ref={footerRef}
+      className={`transition-opacity duration-700 ease-in-out ${
+        visible ? 'opacity-100' : 'opacity-0'
+      } py-3 px-4 shadow-lg bg-gradient-to-r from-gray-500 to-gray-500 text-white text-sm`}
+    >
+      <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-2 md:gap-4">
+        {/* ส่วนชื่อมหาวิทยาลัย */}
+        <div className="text-xs md:text-left text-center">
+          © 2025 คณะครุศาสตร์อุตสาหกรรม, มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน วิทยาเขตขอนแก่น<br />
+          150 ถ.ศรีจันทร์ อ.เมือง จ.ขอนแก่น 40000 <br />
+          <span className="hover:underline cursor-pointer">
+            โทรศัพท์: 043-283703 (งานบริหารงานทั่วไป), 043-283704 (งานบริการการศึกษา)
+          </span> <br />
+          <span className="hover:underline cursor-pointer">แฟกซ์: 043-234756</span>
         </div>
-        <div className="flex gap-4">
-          <p className="text-gray-700 hover:text-gray-900 dark:text-gray-500 hover:dark:text-gray-700">
-            โครงการนี้สร้างขึ้นเพื่อการศึกษา
-          </p>
-          <p className="text-gray-700 hover:text-gray-900 dark:text-gray-500 hover:dark:text-gray-700">
-            ใช้งานในสาขาครุศาสตร์
-          </p>
+
+        {/* ส่วนอีเมลและเว็บไซต์ */}
+        <div className="text-xs md:text-right text-center mt-1 md:mt-0 flex flex-col md:flex-row gap-1 md:gap-3">
+          <a href="mailto:Tec13303rmuti@gmail.com" className="hover:underline">
+            Tec13303rmuti@gmail.com
+          </a>
+          <a
+            href="https://www.fte.rmuti.ac.th/main/th/node/80"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline"
+          >
+            www.fte.rmuti.ac.th
+          </a>
         </div>
       </div>
     </footer>
