@@ -87,18 +87,12 @@ function EditProfile() {
   };
 
   return (
-    <div 
-      className="fixed inset-0 flex items-center justify-center p-6 overflow-hidden  "
-      style={{
-        
-        backgroundImage: `url(${bg2})`,
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
-      }}
-    >
+    <div>
+      <div className=" flex flex-col items-center justify-center p-4 relative overflow-hidden"
+      style={{ backgroundImage: `url(${bg2})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+      >
       {/* Overlay */}
-      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-0"></div>
+      {/* <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-0 "></div> */}
       {/* Profile Display Section */}
       <div className="bg-white rounded-xl p-6 z-10 max-w-3xl w-full  ">
         <div className="flex items-center gap-2  mb-2">
@@ -181,7 +175,7 @@ function EditProfile() {
           แก้ไขข้อมูลส่วนตัว
         </button>
       </div>
-
+</div>
       {/* Edit Modal */}
       {editModalOpen && userToEdit && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-4">

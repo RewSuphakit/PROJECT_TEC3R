@@ -147,13 +147,8 @@ function ListReturn() {
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
           {/* Header */}
           <div className="mb-6 sm:mb-8">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-800">📦 รายชื่อคนคืนอุปกรณ์</h1>
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">
-              หมายเหตุ: ต้องคืนอุปกรณ์ทั้งหมดที่ยืมถึงจะถือว่าคืนเรียบร้อย
-            </p>
-            <p className="text-xs sm:text-sm mt-1">
-              <span className="text-green-500 font-semibold">* คืนแล้ว = คืนเรียบร้อยแล้ว</span>
-            </p>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-800">📦 รายการคืนอุปกรณ์</h1>
+          
           </div>
 
           {loading ? (

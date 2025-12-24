@@ -63,10 +63,10 @@ function History() {
       }}
     >
       {/* ชั้น overlay */}
-      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-0"></div>
+      {/* <div className="fixed inset-0 bg-black/30r-sm "></div> */}
 
       {/* กล่องหลัก */}
-      <div className="relative z-10 w-full max-w-6xl mx-auto bg-white/95 backdrop-blur-md rounded-xl shadow-2xl p-4 sm:p-6 lg:p-8">
+      <div className="relative z-10 w-full max-w-6xl mx-auto bg-white/95 rounded-xl shadow-2xl p-4 sm:p-6 lg:p-8">
         <h2 className="text-2xl sm:text-3xl font-semibold text-center mb-6 sm:mb-8 text-gray-800">
           ประวัติการยืม-คืนอุปกรณ์
         </h2>

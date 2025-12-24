@@ -147,9 +147,6 @@ function ManageUsers() {
           {/* Header */}
           <div className="mb-6 sm:mb-8">
             <h1 className="text-xl sm:text-2xl font-bold text-gray-800">⚙️ จัดการผู้ใช้</h1>
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">
-              คุณสามารถดูและจัดการผู้ใช้ทั้งหมดในระบบได้ที่นี่
-            </p>
           </div>
 
           {/* Desktop Table View */}
@@ -181,7 +178,7 @@ function ManageUsers() {
                           user.role === "admin" ? "bg-blue-800" : 
                           user.role === "teacher" ? "bg-blue-500" : "bg-blue-300"
                         }`}>
-                          {user.role === "admin" ? "ดูแลระบบ" : 
+                          {user.role === "admin" ? "ผู้ดูแลระบบ" : 
                            user.role === "teacher" ? "อาจารย์" : "นักศึกษา"}
                         </span>
                       </td>
@@ -232,7 +229,7 @@ function ManageUsers() {
                       user.role === "admin" ? "bg-red-500" : 
                       user.role === "teacher" ? "bg-purple-500" : "bg-blue-500"
                     }`}>
-                      {user.role === "admin" ? "ดูแลระบบ" : 
+                      {user.role === "admin" ? "ผู้ดูแลระบบ" : 
                        user.role === "teacher" ? "อาจารย์" : "นักศึกษา"}
                     </span>
                   </div>
@@ -427,7 +424,7 @@ function ManageUsers() {
                         className="select select-bordered select-sm sm:select-md w-full"
                       >
                         <option value="user">นักศึกษา</option>
-                        <option value="admin">ดูแลระบบ</option>
+                        <option value="admin">ผู้ดูแลระบบ</option>
                         <option value="teacher">อาจารย์</option>
                       </select>
                     </div>

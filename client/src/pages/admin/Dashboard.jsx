@@ -46,13 +46,12 @@ function Dashboard() {
             <div className="md:col-span-3 lg:col-span-1 bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-500 text-sm">อุปกรณ์ทั้งหมด</p>
                   <h3 className="text-3xl font-bold text-gray-800 mt-2">
                     {statsData.total_equipment || 0}
                   </h3>
                   <p className="text-blue-500 text-sm font-medium mt-2 flex items-center gap-1">
                     <i className="fa-solid fa-box text-xs" />
-                    <span>อุปกรณ์ทั้งหมดที่มีให้ยืม</span>
+                    <span>อุปกรณ์ทั้งหมด</span>
                   </p>
                 </div>
                 <div className="bg-blue-50 p-4 rounded-xl">
@@ -65,13 +64,12 @@ function Dashboard() {
             <div className="md:col-span-3 lg:col-span-1 bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-500 text-sm">กำลังถูกยืม</p>
                   <h3 className="text-3xl font-bold text-gray-800 mt-2">
                     {statsData.total_borrowed || 0}
                   </h3>
                   <p className="text-green-500 text-sm font-medium mt-2 flex items-center gap-1">
                     <i className="fas fa-exchange-alt text-xs" />
-                    <span>อุปกรณ์ที่กำลังถูกยืมทั้งหมด</span>
+                    <span>รายการอุปกรณ์ที่ถูกยืม</span>
                   </p>
                 </div>
                 <div className="bg-green-50 p-4 rounded-xl">
@@ -84,7 +82,6 @@ function Dashboard() {
             <div className="md:col-span-3 lg:col-span-1 bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-500 text-sm">ผู้ใช้งานทั้งหมด</p>
                   <h3 className="text-3xl font-bold text-gray-800 mt-2">
                     {statsData.total_users || 0}
                   </h3>

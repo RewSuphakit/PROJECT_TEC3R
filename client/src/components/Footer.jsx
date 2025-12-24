@@ -28,17 +28,15 @@ function Footer() {
       ref={footerRef}
       className={`transition-opacity duration-700 ease-in-out ${
         visible ? 'opacity-100' : 'opacity-0'
-      } py-3 px-4 shadow-lg bg-gradient-to-r from-gray-500 to-gray-500 text-white text-sm`}
+      } py-3 px-4 shadow-lg bg-gradient-to-r from-gray-500 to-gray-500 text-white text-sm `}
     >
       <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-2 md:gap-4">
         {/* ส่วนชื่อมหาวิทยาลัย */}
         <div className="text-xs md:text-left text-center">
           © 2025 คณะครุศาสตร์อุตสาหกรรม, มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน วิทยาเขตขอนแก่น<br />
           150 ถ.ศรีจันทร์ อ.เมือง จ.ขอนแก่น 40000 <br />
-          <span className="hover:underline cursor-pointer">
-            โทรศัพท์: 043-283703 (งานบริหารงานทั่วไป), 043-283704 (งานบริการการศึกษา)
-          </span> <br />
-          <span className="hover:underline cursor-pointer">แฟกซ์: 043-234756</span>
+          
+        
         </div>
 
         {/* ส่วนอีเมลและเว็บไซต์ */}

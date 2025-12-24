@@ -32,7 +32,7 @@ function Header() {
         src="https://img.icons8.com/?size=100&id=59835&format=png&color=374151"
         alt="email icon"
       />
-      อีเมลผู้ใช้งาน: {user?.student_email}
+      อีเมล: {user?.student_email}
     </Link>
   </li>
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
@@ -102,10 +102,10 @@ function Header() {
       
         
           <div className="flex items-center space-x-2">   
-            <p className="text-sm text-black-100 font-bold">ระบบการยืม-คืนอุปกรณ์ชุดฝึกการเรียนการสอน</p>
+            <p className="text-sm text-black-100 font-bold">ระบบการยืม-คืนอุปกรณ์</p>
             </div>
          <div className="flex items-center space-x-2">
-          <p className="text-sm text-black-100 font-bold">ใช้งานในสาขาครุศาสตร์อุตสาหกรรมคอมพิวเตอร์</p>
+          <p className="text-sm text-black-100 font-bold">สาขาครุศาสตร์อุตสาหกรรมคอมพิวเตอร์</p>
           </div>
          </div>
           {/* <img className="rounded-md " src={logofix} alt="logo" /> */}
@@ -119,9 +119,9 @@ function Header() {
               <div className="flex items-center space-x-4">
   <p className="text-gray-700 text-sm font-medium">
   ผู้ใช้งาน : {user?.role === "user" 
-    ? "นักเรียน" 
+    ? "นักศึกษา" 
     : user?.role === "teacher" 
-      ? "ครู" 
+      ? "อาจารย์" 
       : "ไม่ทราบ"}
 </p>
 

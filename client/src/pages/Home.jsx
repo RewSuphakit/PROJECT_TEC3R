@@ -64,7 +64,7 @@ function Home() {
     const typed = new Typed(el.current, {
       strings: [
         'ยินดีต้อนรับเข้าสู่',
-        'ระบบการยืม-คืนอุปกรณ์ ชุดฝึกการเรียนการสอน'
+        'ระบบการยืม-คืนอุปกรณ์ '
       ],
       typeSpeed: 50,
       loop: true,
@@ -293,7 +293,7 @@ function Home() {
             <span ref={el} />
           </h1>
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white mt-2 sm:mt-4 text-center transition-all duration-300">
-            ในสาขาครุศาสตร์อุตสาหกรรมคอมพิวเตอร์
+            สาขาครุศาสตร์อุตสาหกรรมคอมพิวเตอร์
           </p>
         </div>
       </div>

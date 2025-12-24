@@ -109,8 +109,8 @@ const CameraCapture = ({ onCapture, recordId }) => {
                 <video ref={videoRef} autoPlay width="100%" height="auto" className="mb-4" />
                 <canvas ref={canvasRef} width="640" height="480" style={{ display: 'none' }} />
                 <div className="flex justify-center">
-                  <button onClick={handleCapture} className="btn btn-success mr-2">Capture</button>
                   <button onClick={() => setIsModalOpen(false)} className="btn btn-error">Close</button>
+                  <button onClick={handleCapture} className="btn btn-success mr-2">Capture</button>
                 </div>
               </div>
             </div>

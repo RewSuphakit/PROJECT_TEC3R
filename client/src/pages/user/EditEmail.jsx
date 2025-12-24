@@ -78,7 +78,7 @@ function EditEmail() {
 
   return (
     <div 
-      className=" flex items-center justify-center p-6">
+      className=" flex items-center justify-center p-6 min-h-screen">
       <div className="bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-all hover:shadow-3xl">
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full mb-4 shadow-lg">
@@ -101,7 +101,7 @@ function EditEmail() {
                 </svg>
               </div>
               <div className="flex-1">
-                <p className="text-sm text-gray-600 font-medium">อีเมลปัจจุบัน</p>
+                <p className="text-sm text-gray-600 font-medium">อีเมล</p>
                 <p className="text-lg font-semibold text-gray-800">{user.student_email}</p>
               </div>
             </div>

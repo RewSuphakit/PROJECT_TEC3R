@@ -7,8 +7,6 @@ import { toast } from 'react-toastify';
 function Return() {
   const { borrowedBooks, fetchBorrowRecords } = useAuth();
   const [images, setImages] = useState({});
-  const [capturedImage, setCapturedImage] = useState({});
-  const [captureMode, setCaptureMode] = useState(false);
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
   const handleCaptureImage = (capturedImage, recordId) => {
@@ -16,7 +14,6 @@ function Return() {
       ...prevCapturedImages,
       [recordId]: capturedImage,
     }));
-    setCaptureMode(false);
   };
 
   const handleUploadImage = (file, recordId) => {
@@ -75,7 +72,7 @@ function Return() {
         <td className="px-6 py-4">{item.record_id}</td>
         <td className="px-6 py-4">
           <img
-            src={`http://localhost:5000/uploads/${item.image}`}
+            src={`${apiUrl}/uploads/${item.image}`}
             alt="อุปกรณ์"
             className="h-16 w-16 rounded-lg"
           />
@@ -88,7 +85,7 @@ function Return() {
           <ImageUpload onImageUpload={handleUploadImage} recordId={item.record_id} />
         </td>
         <td className="px-6 py-4 text-center">
-          {(images[item.record_id] || capturedImage[item.record_id]) && (
+          {images[item.record_id] && (
             <button
               onClick={() => handleReturned(item.record_id, 'Returned')}
               className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-150"
@@ -114,7 +111,7 @@ function Return() {
     ))
   ) : (
     <tr>
-      <td className="px-6 py-4" colSpan="6">ไม่มีรายการอุปกรณ์ที่ต้องคืน</td>
+      <td className="px-6 py-4" colSpan="7">ไม่มีรายการอุปกรณ์ที่ต้องคืน</td>
     </tr>
   )}
 </tbody>

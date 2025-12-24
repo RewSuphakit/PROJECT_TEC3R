@@ -2,8 +2,8 @@ const line = require('@line/bot-sdk');
 require('dotenv').config();
 // ตั้งค่า LINE Messaging API
 const lineConfig = {
-  channelAccessToken:process.env.channelAccessToken , // ใส่ Access Token จาก LINE Developers
-  channelSecret: process.env.channelSecret,           
+  channelAccessToken: process.env.channelAccessToken, // ใส่ Access Token จาก LINE Developers
+  channelSecret: process.env.channelSecret,
 };
 
 const client = new line.Client(lineConfig);
@@ -22,13 +22,13 @@ exports.sendMessage = async (message, imageUrl) => {
     if (imageUrl) {
       messages.push({
         type: 'image',
-        originalContentUrl: imageUrl, 
+        originalContentUrl: imageUrl,
         previewImageUrl: imageUrl,
       });
     }
 
 
-    const recipientId = process.env.recipientId; 
+    const recipientId = process.env.recipientId;
 
     // Send the message using LINE's pushMessage method
     await client.pushMessage(recipientId, messages);
@@ -37,4 +37,3 @@ exports.sendMessage = async (message, imageUrl) => {
     console.error('Error sending LINE message:', error);
   }
 };
-  
