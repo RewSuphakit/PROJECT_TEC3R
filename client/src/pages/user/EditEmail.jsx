@@ -78,18 +78,17 @@ function EditEmail() {
 
   return (
     <div 
-      className=" flex items-center justify-center p-6 min-h-screen">
+      className=" flex items-center justify-center p-6  min-h-screen ">
       <div className="bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-all hover:shadow-3xl">
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full mb-4 shadow-lg">
             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
+              <path strokeLinecap="round" strokeLinejo  in="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>  
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
             แก้ไขข้อมูลส่วนตัว
           </h1>
-          <p className="text-gray-500 mt-2">จัดการอีเมลและรหัสผ่านของคุณ</p>
         </div>
 
         {user && (
@@ -138,7 +137,6 @@ function EditEmail() {
               <h2 className="text-2xl font-bold text-gray-800">
                 แก้ไขข้อมูล
               </h2>
-              <p className="text-sm text-gray-500 mt-1">อัพเดทอีเมลและรหัสผ่านของคุณ</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">

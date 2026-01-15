@@ -105,7 +105,6 @@ function EditProfile() {
             <h1 className="text-3xl font-bold text-blue-900">
               โปรไฟล์ของฉัน
             </h1>
-            <p className="text-gray-500 text-sm mt-1">ข้อมูลส่วนตัวของคุณ</p>
           </div>
         </div>
 
@@ -189,7 +188,6 @@ function EditProfile() {
           />
               </div>
               <h2 className="text-2xl font-bold text-gray-800">แก้ไขข้อมูลส่วนตัว</h2>
-              <p className="text-sm text-gray-500 mt-1">อัพเดทข้อมูลของคุณ</p>
             </div>
 
             <form onSubmit={handleEditSubmit} className="space-y-5">
