@@ -4,10 +4,8 @@ import { useParams, Link } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import bg2 from '../../assets/bg2.png';
 
-// ฟอนต์ไทย THSarabunNew (Base64)
-const thaiFont = 'AAEAAAASAQAABAAgR0RFRgBDAAQAAAEoAAAAKEdQT1MHYQAKAAABUAAAABxHU1VCABsAAgAAAWwAAAA+T1MvMnmTYF0AAAK8AAAAYGNtYXABOgFrAAADHAAAAERnYXNwAAAAEAAAA2AAAAAIZ2x5ZvSElT0AAANoAAAGGGhlYWQfxAeKAAAJgAAAADZoaGVhB+ID/AAACbgAAAAkaG10eDEAD/sAAAncAAAASGxvY2EHEgZyAAAKJAAAACZtYXhwABkAWgAACkwAAAAgbmFtZfNWFtAAAApsAAABn3Bvc3T/bQBkAAAMDAAAACBwcmVwomb4nQAADCwAAAAHAAEAAAABAABjqvKjXw889QALA+gAAAAA2fKVxAAAAADZ8pXEAAD/4AOAAwwAAAAIAAIAAAAAAAAAAQAAAwz/zAAABAAAAAAAA4AAAQAAAAAAAAAAAAAAAAAAAAkAAQAAAAwAVAADAAAAAAACAAAAAACaAAAAAAAAAP/qAAAAAAAAAAAAAAD/+QOAAwz/4P/g/+EAAAABAAAACQAJAAkACQAAAAEAAAABAAEAAQAAAAEAAAABAAEAAQAAAAEAAAACAAEAAQAAAwACAAAAAAARAAwAAQAAAAAAAAACAAcAAQAAAAEAAQABAAAAAwQFBgcICQoLDA==';
-
-// ต้องติดตั้ง: npm install jspdf
+// ❌ ไม่ต้อง import thaiFont.js แล้ว
+// ✅ เราจะดึงไฟล์ .ttf จากโฟลเดอร์ public แทน
 
 function ReportDetails() {
   const { transaction_id } = useParams();
@@ -18,134 +16,158 @@ function ReportDetails() {
   useEffect(() => {
     const fetchReportDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/stats/reports/${transaction_id}`);
-        setBorrowRecords(response.data.borrow_records || []);
+        setLoading(true);
+        const response = await axios.get(`http://localhost:5000/api/borrowRecords/transaction/${transaction_id}`);
+        setBorrowRecords(response.data);
+        setError(null);
       } catch (err) {
-        console.error("Error fetching report details:", err);
-        setError("Failed to load report details. Please try again later.");
+        console.error('Error fetching report details:', err);
+        setError('ไม่สามารถโหลดข้อมูลรายงานได้');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchReportDetails();
+    if (transaction_id) {
+      fetchReportDetails();
+    }
   }, [transaction_id]);
 
-  const handleExportPDF = () => {
+  // --- ฟังก์ชันช่วยแปลงไฟล์ฟอนต์เป็น Base64 ---
+  const getFontBase64 = async (path) => {
+    try {
+      const response = await fetch(path);
+      if (!response.ok) throw new Error("Network response was not ok");
+      const blob = await response.blob();
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          // ตัดส่วนหัว data:...base64, ออกอัตโนมัติ
+          const base64data = reader.result.split(',')[1]; 
+          resolve(base64data);
+        };
+        reader.readAsDataURL(blob);
+      });
+    } catch (e) {
+      console.error("Error loading font:", e);
+      return null;
+    }
+  };
+
+  // --- ฟังก์ชัน Export PDF ---
+  const handleExportPDF = async () => {
     try {
       if (!borrowRecords || borrowRecords.length === 0) {
-        alert('ไม่มีข้อมูลสำหรับ Export PDF');
+        alert("ไม่มีข้อมูลสำหรับออกรายงาน");
         return;
       }
 
       const doc = new jsPDF();
+
+      // 1. โหลดฟอนต์จาก public
+      const fontBase64 = await getFontBase64('/RMUTI/fonts/THSarabunNew.ttf');
+      
+      if (!fontBase64) {
+        alert("ไม่พบไฟล์ฟอนต์! กรุณาตรวจสอบว่ามีไฟล์ public/fonts/THSarabunNew.ttf หรือไม่");
+        return;
+      }
+
+      // 2. ตั้งค่าฟอนต์
+      doc.addFileToVFS('THSarabunNew.ttf', fontBase64);
+      doc.addFont('THSarabunNew.ttf', 'THSarabunNew', 'normal');
+      doc.setFont('THSarabunNew');
+
       const borrower = borrowRecords[0];
-      
-      // หัวเอกสาร
-      doc.setFontSize(16);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Transaction ID: ' + transaction_id, 105, 15, { align: 'center' });
-      
+      let yPosition = 20;
+
+      // หัวเรื่อง
+      doc.setFontSize(20);
+      doc.text(`รายงานการยืม #${transaction_id}`, 105, yPosition, { align: 'center' });
+      yPosition += 15;
+
       // ข้อมูลผู้ยืม
+      doc.setFontSize(14);
+      doc.text('ข้อมูลผู้ยืม', 20, yPosition);
+      yPosition += 8;
+
       doc.setFontSize(12);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Equipment Borrowing and Returning System', 14, 30);
-      
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10);
-      doc.text('Borrower: ' + (borrower.student_name || '-'), 14, 38);
-      doc.text('Year: ' + (borrower.year_of_study || '-'), 14, 44);
-      doc.text('Email: ' + (borrower.student_email || '-'), 14, 50);
-      doc.text('Phone: ' + (borrower.phone || '-'), 14, 56);
-      
+      doc.text(`ชื่อผู้ยืม: ${borrower.student_name || '-'}`, 20, yPosition);
+      yPosition += 7;
+      doc.text(`ชั้นปี: ${borrower.year_of_study || '-'}`, 20, yPosition);
+      yPosition += 7;
+      doc.text(`อีเมล: ${borrower.student_email || '-'}`, 20, yPosition);
+      yPosition += 7;
+      doc.text(`เบอร์โทร: ${borrower.phone || '-'}`, 20, yPosition);
+      yPosition += 15;
+
+      // หัวตาราง
+      doc.setFontSize(14);
+      doc.text('รายการอุปกรณ์ที่ยืม', 20, yPosition);
+      yPosition += 10;
+
       // วาดตาราง
-      let startY = 68;
-      const rowHeight = 10;
-      const colWidths = [60, 20, 30, 40, 40];
-      const startX = 14;
+      doc.setFontSize(11);
+      const tableHeaders = ['ลำดับ', 'ชื่ออุปกรณ์', 'จำนวน', 'สถานะ', 'วันที่ยืม'];
+      const colWidths = [15, 60, 25, 30, 50];
+      let xPosition = 20;
+
+      // พื้นหลังหัวตาราง
+      doc.setFillColor(220, 220, 220);
+      doc.rect(20, yPosition - 5, 180, 8, 'F');
       
-      // Header
-      doc.setFillColor(66, 139, 202);
-      doc.rect(startX, startY, colWidths.reduce((a, b) => a + b, 0), rowHeight, 'F');
-      
-      doc.setTextColor(255, 255, 255);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9);
-      doc.text('Equipment', startX + 2, startY + 6);
-      doc.text('Qty', startX + colWidths[0] + 2, startY + 6);
-      doc.text('Status', startX + colWidths[0] + colWidths[1] + 2, startY + 6);
-      doc.text('Borrow Date', startX + colWidths[0] + colWidths[1] + colWidths[2] + 2, startY + 6);
-      doc.text('Return Date', startX + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + 2, startY + 6);
-      
-      startY += rowHeight;
-      
-      // Data rows
-      doc.setTextColor(0, 0, 0);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
-      
+      tableHeaders.forEach((header, index) => {
+        doc.text(header, xPosition, yPosition);
+        xPosition += colWidths[index];
+      });
+      yPosition += 8;
+
+      // วาดข้อมูลในตาราง
       borrowRecords.forEach((record, index) => {
-        // สลับสีแถว
-        if (index % 2 === 1) {
-          doc.setFillColor(245, 245, 245);
-          doc.rect(startX, startY, colWidths.reduce((a, b) => a + b, 0), rowHeight, 'F');
-        }
+        xPosition = 20;
         
-        // ข้อมูลในแต่ละคอลัมน์
-        const equipmentName = record.equipment_name || '-';
-        const qty = String(record.quantity_borrow || '0');
-        const status = record.status === 'Returned' ? 'Returned' : 'Borrowed';
+        const borrowDate = record.borrow_date 
+          ? new Date(record.borrow_date).toLocaleDateString('th-TH', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            })
+          : '-';
+
+        const status = record.status === 'Returned' ? 'คืนแล้ว' : 'ยังไม่คืน';
+
+        doc.text((index + 1).toString(), xPosition, yPosition);
+        xPosition += colWidths[0];
         
-        // Format วันที่แบบไทย
-        const borrowDate = record.borrow_date ? 
-          new Date(record.borrow_date).toLocaleString('th-TH', {
-            timeZone: 'Asia/Bangkok',
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
-          }) : '-';
-          
-        const returnDate = record.status === 'Returned' && record.return_date ? 
-          new Date(record.return_date).toLocaleString('th-TH', {
-            timeZone: 'Asia/Bangkok',
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
-          }) : 'Not Returned';
+        doc.text(record.equipment_name || '-', xPosition, yPosition);
+        xPosition += colWidths[1];
         
-        doc.text(equipmentName.substring(0, 30), startX + 2, startY + 6);
-        doc.text(qty, startX + colWidths[0] + 2, startY + 6);
-        doc.text(status, startX + colWidths[0] + colWidths[1] + 2, startY + 6);
-        doc.text(borrowDate, startX + colWidths[0] + colWidths[1] + colWidths[2] + 2, startY + 6);
-        doc.text(returnDate, startX + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + 2, startY + 6);
+        doc.text((record.quantity_borrow || 0).toString(), xPosition, yPosition);
+        xPosition += colWidths[2];
         
-        // วาดเส้นขอบ
-        doc.setDrawColor(200, 200, 200);
-        doc.rect(startX, startY, colWidths.reduce((a, b) => a + b, 0), rowHeight, 'S');
+        doc.text(status, xPosition, yPosition);
+        xPosition += colWidths[3];
         
-        startY += rowHeight;
+        doc.text(borrowDate, xPosition, yPosition);
         
-        // เช็คว่าเกินหน้ากระดาษหรือไม่
-        if (startY > 270) {
+        yPosition += 8;
+
+        // ขึ้นหน้าใหม่ถ้าเกินพื้นที่
+        if (yPosition > 270) {
           doc.addPage();
-          startY = 20;
+          yPosition = 20;
         }
       });
-      
-      // บันทึกไฟล์ PDF
-      doc.save(`Report_${transaction_id}.pdf`);
-      alert('Export PDF สำเร็จ!');
-      
-    } catch (error) {
-      console.error('Error exporting PDF:', error);
-      alert(`เกิดข้อผิดพลาดในการ Export PDF: ${error.message}`);
+
+      // บันทึกไฟล์
+      doc.save(`รายงาน_${transaction_id}.pdf`);
+
+    } catch (err) {
+      console.error("PDF Export Error:", err);
+      alert(`เกิดข้อผิดพลาดในการ Export PDF: ${err.message}`);
     }
   };
 
+  // --- Render Loading ---
   if (loading) {
     return (
       <div style={{ 
@@ -159,7 +181,8 @@ function ReportDetails() {
         <div className="lg:pl-72">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="bg-white rounded-lg shadow-md p-8 text-center">
-              <p className="text-lg text-gray-600">กำลังโหลดข้อมูล...</p>
+              <span className="loading loading-spinner loading-lg text-primary"></span>
+              <p className="mt-4 text-gray-600">กำลังโหลดข้อมูล...</p>
             </div>
           </div>
         </div>
@@ -167,6 +190,7 @@ function ReportDetails() {
     );
   }
 
+  // --- Render Error ---
   if (error) {
     return (
       <div style={{ 
@@ -188,6 +212,7 @@ function ReportDetails() {
     );
   }
 
+  // --- Render No Data ---
   if (borrowRecords.length === 0) {
     return (
       <div style={{ 
@@ -211,6 +236,7 @@ function ReportDetails() {
 
   const borrower = borrowRecords[0];
 
+  // --- Render Main Content ---
   return (
     <div style={{ 
       minHeight: '100vh', 
@@ -222,7 +248,8 @@ function ReportDetails() {
     }}>
       <div className="lg:pl-72">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-          {/* Header */}
+          
+          {/* Header Card */}
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-4 sm:mb-6">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 text-center mb-4 sm:mb-6">
               📋 รายงานหมายเลข {transaction_id}

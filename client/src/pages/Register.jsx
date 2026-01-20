@@ -15,6 +15,7 @@ const Register = () => {
   const [role, setRole] = useState("user");
   const [message, setMessage] = useState("");
   const [emailValid, setEmailValid] = useState(true);
+  const [emailDuplicate, setEmailDuplicate] = useState(false);
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
   
   const handleRegister = async (e) => {
@@ -43,6 +44,7 @@ const Register = () => {
     }
 
     setEmailValid(true);
+    setEmailDuplicate(false);
 
     try {
       const response = await axios.post(`${apiUrl}/api/users/register`, {
@@ -60,10 +62,17 @@ const Register = () => {
       });
       navigate("/RMUTI/Login");
     } catch (error) {
-      setMessage("การสมัครสมาชิกไม่สำเร็จ กรุณาลองอีกครั้ง");
-      toast.error("การสมัครสมาชิกไม่สำเร็จ กรุณาลองอีกครั้ง", {
-        position: "top-center"
-      });
+      if (error.response?.data?.message === 'User with this email already exists') {
+        setEmailDuplicate(true);
+        toast.error("อีเมลนี้ถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น", {
+          position: "top-center"
+        });
+      } else {
+        setMessage("การสมัครสมาชิกไม่สำเร็จ กรุณาลองอีกครั้ง");
+        toast.error("การสมัครสมาชิกไม่สำเร็จ กรุณาลองอีกครั้ง", {
+          position: "top-center"
+        });
+      }
     }
   };
 
@@ -107,6 +116,8 @@ const Register = () => {
                   />
                   <input
                     type="text"
+                    id="student_name"
+                    name="student_name"
                     value={student_name}
                     onChange={(e) => setStudentName(e.target.value)}
                     className="w-full border rounded-lg pl-10 pr-4 py-2 text-sm bg-white focus:ring-2 focus:ring-[#0F4C75] focus:outline-none"
@@ -129,6 +140,8 @@ const Register = () => {
                   />
                   <input
                     type="text"
+                    id="year_of_study"
+                    name="year_of_study"
                     value={year_of_study}
                     onChange={(e) => setStudentYear(e.target.value)}
                     className="w-full border rounded-lg pl-10 pr-4 py-2 text-sm bg-white focus:ring-2 focus:ring-[#0F4C75] focus:outline-none"
@@ -151,6 +164,8 @@ const Register = () => {
                   />
                   <input
                     type="text"
+                    id="student_id"
+                    name="student_id"
                     value={student_id}
                     onChange={(e) => setStudentId(e.target.value)}
                     className="w-full border rounded-lg pl-10 pr-4 py-2 text-sm bg-white focus:ring-2 focus:ring-[#0F4C75] focus:outline-none"
@@ -173,16 +188,24 @@ const Register = () => {
                   />
                   <input
                     type="email"
+                    id="student_email"
+                    name="student_email"
                     value={student_email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setEmailDuplicate(false);
+                    }}
                     className={`w-full border rounded-lg pl-10 pr-4 py-2 text-sm bg-white focus:ring-2 
           focus:ring-[#0F4C75] focus:outline-none ${
-            !emailValid ? "border-red-500" : ""
+            !emailValid || emailDuplicate ? "border-red-500 bg-red-50" : ""
           }`}
                     placeholder="กรุณากรอกอีเมลนักศึกษา"
                     aria-label="อีเมลนักศึกษา"
                   />
                 </div>
+                {emailDuplicate && (
+                  <p className="text-red-500 text-xs mt-1">อีเมลนี้ถูกใช้งานแล้ว</p>
+                )}
               </div>
 
               {/* รหัสผ่าน */}
@@ -198,6 +221,8 @@ const Register = () => {
                   />
                   <input
                     type="password"
+                    id="password"
+                    name="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full border rounded-lg pl-10 pr-4 py-2 text-sm bg-white focus:ring-2 focus:ring-[#0F4C75] focus:outline-none"
@@ -219,7 +244,9 @@ const Register = () => {
                     alt="phone-icon"
                   />
                   <input
-                    type="text"
+                    type="tel"
+                    id="phone"
+                    name="phone"
                     value={phone}
                     onChange={(e) => setStudentPhone(e.target.value)}
                     className="w-full border rounded-lg pl-10 pr-4 py-2 text-sm bg-white focus:ring-2 focus:ring-[#0F4C75] focus:outline-none"
@@ -231,7 +258,7 @@ const Register = () => {
 
               {/* บทบาท */}
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-gray-600">บทบาท</label>
+                <label className="text-sm font-medium text-gray-600">ผู้ใช้งาน</label>
                 <div className="relative">
                   <img
                     src="https://img.icons8.com/?size=100&id=23265&format=png&color=CDCDCD"

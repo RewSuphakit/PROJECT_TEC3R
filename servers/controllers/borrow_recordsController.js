@@ -422,6 +422,41 @@ exports.deleteBorrowRecord = async (req, res) => {
 // =========================
 // 6. ดึงข้อมูลบันทึกการยืมตาม record_id (Get Borrow Record by ID)
 // =========================
+// =========================
+// 6.1 ดึงข้อมูลบันทึกการยืมตาม transaction_id (Get Borrow Records by Transaction ID)
+// =========================
+exports.getBorrowRecordsByTransactionId = async (req, res) => {
+  const { transaction_id } = req.params;
+  if (!transaction_id) return res.status(400).json({ message: "Transaction ID is required" });
+
+  try {
+    const query = `
+      SELECT br.record_id, bt.transaction_id, u.student_id, u.student_name, u.student_email, 
+             u.phone, u.year_of_study,
+             e.equipment_name, br.borrow_date, br.return_date, 
+             br.status, br.quantity_borrow, br.image_return
+      FROM borrow_records br
+      JOIN borrow_transactions bt ON br.transaction_id = bt.transaction_id
+      JOIN users u ON br.user_id = u.user_id
+      JOIN equipment e ON br.equipment_id = e.equipment_id
+      WHERE bt.transaction_id = ?
+      ORDER BY br.record_id ASC
+    `;
+    const [borrowResults] = await connection.promise().query(query, [transaction_id]);
+    if (!borrowResults.length) {
+      return res.status(404).json({ message: "No borrow records found for this transaction" });
+    }
+
+    res.status(200).json(borrowResults);
+  } catch (error) {
+    console.error("Error fetching borrow records by transaction ID:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
+
+// =========================
+// 6.2 ดึงข้อมูลบันทึกการยืมตาม record_id (Get Borrow Record by ID)
+// =========================
 exports.getAllBorrowRecordsID = async (req, res) => {
   const { record_id } = req.params;
   if (!record_id) return res.status(400).json({ message: "ID is required" });

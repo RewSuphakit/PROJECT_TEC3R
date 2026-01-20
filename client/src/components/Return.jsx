@@ -4,6 +4,8 @@ import axios from 'axios';
 import CameraCapture from '../components/CameraCapture';
 import ImageUpload from '../components/ImageUpload';
 import { toast } from 'react-toastify';
+import bg2 from '../assets/bg2.png';
+
 function Return() {
   const { borrowedBooks, fetchBorrowRecords } = useAuth();
   const [images, setImages] = useState({});
@@ -48,6 +50,9 @@ function Return() {
   };
 
   return (
+     <div className=" flex flex-col items-center justify-center p-4 relative overflow-hidden"
+               style={{ backgroundImage: `url(${bg2})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+               >
     <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
@@ -121,7 +126,7 @@ function Return() {
         </div>
       </div>
     </div>
-    
+    </div>
   );
 }
 

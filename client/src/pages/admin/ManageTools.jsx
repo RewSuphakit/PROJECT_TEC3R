@@ -166,9 +166,7 @@ function ManageTools() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-8 gap-2">
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-gray-800">🧰 จัดการอุปกรณ์</h1>
-              <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                หมายเหตุ: คลิกที่สถานะเพื่อเปลี่ยนสถานะอุปกรณ์
-              </p>
+             
             </div>
           </div>
 

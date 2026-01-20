@@ -5,7 +5,6 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import bg2 from '../../assets/bg2.png';
-
 function EditEmail() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -77,6 +76,11 @@ function EditEmail() {
   };
 
   return (
+     <div className=" flex flex-col items-center justify-center p-4 relative overflow-hidden"
+           style={{ backgroundImage: `url(${bg2})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+           >
+
+     
     <div 
       className=" flex items-center justify-center p-6  min-h-screen ">
       <div className="bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-all hover:shadow-3xl">
@@ -318,6 +322,7 @@ function EditEmail() {
           animation: bounceIn 0.35s ease-out forwards;
         }
       `}</style>
+    </div>
     </div>
   );
 }

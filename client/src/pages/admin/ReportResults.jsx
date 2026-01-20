@@ -81,9 +81,6 @@ function ReportResults() {
       <div className="flex justify-between items-center mb-8">
             <div>
               <h1 className="text-2xl font-bold text-gray-800">📅 รายงานคนคืนอุปกรณ์</h1>
-              <p className="text-sm text-gray-500 mt-1">
-                ดูรายงานการคืนอุปกรณ์ทั้งหมด
-              </p>
             </div>
            
           </div>

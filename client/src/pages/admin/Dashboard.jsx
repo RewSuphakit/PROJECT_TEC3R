@@ -32,9 +32,6 @@ function Dashboard() {
           <div className="flex justify-between items-center mb-8">
             <div>
               <h1 className="text-2xl font-bold text-gray-800">แดชบอร์ด</h1>
-              <p className="text-sm text-gray-500 mt-1">
-                ภาพรวมของระบบและสถิติที่สำคัญ
-              </p>
             </div>
            
             <AddTool />

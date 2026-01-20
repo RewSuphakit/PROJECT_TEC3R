@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@pdfme/common": "^5.5.8",
     "aos": "^2.3.4",
     "axios": "^1.7.7",
     "countup.js": "^2.8.0",
