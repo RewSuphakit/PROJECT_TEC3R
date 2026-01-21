@@ -68,9 +68,10 @@ function AuthContextProvider({ children }) {
       setReturnedCount(data.returned_count || 0);
 
       const borrowedRecords = (data.borrow_records || []).filter(
-        (record) => record.status === 'Borrowed'
+        (record) => record.status !== 'Returned'
       );
       setBorrowedBooks(borrowedRecords);
+      setBorrowedCount(borrowedRecords.length);
     } catch (error) {
       console.error('Error fetching borrow records:', error.message);
       setBorrowedCount(0);

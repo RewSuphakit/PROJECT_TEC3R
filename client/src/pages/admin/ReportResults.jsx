@@ -11,6 +11,9 @@ function ReportResults() {
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
   // ใช้ state สำหรับเก็บเดือนในรูปแบบ "YYYY-MM"
   const [selectedMonth, setSelectedMonth] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 7;
+
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -55,6 +58,18 @@ function ReportResults() {
         );
       })
     : reports;
+
+  // Reset page when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedMonth]);
+
+  // Pagination Logic
+  const totalPages = Math.ceil(filteredReports.length / itemsPerPage);
+  const currentItems = filteredReports.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   if (loading) {
     return (
@@ -123,7 +138,7 @@ function ReportResults() {
               </tr>
             </thead>
             <tbody>
-              {filteredReports.map(report => (
+              {currentItems.map(report => (
                 <tr key={report.transaction_id} className="hover:bg-gray-100">
                   <td className="py-2 px-4 border-b text-center">{report.transaction_id}</td>
                   <td className="py-2 px-4 border-b text-center">{report.student_name}</td>
@@ -142,6 +157,41 @@ function ReportResults() {
               ))} 
             </tbody>
           </table>
+        </div>
+      )}
+      
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex justify-center">
+          <div className="flex flex-wrap gap-1 sm:gap-2 justify-center">
+            <button
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+              className="btn btn-sm bg-blue-500 hover:bg-blue-600 text-white border-none px-3 sm:px-4 disabled:bg-gray-300"
+            >
+              «
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`btn btn-sm ${
+                  currentPage === i + 1 
+                    ? "bg-blue-500 hover:bg-blue-600 text-white border-none" 
+                    : "btn-outline"
+                } px-3 sm:px-4`}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+              className="btn btn-sm bg-blue-500 hover:bg-blue-600 text-white border-none px-3 sm:px-4 disabled:bg-gray-300"
+            >
+              »
+            </button>
+          </div>
         </div>
       )}
     </div>

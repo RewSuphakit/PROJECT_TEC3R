@@ -12,10 +12,10 @@ const Login = () => {
   const [student_email, setStudentEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // เพิ่ม Loading State
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  // ปรับให้ตรงกับ Backend - ต้องเป็น @rmuti.ac.th
+ 
   const validateEmail = (email) => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@rmuti\.ac\.th$/;
     return emailRegex.test(email);
@@ -38,7 +38,7 @@ const Login = () => {
       return;
     }
 
-    setIsLoading(true); // เริ่ม Loading
+    setIsLoading(true); 
   
     try {
       const response = await axios.post(`${apiUrl}/api/users/login`, {
@@ -49,16 +49,14 @@ const Login = () => {
       if (response.status === 200 || response.status === 201) {
         const { token, payload } = response.data;
   
-        // ตรวจสอบว่า payload มี student_name หรือไม่
+    
         if (!payload || !payload.student_name) {
           throw new Error("ข้อมูลที่ส่งกลับไม่ถูกต้อง");
         }
   
-        // เก็บ token และข้อมูลผู้ใช้
-        localStorage.setItem('token', token);
+        localStorage.setItem("token", token);
         setUser(payload);
-  
-        // แสดงข้อความต้อนรับ
+
         toast(
   <div>
     <div>ยินดีต้อนรับ,</div>
