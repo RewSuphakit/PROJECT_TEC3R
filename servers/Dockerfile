@@ -15,6 +15,8 @@ RUN npm i
 # Copy application code
 COPY . .
 
+ENV PORT=8000
+
 # Create uploads directories
 RUN mkdir -p /app/uploads && mkdir -p /app/image_return
 
