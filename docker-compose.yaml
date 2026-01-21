@@ -10,8 +10,6 @@ services:
     environment:
       - NODE_ENV=production
       - VITE_REACT_APP_API_URL=${API_URL}
-    depends_on:
-      - server
 
   server:
     build:

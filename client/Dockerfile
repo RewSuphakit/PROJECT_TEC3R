@@ -13,6 +13,8 @@ RUN npm i
 COPY . .
 
 # Build for production
+ENV VITE_REACT_APP_API_URL=${API_URL}
+
 RUN npm run build
 
 # Expose port
