@@ -1,12 +1,12 @@
 // EditModal.js
 import React, { useState, useEffect } from "react";
-
+const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 const EditModal = ({ tool, onSubmit, onCancel }) => {
   const [preview, setPreview] = useState("");
   // เมื่อ component ถูกโหลดหรือค่า tool เปลี่ยน ให้ตั้งค่า preview จากรูปเดิมของ tool
   useEffect(() => {
     if (tool && tool.image) {
-      setPreview(`http://localhost:5000/uploads/${tool.image}`);
+      setPreview(`${apiUrl}/uploads/${tool.image}`);
     }
   }, [tool]);
   // เมื่อมีการเลือกไฟล์ใหม่ให้เปลี่ยน preview
@@ -15,7 +15,7 @@ const EditModal = ({ tool, onSubmit, onCancel }) => {
     if (file) {
       setPreview(URL.createObjectURL(file));
     } else if (tool && tool.image) {
-      setPreview(`http://localhost:5000/uploads/${tool.image}`);
+      setPreview(`${apiUrl}/uploads/${tool.image}`);
     }
   };
 

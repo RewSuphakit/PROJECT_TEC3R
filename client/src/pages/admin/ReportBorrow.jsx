@@ -3,7 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import bg2 from '../../assets/bg2.png';
-
+const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function ReportBorrow() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +14,7 @@ function ReportBorrow() {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/stats/reports');
+        const response = await axios.get(`${apiUrl}/api/stats/reports`);
         let filteredTransactions = [];
         if (response.data && Array.isArray(response.data.borrow_transactions)) {
           // กรองเฉพาะ transaction ที่อุปกรณ์ทั้งหมดถูกคืน (status = "Borrowed")

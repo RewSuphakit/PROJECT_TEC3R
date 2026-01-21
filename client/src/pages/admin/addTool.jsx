@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-
+const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function AddTool() {
   const [showModal, setShowModal] = useState(false);
   const [equipmentName, setEquipmentName] = useState("");
@@ -18,7 +18,7 @@ function AddTool() {
     formData.append("image", image);
 
     try {
-      await axios.post("http://localhost:5000/api/equipment/equipment", formData, {
+      await axios.post(`${apiUrl}/api/equipment/equipment`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 

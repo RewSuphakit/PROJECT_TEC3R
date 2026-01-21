@@ -4,20 +4,19 @@ import { useParams, Link } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import bg2 from '../../assets/bg2.png';
 
-// ❌ ไม่ต้อง import thaiFont.js แล้ว
-// ✅ เราจะดึงไฟล์ .ttf จากโฟลเดอร์ public แทน
+
 
 function ReportDetails() {
   const { transaction_id } = useParams();
   const [borrowRecords, setBorrowRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
   useEffect(() => {
     const fetchReportDetails = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:5000/api/borrowRecords/transaction/${transaction_id}`);
+        const response = await axios.get(`${apiUrl}/api/borrowRecords/transaction/${transaction_id}`);
         setBorrowRecords(response.data);
         setError(null);
       } catch (err) {
@@ -322,7 +321,7 @@ function ReportDetails() {
                       <div className="flex justify-center">
                         {record.status === 'Returned' && record.image_return ? (
                           <img
-                            src={`http://localhost:5000/image_return/${record.image_return}`}
+                            src={`${apiUrl}/image_return/${record.image_return}`}
                             alt="Returned"
                             className="h-16 w-16 rounded-lg object-cover border"
                           />
@@ -392,7 +391,7 @@ function ReportDetails() {
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">รูปที่คืน:</span>
                       <img
-                        src={`http://localhost:5000/image_return/${record.image_return}`}
+                        src={`${apiUrl}/image_return/${record.image_return}`}
                         alt="Returned"
                         className="h-16 w-16 rounded-lg object-cover border"
                       />

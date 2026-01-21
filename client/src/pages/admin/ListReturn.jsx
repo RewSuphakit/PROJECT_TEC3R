@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import bg2 from '../../assets/bg2.png';
-
+const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function ListReturn() {
   const [tools, setTools] = useState([]);
   const [popupImage, setPopupImage] = useState(null);
@@ -58,7 +58,7 @@ function ListReturn() {
   useEffect(() => {
     const fetchReturnRecords = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/borrowRecords/all");
+        const response = await axios.get(`${apiUrl}/api/borrowRecords/all`);
         if (response.data && Array.isArray(response.data.borrow_transactions)) {
           const filteredTransactions = response.data.borrow_transactions.filter(
             (transaction) =>
@@ -186,10 +186,10 @@ function ListReturn() {
                               </td>
                               <td className="py-4 px-4 flex items-center justify-center">
                                 <img
-                                  src={`http://localhost:5000/image_return/${item.image_return}`}
+                                  src={`${apiUrl}/image_return/${item.image_return}`}
                                   alt="Returned"
                                   className="w-16 h-16 rounded-lg object-cover border cursor-pointer"
-                                  onMouseEnter={(e) => handleImageMouseEnter(e, `http://localhost:5000/image_return/${item.image_return}`)}
+                                  onMouseEnter={(e) => handleImageMouseEnter(e, `${apiUrl}/image_return/${item.image_return}`)}
                                   onMouseLeave={handleImageMouseLeave}
                                 />
                               </td>
@@ -218,10 +218,10 @@ function ListReturn() {
                                 </td>
                                 <td className="py-4 px-4 flex items-center justify-center">
                                   <img
-                                    src={`http://localhost:5000/image_return/${firstItem.image_return}`}
+                                    src={`${apiUrl}/image_return/${firstItem.image_return}`}
                                     alt="Returned"
                                     className="w-16 h-16 rounded-lg object-cover border cursor-pointer"
-                                    onMouseEnter={(e) => handleImageMouseEnter(e, `http://localhost:5000/image_return/${firstItem.image_return}`)}
+                                    onMouseEnter={(e) => handleImageMouseEnter(e, `${apiUrl}/image_return/${firstItem.image_return}`)}
                                     onMouseLeave={handleImageMouseLeave}
                                   />
                                 </td>
@@ -238,10 +238,10 @@ function ListReturn() {
                                     </td>
                                     <td className="py-4 px-4 flex items-center justify-center">
                                       <img
-                                        src={`http://localhost:5000/image_return/${item.image_return}`}
+                                        src={`${apiUrl}/image_return/${item.image_return}`}
                                         alt="Returned"
                                         className="w-16 h-16 rounded-lg object-cover border cursor-pointer"
-                                        onMouseEnter={(e) => handleImageMouseEnter(e, `http://localhost:5000/image_return/${item.image_return}`)}
+                                        onMouseEnter={(e) => handleImageMouseEnter(e, `${apiUrl}/image_return/${item.image_return}`)}
                                         onMouseLeave={handleImageMouseLeave}
                                       />
                                     </td>
@@ -315,12 +315,12 @@ function ListReturn() {
                             <div className="flex justify-between items-center text-sm">
                               <span className="text-gray-600">รูปที่คืน:</span>
                               <img
-                                src={`http://localhost:5000/image_return/${groupItems[0].image_return}`}
+                                src={`${apiUrl}/image_return/${groupItems[0].image_return}`}
                                 alt="Returned"
                                 className="w-16 h-16 rounded-lg object-cover border cursor-pointer hover:opacity-80 transition-opacity image-clickable"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  openImageModal(`http://localhost:5000/image_return/${groupItems[0].image_return}`);
+                                  openImageModal(`${apiUrl}/image_return/${groupItems[0].image_return}`);
                                 }}
                               />
                             </div>
@@ -354,12 +354,12 @@ function ListReturn() {
                                   <div className="flex justify-between items-center text-sm">
                                     <span className="text-gray-600">รูปที่คืน:</span>
                                     <img
-                                      src={`http://localhost:5000/image_return/${item.image_return}`}
+                                      src={`${apiUrl}/image_return/${item.image_return}`}
                                       alt="Returned"
                                       className="w-16 h-16 rounded-lg object-cover border cursor-pointer hover:opacity-80 transition-opacity image-clickable"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        openImageModal(`http://localhost:5000/image_return/${item.image_return}`);
+                                        openImageModal(`${apiUrl}/image_return/${item.image_return}`);
                                       }}
                                     />
                                   </div>

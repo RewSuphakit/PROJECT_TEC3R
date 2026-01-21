@@ -10,7 +10,7 @@ import useAuth from "../hooks/useAuth";
 import StatsSection from '../components/StatsSection';
 import Swal from 'sweetalert2';
 import ScrollToTopButton from '../components/ScrollToTopButton';
-
+const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function Home() {
   const { user, fetchBorrowRecords } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,7 +41,7 @@ function Home() {
   // ======= ดึงข้อมูลอุปกรณ์ =======
   const fetchEquipment = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/equipment/equipment');
+      const response = await axios.get(`${apiUrl}/api/equipment/equipment`);
       const sortedEquipment = response.data.equipment || [];
       const equipmentAvailable = sortedEquipment.filter(record => record.status === 'Available');
       setEquipment(equipmentAvailable);
@@ -119,7 +119,7 @@ function Home() {
 
       if (result.isConfirmed) {
         await axios.post(
-          `http://localhost:5000/api/borrowRecords/add`,
+          `${apiUrl}/api/borrowRecords/add`,
           { user_id: user.user_id, items },
           { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
         );
@@ -162,7 +162,7 @@ function Home() {
 
       const result = await swalWithBootstrapButtons.fire({
         title: `ยืมอุปกรณ์ ${title}`,
-        imageUrl: image ? `http://localhost:5000/uploads/${image.replace(/\\/g, "/")}` : "default-image-url.jpg",
+        imageUrl: image ? `${apiUrl}/uploads/${image.replace(/\\/g, "/")}` : "default-image-url.jpg",
         imageWidth: 150,
         imageHeight: 150,
         imageAlt: `${title}`,
@@ -229,7 +229,7 @@ function Home() {
 
         if (confirmBorrow.isConfirmed) {
           await axios.post(
-            `http://localhost:5000/api/borrowRecords/add`,
+            `${apiUrl}/api/borrowRecords/add`,
             { user_id: user.user_id, items },
             { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
           );
@@ -330,7 +330,7 @@ function Home() {
                   <div className="aspect-w-16 aspect-h-9 p-2">
                     <img
                       className="rounded-md min-w-[100px] min-h-[100px] object-cover object-center"
-                      src={item.image ? `http://localhost:5000/uploads/${item.image.replace(/\\/g, "/")}` : null}
+                      src={item.image ? `${apiUrl}/uploads/${item.image.replace(/\\/g, "/")}` : null}
                       alt={item.equipment_id}
                       loading="lazy"
                       width="200"

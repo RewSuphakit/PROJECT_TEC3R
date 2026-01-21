@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import bg2 from '../../assets/bg2.png';
-
+const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function ManageUsers() {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
@@ -33,7 +33,7 @@ function ManageUsers() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:5000/api/users/users",
+        `${apiUrl}/api/users/users`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -54,7 +54,7 @@ function ManageUsers() {
   const deleteUser = async (userId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/users/${userId}`, {
+      await axios.delete(`${apiUrl}/api/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsers(users.filter((user) => user.user_id !== userId));
@@ -81,7 +81,7 @@ function ManageUsers() {
       const currentUser = getCurrentUser();
       
       await axios.put(
-        `http://localhost:5000/api/users/admin/${userId}`,
+        `${apiUrl}/api/users/admin/${userId}`,
         userData,
         {
           headers: { Authorization: `Bearer ${token}` }

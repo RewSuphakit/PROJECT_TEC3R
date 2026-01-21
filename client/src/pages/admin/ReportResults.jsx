@@ -8,13 +8,14 @@ function ReportResults() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
   // ใช้ state สำหรับเก็บเดือนในรูปแบบ "YYYY-MM"
   const [selectedMonth, setSelectedMonth] = useState('');
 
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/stats/reports');
+        const response = await axios.get(`${apiUrl}/api/stats/reports`);
         let filteredTransactions = [];
         if (response.data && Array.isArray(response.data.borrow_transactions)) {
           // กรองเฉพาะ transaction ที่อุปกรณ์ทั้งหมดถูกคืน (status = "Returned")

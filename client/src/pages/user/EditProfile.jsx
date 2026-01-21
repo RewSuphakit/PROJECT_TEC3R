@@ -4,7 +4,7 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import bg2 from '../../assets/bg2.png';
-
+const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function EditProfile() {
   const { user, fetchUserProfile, logout } = useAuth();
   const userId = user?.user_id;
@@ -59,7 +59,7 @@ function EditProfile() {
   const updateUser = async (userId, userData) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`http://localhost:5000/api/users/${userId}`, userData, {
+      await axios.put(`${apiUrl}/api/users/${userId}`, userData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

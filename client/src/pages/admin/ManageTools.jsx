@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import DeleteModal from "./DeleteModal";
 import EditModal from "./EditModal";
 import bg2 from '../../assets/bg2.png';
-
+const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function ManageTools() {
   const [tools, setTools] = useState([]);
   const [popupImage, setPopupImage] = useState(null);
@@ -19,7 +19,7 @@ function ManageTools() {
   const fetchTools = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/equipment/equipment/"
+        `${apiUrl}/api/equipment/equipment/`
       );
       setTools(response.data.equipment);
     } catch (error) {
@@ -34,7 +34,7 @@ function ManageTools() {
   const deleteTool = async (equipmentId) => {
     try {
       await axios.delete(
-        `http://localhost:5000/api/equipment/equipment/${equipmentId}`
+        `${apiUrl}/api/equipment/equipment/${equipmentId}`
       );
       setTools((prevTools) =>
         prevTools.filter((tool) => tool.equipment_id !== equipmentId)
@@ -66,7 +66,7 @@ function ManageTools() {
       }
   
       const response = await axios.put(
-        `http://localhost:5000/api/equipment/equipment/${currentTool.equipment_id}`,
+        `${apiUrl}/api/equipment/equipment/${currentTool.equipment_id}`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
@@ -99,7 +99,7 @@ function ManageTools() {
     const newStatus = tool.status === "Available" ? "Unavailable" : "Available";
     try {
       await axios.put(
-        `http://localhost:5000/api/equipment/equipment/${tool.equipment_id}/status`,
+        `${apiUrl}/api/equipment/equipment/${tool.equipment_id}/status`,
         { status: newStatus }
       );
       setTools((prevTools) =>
@@ -220,10 +220,10 @@ function ManageTools() {
                       </td>
                       <td className="py-4 px-2 flex justify-center">
                         <img
-                          src={`http://localhost:5000/uploads/${tool.image}`}
+                          src={`${apiUrl}/uploads/${tool.image}`}
                           alt={tool.equipment_name}
                           className="w-16 h-16 rounded-lg object-cover border cursor-pointer"
-                          onMouseEnter={(e) => handleImageMouseEnter(e, `http://localhost:5000/uploads/${tool.image}`)}
+                          onMouseEnter={(e) => handleImageMouseEnter(e, `${apiUrl}/uploads/${tool.image}`)}
                           onMouseLeave={handleImageMouseLeave}
                         />
                       </td>
@@ -270,7 +270,7 @@ function ManageTools() {
                     {/* Image */}
                     <div className="flex-shrink-0">
                       <img
-                        src={`http://localhost:5000/uploads/${tool.image}`}
+                        src={`${apiUrl}/uploads/${tool.image}`}
                         alt={tool.equipment_name}
                         className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg object-cover border"
                       />

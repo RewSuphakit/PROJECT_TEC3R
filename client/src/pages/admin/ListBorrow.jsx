@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import bg2 from '../../assets/bg2.png';
-
+const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function ListBorrow() {
   const [tools, setTools] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +33,7 @@ function ListBorrow() {
   useEffect(() => {
     const fetchTools = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/borrowRecords/all");
+        const response = await axios.get(`${apiUrl}/api/borrowRecords/all`);
         if (
           response.data &&
           Array.isArray(response.data.borrow_transactions)

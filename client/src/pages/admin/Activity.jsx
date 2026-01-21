@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
+const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function Activity() {
   const [transactions, setTransactions] = useState([]);
   const [error, setError] = useState(null);
@@ -10,7 +10,7 @@ function Activity() {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/borrowRecords/all');
+        const response = await axios.get(`${apiUrl}/api/borrowRecords/all`);
         const filtered = response.data.borrow_transactions?.filter(transaction => {
           const borrowDate = new Date(transaction.borrow_date);
           const diffInHours = (now - borrowDate.getTime()) / 3600000;

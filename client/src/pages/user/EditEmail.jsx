@@ -5,6 +5,7 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import bg2 from '../../assets/bg2.png';
+const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function EditEmail() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ function EditEmail() {
       if (formData.password) payload.password = formData.password;
 
       await axios.put(
-        `http://localhost:5000/api/users/email/${userId}`,
+        `${apiUrl}/api/users/email/${userId}`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
