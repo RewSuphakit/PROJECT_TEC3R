@@ -2,7 +2,9 @@ import logoTec from '../assets/LOGGG.png'
 
 import register from '../assets/register.png'
 import icon from '../assets/rmutikkc.png'
+import ContactAdminModal from './ContactAdminModal';
 import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import useAuth from '../hooks/useAuth';
 import axios from 'axios';
 function Header() {
@@ -12,6 +14,7 @@ function Header() {
     logout();
     navigate('/RMUTI/');
   }
+  const [showContactModal, setShowContactModal] = useState(false);
 
   
   const userMenu = user?.user_id && (
@@ -60,15 +63,18 @@ function Header() {
     </a>
      </li>
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-    <a href="https://www.facebook.com/ci.r.sakdi.phimph.kha.hil" className="flex items-center gap-3">
+    <button className="flex items-center gap-3 w-full text-left" onClick={() => setShowContactModal(true)}>
       <img
         className="w-6 h-6"
         src="https://img.icons8.com/?size=100&id=2817&format=png&color=374151"
         alt="contact admin icon"
       />
       ติดต่อแอดมิน
-    </a>
+    </button>
   </li>
+
+  
+
 
 
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
@@ -208,6 +214,7 @@ function Header() {
           )}
         </div>
       </nav>
+      <ContactAdminModal isOpen={showContactModal} onClose={() => setShowContactModal(false)} />
     </section>
 
   )
