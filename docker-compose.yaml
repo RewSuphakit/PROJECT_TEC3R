@@ -29,6 +29,7 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
+      - API_URL=${API_URL}
       - DB_HOST=${DB_HOST}
       - DB_USER=${DB_USER}
       - DB_PASS=${DB_PASS}
