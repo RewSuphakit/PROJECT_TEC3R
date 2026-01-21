@@ -95,9 +95,6 @@ const Register = () => {
               <p className="text-2xl font-semibold text-[#0F4C75] text-center">
                 ลงทะเบียนผู้ใช้งาน
               </p>
-              <span className="text-sm text-center text-gray-500">
-                กรุณาสมัครสมาชิกก่อนใช้เข้างาน
-              </span>
             </div>
             <form
               className="w-full grid grid-cols-1 md:grid-cols-2 gap-4"
