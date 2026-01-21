@@ -1,14 +1,22 @@
 # Simple Node.js Dockerfile for servers
 FROM node:20-alpine
 
+# Install build dependencies for native modules (sharp, bcrypt)
+RUN apk add --no-cache python3 make g++ vips-dev
+
 WORKDIR /app
 
-COPY package.json /app
+# Copy package files
+COPY package*.json ./
 
+# Install dependencies
 RUN npm install
 
-COPY . /app
+# Copy application code
+COPY . .
 
+# Expose port
 EXPOSE 8000
 
-CMD ["node","index.js"]
+# Start the server
+CMD ["node", "index.js"]
