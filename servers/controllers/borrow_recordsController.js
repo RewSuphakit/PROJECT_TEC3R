@@ -1,3 +1,4 @@
+require('dotenv').config();
 // =========================
 // 7. ดึงประวัติการยืม-คืนทั้งหมดของผู้ใช้ (History)
 // =========================
@@ -248,7 +249,7 @@ exports.updateReturnStatus = async (req, res) => {
 - ✅ สถานะ: ${borrow_status}`;
 
     // หากมีรูปภาพในการคืน ให้แนบ URL (ปรับ URL ให้ตรงกับโดเมนของคุณ)
-    const imageUrl = image_return ? `https://f6488595413d.ngrok-free.app/image_return/${image_return}` : null;
+    const imageUrl = image_return ? `${process.env.API_URL}/image_return/${image_return}` : null;
     try {
       await lineNotify.sendMessage(message, imageUrl);
     } catch (lineError) {

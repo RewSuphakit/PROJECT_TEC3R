@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - VITE_REACT_APP_API_URL=${API_URL}
+
+  server:
+    build:
+      context: ./servers
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=development
+      - API_URL=${API_URL}
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+      - channelAccessToken=${channelAccessToken}
+      - channelSecret=${channelSecret}
+      - recipientId=${recipientId}
