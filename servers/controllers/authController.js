@@ -4,7 +4,7 @@ const connection = require('../config/db'); // การเชื่อมต่
 
 // การสมัครสมาชิก
 exports.register = async (req, res) => {
-  const { student_id, student_name, year_of_study, student_email, password,phone,role } = req.body;
+  const { student_id, student_name, year_of_study, student_email, password, phone, role } = req.body;
 
   // ตรวจสอบว่าอีเมลมีโดเมน @rmuti.ac.th หรือไม่
   const emailRegex = /^[a-zA-Z0-9._%+-]+@rmuti\.ac\.th$/;
@@ -32,7 +32,7 @@ exports.register = async (req, res) => {
         // แทรกผู้ใช้งานใหม่
         connection.query(
           'INSERT INTO users (student_id, student_name, year_of_study, student_email, password,phone,role) VALUES (?, ?, ?, ?, ?,?,?)',
-          [student_id, student_name, year_of_study, student_email, hashedPassword,phone,role],
+          [student_id, student_name, year_of_study, student_email, hashedPassword, phone, role],
           (err, results) => {
             if (err) {
               console.error(err);
@@ -118,64 +118,64 @@ exports.login = async (req, res) => {
 
 
 
-  exports.getUserProfile = async (req, res) => {
-    try {
-      const { user_id, student_id, student_name, year_of_study, student_email, phone, role } = req.user;
+exports.getUserProfile = async (req, res) => {
+  try {
+    const { user_id, student_id, student_name, year_of_study, student_email, phone, role } = req.user;
 
-      // ตรวจสอบว่า role มีอยู่ในข้อมูลหรือไม่
-      if (!role) {
-        return res.status(400).json({ error: 'Role is missing in the user profile' });
-      }
-
-      if (role !== 'admin' && role !== 'user' && role !== 'teacher')  {
-        return res.status(403).json({ error: 'Unauthorized: Invalid user role' });
-      }
-
-      const userProfile = {
-        user_id,
-        student_id,
-        student_name,
-        year_of_study,
-        student_email,
-        phone,
-        role
-      };
-
-      res.status(200).json(userProfile);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Internal Server Error' });
+    // ตรวจสอบว่า role มีอยู่ในข้อมูลหรือไม่
+    if (!role) {
+      return res.status(400).json({ error: 'Role is missing in the user profile' });
     }
-  };
-  
 
-  exports.getAllUsers = async (req, res) => {
-    try {
-      connection.query('SELECT * FROM users', (err, results) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).json({ error: 'Internal Server Error' });
-        }
-        if (results.length === 0) {
-          return res.status(404).json({ message: 'No users found' });
-        }
-        res.status(200).json({ users: results });
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Internal Server Error' });
+    if (role !== 'admin' && role !== 'user' && role !== 'teacher') {
+      return res.status(403).json({ error: 'Unauthorized: Invalid user role' });
     }
-  };
-  
-  
+
+    const userProfile = {
+      user_id,
+      student_id,
+      student_name,
+      year_of_study,
+      student_email,
+      phone,
+      role
+    };
+
+    res.status(200).json(userProfile);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    connection.query('SELECT * FROM users', (err, results) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
+      if (results.length === 0) {
+        return res.status(404).json({ message: 'No users found' });
+      }
+      res.status(200).json({ users: results });
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
 // Backend: Controller
 exports.deleteUser = async (req, res) => {
   try {
-    const { user_id } = req.params; 
-    
+    const { user_id } = req.params;
+
     connection.query(
-      'DELETE FROM users WHERE user_id = ?', 
-      [user_id], 
+      'DELETE FROM users WHERE user_id = ?',
+      [user_id],
       (err, results) => {
         if (err) {
           console.error(err);
@@ -278,42 +278,58 @@ exports.updateEmailPassword = async (req, res) => {
 exports.adminUpdateUser = async (req, res) => {
   try {
     const { user_id } = req.params;
-    const { student_id, student_name, year_of_study, student_email, password, phone } = req.body;
-  
+    const { student_id, student_name, year_of_study, student_email, password, phone, role } = req.body;
 
-    let updateQuery = `
-      UPDATE users
-      SET student_id = ?,
-          student_name = ?,
-          year_of_study = ?,
-          student_email = ?,
-          phone = ?
-        
-    `;
-    const values = [student_id, student_name, year_of_study, student_email, phone];
+    // ตรวจสอบว่าอีเมลซ้ำกับผู้ใช้อื่นหรือไม่
+    connection.query(
+      'SELECT user_id FROM users WHERE student_email = ? AND user_id != ?',
+      [student_email, user_id],
+      async (err, existingUsers) => {
+        if (err) {
+          console.error('Check email query error:', err);
+          return res.status(500).json({ error: 'Internal Server Error' });
+        }
 
-    // หากมีการส่ง password เข้ามา ให้แฮชและรวมลงใน query
-    if (password && password.trim() !== '') {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      updateQuery += `, password = ? `;
-      values.push(hashedPassword);
-    }
+        // ถ้าพบอีเมลซ้ำ
+        if (existingUsers.length > 0) {
+          return res.status(409).json({ error: 'อีเมลนี้มีผู้ใช้งานแล้ว กรุณาใช้อีเมลอื่น' });
+        }
 
-    updateQuery += `WHERE user_id = ?`;
-    values.push(user_id);
+        let updateQuery = `
+          UPDATE users
+          SET student_id = ?,
+              student_name = ?,
+              year_of_study = ?,
+              student_email = ?,
+              phone = ?,
+              role = ?
+        `;
+        const values = [student_id, student_name, year_of_study, student_email, phone, role];
 
-    connection.query(updateQuery, values, (err, results) => {
-      if (err) {
-        console.error('Update query error:', err);
-        return res.status(500).json({ error: 'Internal Server Error' });
+        // หากมีการส่ง password เข้ามา ให้แฮชและรวมลงใน query
+        if (password && password.trim() !== '') {
+          const hashedPassword = await bcrypt.hash(password, 10);
+          updateQuery += `, password = ? `;
+          values.push(hashedPassword);
+        }
+
+        updateQuery += `WHERE user_id = ?`;
+        values.push(user_id);
+
+        connection.query(updateQuery, values, (err, results) => {
+          if (err) {
+            console.error('Update query error:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+          }
+
+          if (results.affectedRows === 0) {
+            return res.status(404).json({ error: 'User not found' });
+          }
+
+          res.status(200).json({ message: 'User updated successfully' });
+        });
       }
-
-      if (results.affectedRows === 0) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-
-      res.status(200).json({ message: 'User updated successfully' });
-    });
+    );
   } catch (error) {
     console.error('Error in updateUser:', error);
     res.status(500).json({ error: 'Internal Server Error' });

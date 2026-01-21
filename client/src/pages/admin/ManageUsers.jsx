@@ -1,17 +1,33 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import bg2 from '../../assets/bg2.png';
 
 function ManageUsers() {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 5;
+  const usersPerPage = 7;
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
   const [userToEdit, setUserToEdit] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+
+  // ดึงข้อมูลแอดมินที่กำลัง login อยู่
+  const getCurrentUser = () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.user;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  };
 
   const fetchUsers = async () => {
     try {
@@ -59,9 +75,11 @@ function ManageUsers() {
     }
   };
 
-  const updateUser = async (userId, userData) => {
+  const updateUser = async (userId, userData, originalEmail) => {
     try {
       const token = localStorage.getItem("token");
+      const currentUser = getCurrentUser();
+      
       await axios.put(
         `http://localhost:5000/api/users/admin/${userId}`,
         userData,
@@ -69,6 +87,19 @@ function ManageUsers() {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
+      
+      // ตรวจสอบว่าแอดมินกำลังแก้ไขอีเมลของตัวเองหรือไม่
+      if (currentUser && currentUser.user_id === userId && userData.student_email !== originalEmail) {
+        toast.warning("คุณได้เปลี่ยนอีเมลของตัวเอง กรุณาเข้าสู่ระบบใหม่ด้วยอีเมลใหม่", { autoClose: 3000 });
+        
+        // รอ 3 วินาทีแล้ว logout
+        setTimeout(() => {
+          localStorage.removeItem("token");
+          navigate("/RMUTI/login");
+        }, 3000);
+        return;
+      }
+      
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
           user.user_id === userId ? { ...user, ...userData } : user
@@ -84,6 +115,8 @@ function ManageUsers() {
           toast.error("ไม่ได้รับอนุญาต: กรุณาเข้าสู่ระบบใหม่");
         } else if (error.response.status === 403) {
           toast.error("ไม่มีสิทธิ์ในการแก้ไขผู้ใช้นี้");
+        } else if (error.response.status === 409) {
+          toast.error("อีเมลนี้มีผู้ใช้งานแล้ว กรุณาใช้อีเมลอื่น");
         } else {
           toast.error(`เกิดข้อผิดพลาด: ${error.response.data.error}`);
         }
@@ -95,16 +128,21 @@ function ManageUsers() {
 
   const handleEditSubmit = (e) => {
     e.preventDefault();
+    const passwordValue = e.target.password.value;
+    const originalEmail = userToEdit?.student_email; // เก็บอีเมลเดิมไว้เพื่อเปรียบเทียบ
     const updatedUser = {
       student_id: e.target.student_id.value,
       year_of_study: e.target.year_of_study.value,
       student_name: e.target.student_name.value,
       student_email: e.target.student_email.value,
-      password: e.target.password.value,
       phone: e.target.phone.value,
       role: e.target.role.value
     };
-    updateUser(userToEdit.user_id, updatedUser);
+    // ส่ง password เฉพาะเมื่อมีการกรอกรหัสผ่านใหม่เท่านั้น
+    if (passwordValue && passwordValue.trim() !== '') {
+      updatedUser.password = passwordValue;
+    }
+    updateUser(userToEdit.user_id, updatedUser, originalEmail);
   };
 
   const openDeleteModal = (user) => {
@@ -387,11 +425,11 @@ function ManageUsers() {
 
                     {/* รหัสผ่าน */}
                     <div className="flex flex-col">
-                      <label className="block text-xs sm:text-sm font-semibold mb-1">รหัสผ่าน</label>
+                      <label className="block text-xs sm:text-sm font-semibold mb-1">รหัสผ่านใหม่</label>
                       <input
                         type={showPassword ? "text" : "password"}
                         name="password"
-                        defaultValue={userToEdit?.password}
+                        placeholder="เว้นว่างไว้หากไม่ต้องการเปลี่ยน"
                         className="input input-bordered input-sm sm:input-md w-full"
                       />
                       <div className="mt-2 flex items-center">
@@ -402,6 +440,7 @@ function ManageUsers() {
                         />
                         <label className="text-xs sm:text-sm text-gray-600">แสดงรหัสผ่าน</label>
                       </div>
+
                     </div>
 
                     {/* เบอร์ติดต่อ */}

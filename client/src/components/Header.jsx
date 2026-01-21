@@ -1,4 +1,5 @@
-import logofix from '../assets/logofix.png'
+import logoTec from '../assets/LOGGG.png'
+
 import register from '../assets/register.png'
 import icon from '../assets/rmutikkc.png'
 import { Link, useNavigate } from 'react-router-dom';
@@ -89,7 +90,13 @@ function Header() {
   
     <section className="w-full  text-gray-700 sticky top-0 z-50" style={{backgroundColor: '#eaeaeaff'}}>
   <nav className="navbar e shadow-md  border-b border-gray-200 ">
-    <div className="container mx-auto flex flex-wrap items-center justify-around">
+    <div><img className="rounded-md " style={{
+      imageSize: 'cover',
+      width: '200px',
+      height: '100px',
+      objectFit: 'contain'
+    }}  src={logoTec} alt="logo" /></div>
+    <div className="container  flex flex-wrap items-center justify-between">
       {/* Logo Section */}
       <div className="flex items-center">
         <a href="/RMUTI/" className="flex items-center">

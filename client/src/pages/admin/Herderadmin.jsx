@@ -139,7 +139,7 @@ function Herderadmin() {
                 >
                   <i className="fas fa-bars text-xl" />
                 </button>
-                <p className="text-gray-500">ใช้งานในสาขาครุศาสตร์อุตสาหกรรม คอมพิวเตอร์</p>
+                <p className="text-gray-500">ระบบการยืม-คืนอุปกรณ์ชุดฝึกการเรียนการสอน</p>
               </div>
 
               <div className="flex items-center gap-6">
