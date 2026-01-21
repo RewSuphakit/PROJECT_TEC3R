@@ -2,12 +2,15 @@ const express = require('express');
 const router = express.Router();
 const borrowRecordsController = require('../controllers/borrow_recordsController');
 const { upload_return, compressImage_return } = require('../middleware/upload_return');
-router.post('/add', borrowRecordsController.addBorrowRecord);
-router.put('/update/:record_id', upload_return.single('image_return'), compressImage_return, borrowRecordsController.updateReturnStatus);
-router.get('/all', borrowRecordsController.getAllBorrowRecords);
-router.get('/all/:user_id', borrowRecordsController.getAllBorrowRecordsByUserId);
-router.get('/history/:user_id', borrowRecordsController.getHistoryByUserId);
-router.delete('/delete/:record_id', borrowRecordsController.deleteBorrowRecord);
-router.get('/transaction/:transaction_id', borrowRecordsController.getBorrowRecordsByTransactionId);
+const authenticate = require('../middleware/authenticate');
+
+// การยืม-คืน - ต้อง login ก่อนจึงจะเข้าถึงได้
+router.post('/add', authenticate, borrowRecordsController.addBorrowRecord);  // เพิ่มการยืม
+router.put('/update/:record_id', authenticate, upload_return.single('image_return'), compressImage_return, borrowRecordsController.updateReturnStatus);  // อัพเดตการคืน
+router.get('/all', authenticate, borrowRecordsController.getAllBorrowRecords);  // ดูการยืมทั้งหมด
+router.get('/all/:user_id', authenticate, borrowRecordsController.getAllBorrowRecordsByUserId);  // ดูการยืมของ user
+router.get('/history/:user_id', authenticate, borrowRecordsController.getHistoryByUserId);  // ดูประวัติการยืม
+router.delete('/delete/:record_id', authenticate, borrowRecordsController.deleteBorrowRecord);  // ลบการยืม
+router.get('/transaction/:transaction_id', authenticate, borrowRecordsController.getBorrowRecordsByTransactionId);  // ดูรายละเอียด transaction
 
 module.exports = router;

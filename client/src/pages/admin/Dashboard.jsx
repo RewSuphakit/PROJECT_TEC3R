@@ -9,7 +9,10 @@ function Dashboard() {
   const [statsData, setStatsData] = useState({});
 
   useEffect(() => {
-    axios.get(`${apiUrl}/api/stats/stats/`)
+    const token = localStorage.getItem('token');
+    axios.get(`${apiUrl}/api/stats/stats/`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
       .then((response) => {
         setStatsData(response.data);
       })

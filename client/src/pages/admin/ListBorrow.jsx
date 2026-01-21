@@ -33,7 +33,10 @@ function ListBorrow() {
   useEffect(() => {
     const fetchTools = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/api/borrowRecords/all`);
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${apiUrl}/api/borrowRecords/all`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         if (
           response.data &&
           Array.isArray(response.data.borrow_transactions)

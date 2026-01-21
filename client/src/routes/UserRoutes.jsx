@@ -10,11 +10,13 @@ import NotFound from "../components/NotFound404";
 
 export default function UserLayout() {
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header />
-      <Outlet />
+      <main className="flex-1 flex flex-col">
+        <Outlet />
+      </main>
       <Footer />
-    </>
+    </div>
   );
 }
 

@@ -16,7 +16,10 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
     const fetchReportDetails = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${apiUrl}/api/borrowRecords/transaction/${transaction_id}`);
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${apiUrl}/api/borrowRecords/transaction/${transaction_id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         setBorrowRecords(response.data);
         setError(null);
       } catch (err) {

@@ -12,15 +12,19 @@ const Login = () => {
   const [student_email, setStudentEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // เพิ่ม Loading State
   const navigate = useNavigate();
 
+  // ปรับให้ตรงกับ Backend - ต้องเป็น @rmuti.ac.th
   const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@rmuti\.ac\.th$/;
     return emailRegex.test(email);
   };
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -30,9 +34,11 @@ const Login = () => {
     }
   
     if (!validateEmail(student_email)) {
-      toast.warn('รูปแบบอีเมลไม่ถูกต้อง', { position: 'top-center' });
+      toast.warn('กรุณาใช้อีเมล @rmuti.ac.th เท่านั้น', { position: 'top-center' });
       return;
     }
+
+    setIsLoading(true); // เริ่ม Loading
   
     try {
       const response = await axios.post(`${apiUrl}/api/users/login`, {
@@ -71,15 +77,21 @@ const Login = () => {
         throw new Error('Failed to log in. Please try again.');
       }
     } catch (error) {
-      toast.error('ชื่อหรือรหัสผ่านไม่ถูกต้อง กรุณาลองอีกครั้ง', { position: 'top-center' });
+      // ปรับปรุง Error Handling - แสดงข้อความจาก Backend
+      const errorMessage = error.response?.data?.msg || 
+                           error.response?.data?.message || 
+                           error.response?.data?.error ||
+                           'ชื่อหรือรหัสผ่านไม่ถูกต้อง กรุณาลองอีกครั้ง';
+      toast.error(errorMessage, { position: 'top-center' });
+    } finally {
+      setIsLoading(false); // หยุด Loading
     }
   };
 
   return (
     <div 
-      className="flex items-center justify-center" 
+      className="flex-1 flex items-center justify-center py-4" 
       style={{ 
-        minHeight: '81vh', 
         backgroundImage: `url(${bg2})`,
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
@@ -146,9 +158,24 @@ const Login = () => {
 
             <button
               type="submit"
-              className="w-full py-2 bg-[#0F4C75] text-white rounded-lg hover:bg-[#0D3A5F] transition duration-200"
+              disabled={isLoading}
+              className={`w-full py-2 text-white rounded-lg transition duration-200 flex items-center justify-center gap-2 ${
+                isLoading 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-[#0F4C75] hover:bg-[#0D3A5F]'
+              }`}
             >
-              เข้าสู่ระบบ
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  กำลังเข้าสู่ระบบ...
+                </>
+              ) : (
+                'เข้าสู่ระบบ'
+              )}
             </button>
           </form>
         </div>

@@ -7,11 +7,13 @@ import RegisterForm from "../pages/Register";
 
 export default function GuestRoutes() {
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header />
-      <Outlet />
+      <main className="flex-1 flex flex-col">
+        <Outlet />
+      </main>
       <Footer />
-    </>
+    </div>
   );
 }
 

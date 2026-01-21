@@ -18,8 +18,10 @@ function ManageTools() {
 
   const fetchTools = async () => {
     try {
+      const token = localStorage.getItem('token');
       const response = await axios.get(
-        `${apiUrl}/api/equipment/equipment/`
+        `${apiUrl}/api/equipment/equipment/`,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setTools(response.data.equipment);
     } catch (error) {
@@ -33,8 +35,10 @@ function ManageTools() {
 
   const deleteTool = async (equipmentId) => {
     try {
+      const token = localStorage.getItem('token');
       await axios.delete(
-        `${apiUrl}/api/equipment/equipment/${equipmentId}`
+        `${apiUrl}/api/equipment/equipment/${equipmentId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setTools((prevTools) =>
         prevTools.filter((tool) => tool.equipment_id !== equipmentId)
@@ -65,10 +69,11 @@ function ManageTools() {
         formData.append("image", e.target.image.files[0]);
       }
   
+      const token = localStorage.getItem('token');
       const response = await axios.put(
         `${apiUrl}/api/equipment/equipment/${currentTool.equipment_id}`,
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        { headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` } }
       );
   
       let updatedTool = response.data.updatedTool;
@@ -98,9 +103,11 @@ function ManageTools() {
   const toggleToolStatus = async (tool) => {
     const newStatus = tool.status === "Available" ? "Unavailable" : "Available";
     try {
+      const token = localStorage.getItem('token');
       await axios.put(
         `${apiUrl}/api/equipment/equipment/${tool.equipment_id}/status`,
-        { status: newStatus }
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setTools((prevTools) =>
         prevTools.map((t) =>

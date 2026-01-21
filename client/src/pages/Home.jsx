@@ -39,13 +39,28 @@ function Home() {
   };
 
   // ======= ดึงข้อมูลอุปกรณ์ =======
+  // ใช้ public endpoint สำหรับ Guest, protected endpoint สำหรับ User ที่ login แล้ว
   const fetchEquipment = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/api/equipment/equipment`);
-      const sortedEquipment = response.data.equipment || [];
-      const equipmentAvailable = sortedEquipment.filter(record => record.status === 'Available');
-      setEquipment(equipmentAvailable);
-      sortedEquipment.sort((a, b) => new Date(b.timeupdate) - new Date(a.timeupdate));
+      const token = localStorage.getItem('token');
+      let response;
+      
+      if (token) {
+        // ถ้า login แล้ว ใช้ protected endpoint
+        response = await axios.get(`${apiUrl}/api/equipment/equipment`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const sortedEquipment = response.data.equipment || [];
+        const equipmentAvailable = sortedEquipment.filter(record => record.status === 'Available');
+        setEquipment(equipmentAvailable);
+        sortedEquipment.sort((a, b) => new Date(b.timeupdate) - new Date(a.timeupdate));
+      } else {
+        // ถ้ายังไม่ login ใช้ public endpoint (ได้เฉพาะ Available)
+        response = await axios.get(`${apiUrl}/api/equipment/public`);
+        const sortedEquipment = response.data.equipment || [];
+        setEquipment(sortedEquipment);
+        sortedEquipment.sort((a, b) => new Date(b.timeupdate) - new Date(a.timeupdate));
+      }
     } catch (error) {
       console.error('Error fetching equipment:', error);
     }
@@ -53,7 +68,7 @@ function Home() {
 
   useEffect(() => {
     fetchEquipment();
-  }, []);
+  }, [user]); // เพิ่ม user เป็น dependency เพื่อ refetch เมื่อ login/logout
 
   useEffect(() => {
     AOS.init({ duration: 1000 });

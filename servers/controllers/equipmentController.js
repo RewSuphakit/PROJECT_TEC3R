@@ -5,11 +5,11 @@ const sharp = require('sharp');
 
 // เพิ่มอุปกรณ์
 exports.addEquipment = (req, res) => {
-  const { equipment_name,  quantity } = req.body;
+  const { equipment_name, quantity } = req.body;
   const image = req.file ? req.file.filename : '';  // ใช้ไฟล์ที่อัพโหลดหรือค่าว่าง
 
   const query = 'INSERT INTO equipment (equipment_name,  quantity, image) VALUES (?, ?, ?)';
-  connection.query(query, [equipment_name,  quantity, image], (err, result) => {
+  connection.query(query, [equipment_name, quantity, image], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Server error' });
@@ -18,10 +18,22 @@ exports.addEquipment = (req, res) => {
   });
 };
 
-// ดึงข้อมูลอุปกรณ์ทั้งหมด
+// ดึงข้อมูลอุปกรณ์ทั้งหมด (ต้อง login)
 exports.getAllEquipment = (req, res) => {
   const query = 'SELECT * FROM equipment';
   connection.query(query, (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Server error' });
+    }
+    res.status(200).json({ equipment: results });
+  });
+};
+
+// ดึงข้อมูลอุปกรณ์สำหรับ Public (ไม่ต้อง login) - เฉพาะอุปกรณ์ที่ Available
+exports.getPublicEquipment = (req, res) => {
+  const query = 'SELECT equipment_id, equipment_name, quantity, image, status, timeupdate FROM equipment WHERE status = ?';
+  connection.query(query, ['Available'], (err, results) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Server error' });
@@ -71,7 +83,7 @@ exports.updateEquipmentStatus = (req, res) => {
 // อัปเดตข้อมูลอุปกรณ์ (รวมการอัปเดตไฟล์ภาพ)
 exports.updateEquipment = (req, res) => {
   const { id } = req.params;
-  const { equipment_name,  quantity } = req.body;
+  const { equipment_name, quantity } = req.body;
   const newImage = req.file ? req.file.filename : null;
 
   const query = 'SELECT * FROM equipment WHERE equipment_id = ?';
@@ -106,7 +118,7 @@ exports.updateEquipment = (req, res) => {
       SET equipment_name = ?,  quantity = ?, image = ?
       WHERE equipment_id = ?
     `;
-    connection.query(updateQuery, [equipment_name,  quantity, updatedImage, id], (err, results) => {
+    connection.query(updateQuery, [equipment_name, quantity, updatedImage, id], (err, results) => {
       if (err) {
         console.error(err);
         return res.status(500).json({ message: 'Server error' });

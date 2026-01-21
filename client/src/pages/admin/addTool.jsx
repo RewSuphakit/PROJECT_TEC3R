@@ -18,8 +18,12 @@ function AddTool() {
     formData.append("image", image);
 
     try {
+      const token = localStorage.getItem('token');
       await axios.post(`${apiUrl}/api/equipment/equipment`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { 
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`
+        },
       });
 
       toast.success("เพิ่มอุปกรณ์สำเร็จ!");

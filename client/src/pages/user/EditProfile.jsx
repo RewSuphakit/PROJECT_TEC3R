@@ -87,35 +87,34 @@ function EditProfile() {
   };
 
   return (
-    <div>
-      <div className=" flex flex-col items-center justify-center p-4 relative overflow-hidden"
+    <div className="flex-grow flex flex-col items-center justify-center p-2 relative w-full"
       style={{ backgroundImage: `url(${bg2})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
       >
       {/* Overlay */}
       {/* <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-0 "></div> */}
       {/* Profile Display Section */}
-      <div className="bg-white rounded-xl p-6 z-10 max-w-3xl w-full  ">
-        <div className="flex items-center gap-2  mb-2">
+      <div className="bg-white rounded-xl p-5 z-10 max-w-3xl w-full">
+        <div className="flex items-center gap-2 mb-2">
           <img
             src="https://img.icons8.com/?size=100&id=23tLBxDnXI8K&format=png&color=000000"
             alt="user icon"
-            className="w-20 h-20"
+            className="w-16 h-16"
           />
           <div>
-            <h1 className="text-3xl font-bold text-blue-900">
+            <h1 className="text-2xl font-bold text-blue-900">
               โปรไฟล์ของฉัน
             </h1>
           </div>
         </div>
 
         {user && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* รหัสนักศึกษา */}
-            <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border border-orange-100">
+            <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border border-orange-100">
             <img
             src="https://img.icons8.com/?size=100&id=GhyhrWqfuHQ7&format=png&color=000000"
             alt="user icon"
-            className="w-10 h-10"
+            className="w-8 h-8"
           />
               <div className="flex-1">
                 <p className="text-sm text-gray-600 font-medium">รหัสนักศึกษา</p>
@@ -124,11 +123,11 @@ function EditProfile() {
             </div>
 
             {/* ชื่อนักศึกษา */}
-            <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border border-orange-100">
+            <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border border-orange-100">
                 <img
             src="https://img.icons8.com/?size=100&id=3nWSKVe0pWxx&format=png&color=000000"
             alt="user icon"
-            className="w-10 h-10"
+            className="w-8 h-8"
           />
               <div className="flex-1">
                 <p className="text-sm text-gray-600 font-medium">ชื่อนักศึกษา</p>
@@ -137,11 +136,11 @@ function EditProfile() {
             </div>
 
             {/* ระดับชั้น */}
-            <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border border-orange-100">
+            <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border border-orange-100">
                <img
             src="https://img.icons8.com/?size=100&id=xDDWfeoi2wrD&format=png&color=000000"
             alt="user icon"
-            className="w-10 h-10"
+            className="w-8 h-8"
           />
               <div className="flex-1">
                 <p className="text-sm text-gray-600 font-medium">ระดับชั้น</p>
@@ -150,11 +149,11 @@ function EditProfile() {
             </div>
 
             {/* เบอร์ติดต่อ */}
-            <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border border-orange-100">
+            <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border border-orange-100">
                <img
             src="https://img.icons8.com/?size=100&id=I24lanX6Nq71&format=png&color=000000"
             alt="user icon"
-            className="w-10 h-10"
+            className="w-8 h-8"
           />
               <div className="flex-1">
                 <p className="text-sm text-gray-600 font-medium">เบอร์ติดต่อ</p>
@@ -166,7 +165,7 @@ function EditProfile() {
 
         <button 
           onClick={openEditModal} 
-          className="w-full mt-6 py-3 bg-gradient-to-r from-blue-900 to-blue-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
+          className="w-full mt-4 py-2 bg-gradient-to-r from-blue-900 to-blue-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -174,7 +173,7 @@ function EditProfile() {
           แก้ไขข้อมูลส่วนตัว
         </button>
       </div>
-</div>
+
       {/* Edit Modal */}
       {editModalOpen && userToEdit && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-4">

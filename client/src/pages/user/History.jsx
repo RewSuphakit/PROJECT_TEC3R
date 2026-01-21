@@ -54,7 +54,7 @@ function History() {
 
   return (
     <div
-      className="min-h-screen flex flex-col py-6 px-4 relative"
+      className="flex-1 flex flex-col py-6 px-4 relative"
       style={{
         backgroundImage: `url(${bg2})`,
         backgroundSize: "cover",

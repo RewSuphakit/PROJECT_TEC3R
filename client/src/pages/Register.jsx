@@ -78,9 +78,8 @@ const Register = () => {
 
   return (
     <div 
-      className="flex items-center justify-center bg-gray-100" 
+      className="flex-1 flex items-center justify-center bg-gray-100 py-4" 
       style={{ 
-        minHeight: '81vh',
         backgroundImage: `url(${bg2})`,
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',

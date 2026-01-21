@@ -86,112 +86,129 @@ function Header() {
   
   );
   return (
-
-  
-    <section className="w-full  text-gray-700 sticky top-0 z-50" style={{backgroundColor: '#eaeaeaff'}}>
-  <nav className="navbar e shadow-md  border-b border-gray-200 ">
-    <div><img className="rounded-md " style={{
-      imageSize: 'cover',
-      width: '200px',
-      height: '100px',
-      objectFit: 'contain'
-    }}  src={logoTec} alt="logo" /></div>
-    <div className="container  flex flex-wrap items-center justify-between">
-      {/* Logo Section */}
-      <div className="flex items-center">
-        <a href="/RMUTI/" className="flex items-center">
-        <div className="flex flex-col ">
-        <div className="flex items-center space-x-2 mb-1">
-          <div className="text-5xl font-bold text-orange-500">RMUTI</div>
-          <div className="text-5xl font-bold text-blue-900">KKC</div>
-          {/* <div><img className="rounded-md w-16 h-16" src={icon} alt="logo" /></div> */}
-        </div>
-      
+    <section className="w-full text-gray-700 sticky top-0 z-50">
+      {/* Gradient Background for Header */}
+      <nav className="navbar shadow-lg border-b border-gray-200/50 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-slate-50 via-white to-slate-50">
         
-          <div className="flex items-center space-x-2">   
-            <p className="text-sm text-black-100 font-bold">ระบบการยืม-คืนอุปกรณ์</p>
-            </div>
-         <div className="flex items-center space-x-2">
-          <p className="text-sm text-black-100 font-bold">สาขาครุศาสตร์อุตสาหกรรมคอมพิวเตอร์</p>
+        {/* Logo Container - Modern Layout */}
+        <div className="flex items-center gap-2 sm:gap-4">
+          {/* Logo Image */}
+          <div className="flex-shrink-0">
+            <img 
+              className="rounded-lg w-12 h-12 sm:w-20 sm:h-16 md:w-32 md:h-24 lg:w-[180px] lg:h-[90px] object-contain drop-shadow-sm" 
+              src={logoTec} 
+              alt="logo" 
+            />
           </div>
-         </div>
-          {/* <img className="rounded-md " src={logofix} alt="logo" /> */}
-        </a>
-      </div>
-      
-      
-      <div className="dropdown dropdown-end">
-            {user?.user_id && (
-              <>
-              <div className="flex items-center space-x-4">
-  <p className="text-gray-700 text-sm font-medium">
-  ผู้ใช้งาน : {user?.role === "user" 
-    ? "นักศึกษา" 
-    : user?.role === "teacher" 
-      ? "อาจารย์" 
-      : "ไม่ทราบ"}
-</p>
-
-  <div className="relative">
-    <label
-      tabIndex={0}
-      className="btn btn-outline btn-sm pr-3 cursor-pointer"
-    >
-      <svg
-        className="w-5 h-5"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
-        />
-      </svg>
-      เมนู
-    </label>
-    {borrowedCount <= 0  ? null : (
-      <span className="absolute -top-1 -right-1 block h-3 w-3 rounded-full bg-red-500"></span>
-    )}
-  </div>
-</div>
-
-                <ul className="menu menu-sm dropdown-content mt-3 p-2 shadow bg-white rounded-box w-52 z-10">
-                   {userMenu}
-                </ul>
-              
-              </>
-            )}
-            {!user?.user_id && (
-             <div className="flex space-x-4">
-             {/* Login Button */}
-             <Link to="/RMUTI/Login" className="btn btn-ghost text-orange-500 hover:bg-white-100 flex items-center space-x-2">
-               <img
-                 className="rounded-md w-5 h-5"
-                 src="https://img.icons8.com/?size=100&id=98957&format=png&color=F97316"
-                 alt="login-icon"
-               />
-               <span>เข้าสู่ระบบ</span>
-            </Link>
-     
-             {/* Register Button */}
-             <Link
-               to="/RMUTI/Register"
-               className="btn bg-orange-500 text-white hover:bg-orange-600 border-0 flex items-center space-x-2"
-             >
-               <img className="w-5 h-5" src={register} alt="register-icon" />
-               <span>สมัครใช้งาน</span>
-             </Link>
-           </div>
-            )}
+          
+          {/* Brand Text */}
+          <a href="/RMUTI/" className="flex flex-col justify-center">
+            {/* RMUTI KKC - Stylized */}
+            <div className="flex items-baseline gap-1 sm:gap-2">
+              <span className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-orange-500 to-orange-400 bg-clip-text text-transparent drop-shadow-sm">
+                RMUTI
+              </span>
+              <span className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent drop-shadow-sm">
+                KKC
+              </span>
             </div>
-       
-    </div>
-  </nav>
-</section>
+            
+            {/* Subtitle - Elegant display */}
+            <div className="hidden sm:block">
+              <p className="text-xs md:text-sm text-gray-600 font-semibold tracking-wide">
+                ระบบการยืม-คืนอุปกรณ์
+              </p>
+              <p className="text-[10px] md:text-xs text-gray-500 font-medium">
+                สาขาครุศาสตร์อุตสาหกรรมคอมพิวเตอร์
+              </p>
+            </div>
+          </a>
+        </div>
+
+        {/* Spacer */}
+        <div className="flex-1"></div>
+        
+        {/* Menu Section */}
+        <div className="dropdown dropdown-end">
+          {user?.user_id && (
+            <>
+              <div className="flex items-center gap-2 sm:gap-4">
+                {/* User role badge */}
+                <div className="hidden sm:flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                  <p className="text-gray-600 text-xs sm:text-sm font-medium">
+                    {user?.role === "user" 
+                      ? "นักศึกษา" 
+                      : user?.role === "teacher" 
+                        ? "อาจารย์" 
+                        : "ผู้ใช้งาน"}
+                  </p>
+                </div>
+
+                <div className="relative">
+                  <label
+                    tabIndex={0}
+                    className="btn btn-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200 gap-1 sm:gap-2"
+                  >
+                    <svg
+                      className="w-4 h-4 sm:w-5 sm:h-5"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 6h16M4 12h16M4 18h16"
+                      />
+                    </svg>
+                    <span className="hidden sm:inline">เมนู</span>
+                  </label>
+                  {borrowedCount <= 0 ? null : (
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4 sm:h-5 sm:w-5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-4 w-4 sm:h-5 sm:w-5 bg-red-500 text-white text-[10px] sm:text-xs items-center justify-center font-bold">
+                        {borrowedCount}
+                      </span>
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <ul className="menu menu-sm dropdown-content mt-3 p-3 shadow-xl bg-white rounded-2xl w-60 z-10 border border-gray-100">
+                {userMenu}
+              </ul>
+            </>
+          )}
+          
+          {!user?.user_id && (
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Login Button - Elegant */}
+              <Link 
+                to="/RMUTI/Login" 
+                className="btn btn-sm sm:btn-md btn-ghost text-orange-500 hover:bg-orange-50 flex items-center gap-1 sm:gap-2 font-semibold transition-all duration-200"
+              >
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span className="text-sm sm:text-base">เข้าสู่ระบบ</span>
+              </Link>
+      
+              {/* Register Button - Premium */}
+              <Link
+                to="/RMUTI/Register"
+                className="btn btn-sm sm:btn-md bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white border-0 shadow-md hover:shadow-lg flex items-center gap-1 sm:gap-2 transition-all duration-200"
+              >
+                <img className="w-4 h-4 sm:w-5 sm:h-5" src={register} alt="register-icon" />
+                <span className="text-sm sm:text-base font-semibold">สมัครใช้งาน</span>
+              </Link>
+            </div>
+          )}
+        </div>
+      </nav>
+    </section>
 
   )
 }

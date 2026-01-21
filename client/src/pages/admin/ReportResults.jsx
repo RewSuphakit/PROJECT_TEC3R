@@ -15,7 +15,10 @@ function ReportResults() {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/api/stats/reports`);
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${apiUrl}/api/stats/reports`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         let filteredTransactions = [];
         if (response.data && Array.isArray(response.data.borrow_transactions)) {
           // กรองเฉพาะ transaction ที่อุปกรณ์ทั้งหมดถูกคืน (status = "Returned")

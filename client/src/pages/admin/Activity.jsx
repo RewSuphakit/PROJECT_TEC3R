@@ -10,7 +10,10 @@ function Activity() {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/api/borrowRecords/all`);
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${apiUrl}/api/borrowRecords/all`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         const filtered = response.data.borrow_transactions?.filter(transaction => {
           const borrowDate = new Date(transaction.borrow_date);
           const diffInHours = (now - borrowDate.getTime()) / 3600000;

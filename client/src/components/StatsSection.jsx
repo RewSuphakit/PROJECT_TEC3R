@@ -8,8 +8,6 @@ const StatsSection = () => {
   const [statsData, setStatsData] = useState([]);
 
   useEffect(() => {
-    
-    
     axios.get(`${apiUrl}/api/stats/stats/`)
       .then((response) => {
         // Assuming the response contains the correct structure, map it properly
