@@ -6,7 +6,7 @@ import ListBorrow from "../pages/admin/ListBorrow";
 import ListReturn from "../pages/admin/ListReturn";
 import ManageUsers from "../pages/admin/ManageUsers";
 import ReportResults from "../pages/admin/ReportResults";
-import ReportBorrow from "../pages/admin/Reportborrow";
+import ReportBorrow from "../pages/admin/ReportBorrow";
 import ReportDetails from "../pages/admin/ReportDetails";
 import NotFound from "../components/NotFound404";
 

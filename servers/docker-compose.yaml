@@ -1,0 +1,20 @@
+version: '3.9'
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=development
+      - API_URL=${API_URL}
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+      - channelAccessToken=${channelAccessToken}
+      - channelSecret=${channelSecret}
+      - recipientId=${recipientId}
