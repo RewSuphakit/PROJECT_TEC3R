@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview --port 4000"
   },
   "dependencies": {
     "@pdfme/common": "^5.5.8",

@@ -1,4 +1,4 @@
-# Simple Node.js Dockerfile for client
+# Production Dockerfile for client
 FROM node:20-alpine
 
 WORKDIR /app
@@ -12,8 +12,11 @@ RUN npm i
 # Copy application code
 COPY . .
 
-# Expose Vite dev server port
+# Build for production
+RUN npm run build
+
+# Expose port
 EXPOSE 4000
 
-# Start the Vite dev server
-CMD ["npm", "run", "dev"]
+# Serve the production build
+CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0"]
