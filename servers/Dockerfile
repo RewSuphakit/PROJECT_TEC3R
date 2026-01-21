@@ -79,4 +79,4 @@ ENV PORT=8000
 EXPOSE 8000
 
 # Start the server with nodemon for hot-reload
-CMD ["npx", "nodemon", "index.js"]
+CMD ["npm", "start"]
