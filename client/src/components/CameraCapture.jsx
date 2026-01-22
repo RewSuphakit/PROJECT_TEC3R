@@ -120,22 +120,22 @@ const CameraCapture = ({ onCapture, recordId }) => {
             {/* Modal สำหรับถ่ายภาพ */}
             {isModalOpen && (
               <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-[9999] p-4">
-                <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-sm mx-auto shadow-2xl">
+                <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-sm mx-auto shadow-2xl overflow-hidden">
                   <div className="p-4">
                     <h2 className="text-center text-lg font-semibold mb-3">ถ่ายภาพ</h2>
-                    <div className="relative">
+                    {/* Video container with fixed height */}
+                    <div className="relative w-full h-[40vh] bg-black rounded-lg overflow-hidden">
                       <video
                         ref={videoRef}
                         autoPlay
                         playsInline
                         muted
-                        className="w-full rounded-lg bg-black"
-                        style={{ maxHeight: '50vh', objectFit: 'cover' }}
+                        className="absolute inset-0 w-full h-full object-cover rounded-lg"
                       />
                       {/* ปุ่มสลับกล้อง */}
                       <button
                         onClick={switchCamera}
-                        className="absolute top-2 right-2 p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition-all duration-150"
+                        className="absolute top-2 right-2 p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition-all duration-150 z-10"
                         title={facingMode === 'environment' ? 'สลับเป็นกล้องหน้า' : 'สลับเป็นกล้องหลัง'}
                       >
                         <svg
@@ -154,7 +154,8 @@ const CameraCapture = ({ onCapture, recordId }) => {
                       </button>
                     </div>
                     <canvas ref={canvasRef} width="640" height="480" style={{ display: 'none' }} />
-                    <div className="flex justify-center gap-3 mt-4 pb-2">
+                    {/* Buttons always visible */}
+                    <div className="flex justify-center gap-3 mt-4">
                       <button onClick={() => setIsModalOpen(false)} className="btn btn-error px-6">Close</button>
                       <button onClick={handleCapture} className="btn btn-success px-6">Capture</button>
                     </div>
