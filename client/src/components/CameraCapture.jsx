@@ -119,12 +119,17 @@ const CameraCapture = ({ onCapture, recordId }) => {
 
             {/* Modal สำหรับถ่ายภาพ */}
             {isModalOpen && (
-              <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-40">
-                <div className="modal modal-open z-50">
-                  <div className="modal-box">
-                    <h2 className="text-center text-lg mb-4">ถ่ายภาพ</h2>
-                    <div className="relative">
-                      <video ref={videoRef} autoPlay playsInline width="100%" height="auto" className="mb-4 rounded-lg" />
+              <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-40 p-4">
+                <div className="modal modal-open z-50 w-full max-w-sm">
+                  <div className="modal-box flex flex-col max-h-[90vh] overflow-hidden">
+                    <h2 className="text-center text-lg mb-4 flex-shrink-0">ถ่ายภาพ</h2>
+                    <div className="relative flex-1 min-h-0">
+                      <video
+                        ref={videoRef}
+                        autoPlay
+                        playsInline
+                        className="w-full h-auto max-h-[60vh] object-contain rounded-lg"
+                      />
                       {/* ปุ่มสลับกล้อง */}
                       <button
                         onClick={switchCamera}
@@ -147,7 +152,7 @@ const CameraCapture = ({ onCapture, recordId }) => {
                       </button>
                     </div>
                     <canvas ref={canvasRef} width="640" height="480" style={{ display: 'none' }} />
-                    <div className="flex justify-center gap-2">
+                    <div className="flex justify-center gap-2 mt-4 flex-shrink-0">
                       <button onClick={() => setIsModalOpen(false)} className="btn btn-error">Close</button>
                       <button onClick={handleCapture} className="btn btn-success">Capture</button>
                     </div>
