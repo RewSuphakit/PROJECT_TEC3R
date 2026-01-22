@@ -119,25 +119,27 @@ const CameraCapture = ({ onCapture, recordId }) => {
 
             {/* Modal สำหรับถ่ายภาพ */}
             {isModalOpen && (
-              <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-40 p-4">
-                <div className="modal modal-open z-50 w-full max-w-sm">
-                  <div className="modal-box flex flex-col max-h-[90vh] overflow-hidden">
-                    <h2 className="text-center text-lg mb-4 flex-shrink-0">ถ่ายภาพ</h2>
-                    <div className="relative flex-1 min-h-0">
+              <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-[9999] p-4">
+                <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-sm mx-auto shadow-2xl">
+                  <div className="p-4">
+                    <h2 className="text-center text-lg font-semibold mb-3">ถ่ายภาพ</h2>
+                    <div className="relative">
                       <video
                         ref={videoRef}
                         autoPlay
                         playsInline
-                        className="w-full h-auto max-h-[60vh] object-contain rounded-lg"
+                        muted
+                        className="w-full rounded-lg bg-black"
+                        style={{ maxHeight: '50vh', objectFit: 'cover' }}
                       />
                       {/* ปุ่มสลับกล้อง */}
                       <button
                         onClick={switchCamera}
-                        className="absolute top-2 right-2 p-2 bg-white/80 hover:bg-white rounded-full shadow-lg transition-all duration-150"
+                        className="absolute top-2 right-2 p-2 bg-white/90 hover:bg-white rounded-full shadow-lg transition-all duration-150"
                         title={facingMode === 'environment' ? 'สลับเป็นกล้องหน้า' : 'สลับเป็นกล้องหลัง'}
                       >
                         <svg
-                          className="w-6 h-6 text-gray-700"
+                          className="w-5 h-5 text-gray-700"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -152,9 +154,9 @@ const CameraCapture = ({ onCapture, recordId }) => {
                       </button>
                     </div>
                     <canvas ref={canvasRef} width="640" height="480" style={{ display: 'none' }} />
-                    <div className="flex justify-center gap-2 mt-4 flex-shrink-0">
-                      <button onClick={() => setIsModalOpen(false)} className="btn btn-error">Close</button>
-                      <button onClick={handleCapture} className="btn btn-success">Capture</button>
+                    <div className="flex justify-center gap-3 mt-4 pb-2">
+                      <button onClick={() => setIsModalOpen(false)} className="btn btn-error px-6">Close</button>
+                      <button onClick={handleCapture} className="btn btn-success px-6">Capture</button>
                     </div>
                   </div>
                 </div>
