@@ -37,3 +37,6 @@ servers/.env
 # Other
 *.sqlite
 *.sql
+
+uploads/
+image_return/
