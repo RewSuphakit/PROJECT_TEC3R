@@ -119,8 +119,8 @@ const CameraCapture = ({ onCapture, recordId }) => {
 
             {/* Modal สำหรับถ่ายภาพ */}
             {isModalOpen && (
-              <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-[9999] p-4">
-                <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-sm mx-auto shadow-2xl overflow-hidden">
+              <div className="fixed inset-0 flex items-start justify-center bg-black/70 z-[9999] p-4 overflow-y-auto">
+                <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-sm mx-auto shadow-2xl overflow-hidden my-auto">
                   <div className="p-4">
                     <h2 className="text-center text-lg font-semibold mb-3">ถ่ายภาพ</h2>
                     {/* Video container with fixed height */}
