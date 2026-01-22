@@ -42,13 +42,9 @@ const ContactAdminModal = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        <form method="dialog" className="modal-backdrop bg-black/40" onClick={onClose}>
-           <button type="button" className='cursor-default'>close</button>
-        </form>
+        
       </div>
-       <form method="dialog" className="modal-backdrop" onClick={onClose}>
-          <button type="button">close</button>
-      </form>
+       
     </dialog>,
     document.body
   );

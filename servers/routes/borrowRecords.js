@@ -4,7 +4,7 @@ const borrowRecordsController = require('../controllers/borrow_recordsController
 const { upload_return, compressImage_return } = require('../middleware/upload_return');
 const authenticate = require('../middleware/authenticate');
 
-// การยืม-คืน - ต้อง login ก่อนจึงจะเข้าถึงได้
+
 router.post('/add', authenticate, borrowRecordsController.addBorrowRecord);  // เพิ่มการยืม
 router.put('/update/:record_id', authenticate, upload_return.single('image_return'), compressImage_return, borrowRecordsController.updateReturnStatus);  // อัพเดตการคืน
 router.get('/all', authenticate, borrowRecordsController.getAllBorrowRecords);  // ดูการยืมทั้งหมด

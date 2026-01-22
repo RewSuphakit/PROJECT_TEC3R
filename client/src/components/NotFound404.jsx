@@ -6,9 +6,9 @@ const NotFound404 = () => {
     navigate(-1); 
   };
   return (
-    <div>
-    <section className="">
-      <div className="container min-h-screen px-6 py-12 mx-auto lg:flex lg:items-center lg:gap-12">
+    <>
+    <section className="flex-1 flex items-center justify-center py-4">
+      <div className="container  px-6 py-12 mx-auto lg:flex lg:items-center lg:gap-12">
         <div className="w-full lg:w-1/2">
           <p className="text-sm font-medium text-blue-500 dark:text-blue-400">404 error</p>
           <h1 className="mt-3 text-2xl font-semibold text-gray-800 md:text-3xl">Page not found</h1>
@@ -33,7 +33,7 @@ const NotFound404 = () => {
         </div>
       </div>
     </section>
-    </div>
+    </>
   );
 };
 

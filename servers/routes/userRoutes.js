@@ -16,18 +16,10 @@ const loginLimiter = rateLimit({
     legacyHeaders: false, // Disable X-RateLimit headers
 });
 
-// Rate limiter สำหรับ register - จำกัด 3 ครั้งใน 1 ชั่วโมง
-const registerLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 ชั่วโมง
-    max: 3, // จำกัด 3 ครั้ง
-    message: {
-        msg: 'มีการลงทะเบียนมากเกินไป กรุณาลองใหม่ภายหลัง',
-        error: 'Too many registration attempts. Please try again later.'
-    },
-});
+
 
 // LOGIN
-router.post('/register', registerLimiter, authController.register);
+router.post('/register', authController.register);
 router.post('/login', loginLimiter, authController.login);
 // AUTH
 router.get('/profile', authenticate, authController.getUserProfile);

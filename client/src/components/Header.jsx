@@ -94,7 +94,7 @@ function Header() {
   return (
     <section className="w-full text-gray-700 sticky top-0 z-50">
       {/* Gradient Background for Header */}
-      <nav className="navbar shadow-lg border-b border-gray-200/50 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-slate-50 via-white to-slate-50">
+      <nav className="navbar shadow-lg  border-gray-200/50 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-slate-50 via-white to-slate-50  ">
         
         {/* Logo Container - Modern Layout */}
         <div className="flex items-center gap-2 sm:gap-4">

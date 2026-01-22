@@ -211,7 +211,7 @@ exports.updateUser = async (req, res) => {
 
     const values = [student_id, student_name, year_of_study, phone, user_id];
 
-    connection.query(updateQuery, values, (err, results) => {
+    pool.query(updateQuery, values, (err, results) => {
       if (err) {
         console.error('Update query error:', err);
         return res.status(500).json({ error: 'Internal Server Error' });
