@@ -1,4 +1,4 @@
-const connection = require('../config/db');
+const { promisePool } = require('../config/db');
 const jwt = require('jsonwebtoken');
 
 module.exports = async (req, res, next) => {
@@ -23,7 +23,7 @@ module.exports = async (req, res, next) => {
     }
 
     // ดึงข้อมูลผู้ใช้จาก DB
-    const [rows] = await connection.promise().query(
+    const [rows] = await promisePool.query(
       'SELECT * FROM users WHERE student_email = ? LIMIT 1',
       [payload.user.student_email]
     );

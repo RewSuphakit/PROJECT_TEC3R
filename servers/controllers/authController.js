@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const connection = require('../config/db'); // การเชื่อมต่อฐานข้อมูล
+const { pool } = require('../config/db'); // การเชื่อมต่อฐานข้อมูล
 
 // การสมัครสมาชิก
 exports.register = async (req, res) => {
@@ -14,7 +14,7 @@ exports.register = async (req, res) => {
 
   try {
     // ตรวจสอบการมีอยู่ของอีเมลในฐานข้อมูล
-    connection.query(
+    pool.query(
       'SELECT * FROM users WHERE student_email = ?',
       [student_email],
       async (err, results) => {
@@ -30,7 +30,7 @@ exports.register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // แทรกผู้ใช้งานใหม่
-        connection.query(
+        pool.query(
           'INSERT INTO users (student_id, student_name, year_of_study, student_email, password,phone,role) VALUES (?, ?, ?, ?, ?,?,?)',
           [student_id, student_name, year_of_study, student_email, hashedPassword, phone, role],
           (err, results) => {
@@ -60,7 +60,7 @@ exports.login = async (req, res) => {
 
   try {
     // ตรวจสอบว่าอีเมลถูกต้องหรือไม่
-    connection.query(
+    pool.query(
       'SELECT * FROM users WHERE student_email = ?',
       [student_email],
       async (err, results) => {
@@ -151,7 +151,7 @@ exports.getUserProfile = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-    connection.query('SELECT * FROM users', (err, results) => {
+    pool.query('SELECT * FROM users', (err, results) => {
       if (err) {
         console.error(err);
         return res.status(500).json({ error: 'Internal Server Error' });
@@ -173,7 +173,7 @@ exports.deleteUser = async (req, res) => {
   try {
     const { user_id } = req.params;
 
-    connection.query(
+    pool.query(
       'DELETE FROM users WHERE user_id = ?',
       [user_id],
       (err, results) => {
@@ -211,7 +211,7 @@ exports.updateUser = async (req, res) => {
 
     const values = [student_id, student_name, year_of_study, phone, user_id];
 
-    connection.query(updateQuery, values, (err, results) => {
+    pool.query(updateQuery, values, (err, results) => {
       if (err) {
         console.error('Update query error:', err);
         return res.status(500).json({ error: 'Internal Server Error' });
@@ -254,7 +254,7 @@ exports.updateEmailPassword = async (req, res) => {
     updateQuery += `WHERE user_id = ?`;
     values.push(user_id);
 
-    connection.query(updateQuery, values, (err, results) => {
+    pool.query(updateQuery, values, (err, results) => {
       if (err) {
         console.error("Update query error:", err);
         return res.status(500).json({ error: "Internal Server Error" });
@@ -281,7 +281,7 @@ exports.adminUpdateUser = async (req, res) => {
     const { student_id, student_name, year_of_study, student_email, password, phone, role } = req.body;
 
     // ตรวจสอบว่าอีเมลซ้ำกับผู้ใช้อื่นหรือไม่
-    connection.query(
+    pool.query(
       'SELECT user_id FROM users WHERE student_email = ? AND user_id != ?',
       [student_email, user_id],
       async (err, existingUsers) => {
@@ -316,7 +316,7 @@ exports.adminUpdateUser = async (req, res) => {
         updateQuery += `WHERE user_id = ?`;
         values.push(user_id);
 
-        connection.query(updateQuery, values, (err, results) => {
+        pool.query(updateQuery, values, (err, results) => {
           if (err) {
             console.error('Update query error:', err);
             return res.status(500).json({ error: 'Internal Server Error' });

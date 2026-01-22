@@ -1,11 +1,11 @@
-const connection = require('../config/db');
+const { promisePool } = require('../config/db');
 const sharp = require('sharp');
 
 
 exports.getStats = async (req, res) => {
     try {
         const query = 'SELECT(SELECT COUNT(*) FROM equipment) AS total_equipment,(SELECT COUNT(*) FROM borrow_records) AS total_borrow_records,(SELECT COUNT(*) FROM users) AS total_users,(SELECT COUNT(*) FROM borrow_records WHERE status = "borrowed") AS total_borrowed,(SELECT COUNT(*) FROM borrow_records WHERE status = "returned") AS total_returned';
-        const [rows] = await connection.promise().query(query);
+        const [rows] = await promisePool.query(query);
         res.json(rows[0]);
     }
     catch (err) {
@@ -33,7 +33,7 @@ exports.getReports = async (req, res) => {
           JOIN equipment e ON br.equipment_id = e.equipment_id
           ORDER BY bt.transaction_id DESC
         `;
-        const [rows] = await connection.promise().query(query);
+        const [rows] = await promisePool.query(query);
     
         // รวมข้อมูลให้เป็นรูปแบบ transaction เดียวโดยมี borrow_records เป็น Array
         const transactionsMap = {};
@@ -94,7 +94,7 @@ exports.getReportDetails = async (req, res) => {
             WHERE br.transaction_id = ?
             ORDER BY br.record_id DESC
             `;
-        const [rows] = await connection.promise().query(query, [transaction_id]);
+        const [rows] = await promisePool.query(query, [transaction_id]);
         res.json({ borrow_records: rows });
     }
     catch (error) {

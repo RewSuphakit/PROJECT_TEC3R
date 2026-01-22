@@ -1,6 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
-const connection = require('../config/db');  // เชื่อมต่อกับฐานข้อมูล
+const { pool } = require('../config/db');  // เชื่อมต่อกับฐานข้อมูล
 const sharp = require('sharp');
 
 // เพิ่มอุปกรณ์
@@ -9,7 +9,7 @@ exports.addEquipment = (req, res) => {
   const image = req.file ? req.file.filename : '';  // ใช้ไฟล์ที่อัพโหลดหรือค่าว่าง
 
   const query = 'INSERT INTO equipment (equipment_name,  quantity, image) VALUES (?, ?, ?)';
-  connection.query(query, [equipment_name, quantity, image], (err, result) => {
+  pool.query(query, [equipment_name, quantity, image], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Server error' });
@@ -21,7 +21,7 @@ exports.addEquipment = (req, res) => {
 // ดึงข้อมูลอุปกรณ์ทั้งหมด (ต้อง login)
 exports.getAllEquipment = (req, res) => {
   const query = 'SELECT * FROM equipment';
-  connection.query(query, (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Server error' });
@@ -33,7 +33,7 @@ exports.getAllEquipment = (req, res) => {
 // ดึงข้อมูลอุปกรณ์สำหรับ Public (ไม่ต้อง login) - เฉพาะอุปกรณ์ที่ Available
 exports.getPublicEquipment = (req, res) => {
   const query = 'SELECT equipment_id, equipment_name, quantity, image, status, timeupdate FROM equipment WHERE status = ?';
-  connection.query(query, ['Available'], (err, results) => {
+  pool.query(query, ['Available'], (err, results) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Server error' });
@@ -46,7 +46,7 @@ exports.getPublicEquipment = (req, res) => {
 exports.getEquipmentById = (req, res) => {
   const { id } = req.params;
   const query = 'SELECT * FROM equipment WHERE equipment_id = ?';
-  connection.query(query, [id], (err, results) => {
+  pool.query(query, [id], (err, results) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Server error' });
@@ -66,7 +66,7 @@ exports.updateEquipmentStatus = (req, res) => {
   }
 
   const query = 'UPDATE equipment SET status = ? WHERE equipment_id = ?';
-  connection.query(query, [status, id], (err, results) => {
+  pool.query(query, [status, id], (err, results) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Server error' });
@@ -87,7 +87,7 @@ exports.updateEquipment = (req, res) => {
   const newImage = req.file ? req.file.filename : null;
 
   const query = 'SELECT * FROM equipment WHERE equipment_id = ?';
-  connection.query(query, [id], (err, results) => {
+  pool.query(query, [id], (err, results) => {
     if (err) return res.status(500).json({ message: 'Server error' });
     if (results.length === 0) {
       return res.status(404).json({ message: 'Equipment not found' });
@@ -118,7 +118,7 @@ exports.updateEquipment = (req, res) => {
       SET equipment_name = ?,  quantity = ?, image = ?
       WHERE equipment_id = ?
     `;
-    connection.query(updateQuery, [equipment_name, quantity, updatedImage, id], (err, results) => {
+    pool.query(updateQuery, [equipment_name, quantity, updatedImage, id], (err, results) => {
       if (err) {
         console.error(err);
         return res.status(500).json({ message: 'Server error' });
@@ -137,7 +137,7 @@ exports.deleteEquipment = (req, res) => {
   const { id } = req.params;
   const query = 'SELECT * FROM equipment WHERE equipment_id = ?';
 
-  connection.query(query, [id], (err, results) => {
+  pool.query(query, [id], (err, results) => {
     if (err) return res.status(500).json({ message: 'Server error' });
     if (results.length === 0) {
       return res.status(404).json({ message: 'Equipment not found' });
@@ -163,7 +163,7 @@ exports.deleteEquipment = (req, res) => {
 
     // ลบข้อมูลจากฐานข้อมูล
     const deleteQuery = 'DELETE FROM equipment WHERE equipment_id = ?';
-    connection.query(deleteQuery, [id], (err, results) => {
+    pool.query(deleteQuery, [id], (err, results) => {
       if (err) return res.status(500).json({ message: 'Server error' });
       res.status(200).json({ message: 'Equipment deleted successfully' });
     });

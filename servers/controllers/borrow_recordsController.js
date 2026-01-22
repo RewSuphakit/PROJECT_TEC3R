@@ -1,5 +1,5 @@
 require('dotenv').config();
-const connection = require('../config/db');
+const { promisePool } = require('../config/db');
 const lineNotify = require('../utils/lineNotify');
 // =========================
 // 7. ดึงประวัติการยืม-คืนทั้งหมดของผู้ใช้ (History)
@@ -16,7 +16,7 @@ exports.getHistoryByUserId = async (req, res) => {
       WHERE br.user_id = ?
       ORDER BY br.borrow_date DESC
     `;
-    const [results] = await connection.promise().query(query, [user_id]);
+     const [results] = await promisePool.query(query, [user_id]);
 
     // Format date to Thai locale
     const formattedResults = results.map(record => ({
@@ -54,11 +54,11 @@ exports.addBorrowRecord = async (req, res) => {
 
   try {
     // เริ่ม Transaction
-    await connection.promise().beginTransaction();
+    connection = await promisePool.getConnection();
 
     // 1. สร้าง transaction เดียวใน table borrow_transactions
     const insertTransactionQuery = `INSERT INTO borrow_transactions (user_id) VALUES (?)`;
-    const [transactionResult] = await connection.promise().query(insertTransactionQuery, [user_id]);
+    const [transactionResult] = await connection.query(insertTransactionQuery, [user_id]);
     const transaction_id = transactionResult.insertId;
 
     // 2. บันทึกข้อมูลใน borrow_records ด้วย batch insert
@@ -72,7 +72,7 @@ exports.addBorrowRecord = async (req, res) => {
       equipment_id,
       quantity_borrow,
     ]);
-    await connection.promise().query(insertRecordQuery, [borrowData]);
+    await connection.query(insertRecordQuery, [borrowData]);
 
     // 3. ตรวจสอบและอัปเดตจำนวนอุปกรณ์ในตาราง equipment
     const checkEquipmentQuery = `SELECT quantity FROM equipment WHERE equipment_id = ?`;
@@ -83,7 +83,7 @@ exports.addBorrowRecord = async (req, res) => {
     `;
     for (const { equipment_id, quantity_borrow } of items) {
       // ตรวจสอบว่ามีอุปกรณ์นี้อยู่หรือไม่
-      const [equipmentResult] = await connection.promise().query(checkEquipmentQuery, [equipment_id]);
+      const [equipmentResult] = await connection.query(checkEquipmentQuery, [equipment_id]);
       if (equipmentResult.length === 0) {
         throw new Error(`Equipment with id ${equipment_id} not found`);
       }
@@ -92,7 +92,7 @@ exports.addBorrowRecord = async (req, res) => {
         throw new Error(`Insufficient quantity for equipment id ${equipment_id}`);
       }
       // อัปเดตจำนวนอุปกรณ์
-      const [updateResult] = await connection.promise().query(updateEquipmentQuery, [
+      const [updateResult] = await connection.query(updateEquipmentQuery, [
         quantity_borrow,
         equipment_id,
         quantity_borrow,
@@ -109,7 +109,7 @@ exports.addBorrowRecord = async (req, res) => {
       JOIN borrow_transactions bt ON u.user_id = bt.user_id
       WHERE bt.transaction_id = ?
     `;
-    const [userResult] = await connection.promise().query(selectUserQuery, [transaction_id]);
+    const [userResult] = await connection.query(selectUserQuery, [transaction_id]);
     if (userResult.length === 0) throw new Error("User not found");
 
     const selectRecordsQuery = `
@@ -118,7 +118,7 @@ exports.addBorrowRecord = async (req, res) => {
       JOIN equipment e ON br.equipment_id = e.equipment_id
       WHERE br.transaction_id = ?
     `;
-    const [recordsResult] = await connection.promise().query(selectRecordsQuery, [transaction_id]);
+    const [recordsResult] = await connection.query(selectRecordsQuery, [transaction_id]);
     if (recordsResult.length === 0) throw new Error("Borrow records not found");
 
     // 5. จัดรูปแบบข้อมูลสำหรับ response
@@ -163,10 +163,10 @@ exports.addBorrowRecord = async (req, res) => {
     await lineNotify.sendMessage(message);
 
     // ยืนยัน Transaction
-    await connection.promise().commit();
+    await connection.commit();
     res.status(201).json(responseData);
   } catch (error) {
-    await connection.promise().rollback();
+    await connection.rollback();
     console.error("Error adding borrow record:", error);
     res.status(500).json({ message: "Error adding borrow record", error: error.message });
   }
@@ -183,12 +183,13 @@ exports.updateReturnStatus = async (req, res) => {
   if (!record_id) {
     return res.status(400).json({ message: "Missing required record_id" });
   }
-
+let connection;
   try {
-    await connection.promise().beginTransaction();
+    connection = await promisePool.getConnection();
+    await connection.beginTransaction();
 
     // ดึงข้อมูลการยืมที่ต้องการอัปเดต
-    const [records] = await connection.promise().query(
+    const [records] = await connection.query(
       `SELECT equipment_id, quantity_borrow FROM borrow_records WHERE record_id = ?`,
       [record_id]
     );
@@ -202,7 +203,7 @@ exports.updateReturnStatus = async (req, res) => {
       WHERE record_id = ?
     `;
     const updatedStatus = status ? status : "Returned";
-    const [updateResult] = await connection.promise().query(updateBorrowQuery, [
+    const [updateResult] = await connection.query(updateBorrowQuery, [
       new Date(),
       updatedStatus,
       image_return,
@@ -216,9 +217,9 @@ exports.updateReturnStatus = async (req, res) => {
       SET quantity = quantity + ?
       WHERE equipment_id = ?
     `;
-    await connection.promise().query(restoreQuery, [quantity_borrow, equipment_id]);
+    await connection.query(restoreQuery, [quantity_borrow, equipment_id]);
 
-    await connection.promise().commit();
+    await connection.commit();
 
     // ดึงข้อมูลสำหรับแจ้งเตือน LINE
     const selectReturnQuery = `
@@ -228,7 +229,7 @@ exports.updateReturnStatus = async (req, res) => {
       JOIN equipment e ON br.equipment_id = e.equipment_id
       WHERE br.record_id = ?
     `;
-    const [userResult] = await connection.promise().query(selectReturnQuery, [record_id]);
+    const [userResult] = await connection.query(selectReturnQuery, [record_id]);
     if (!userResult.length) throw new Error("Return record not found after update");
     const { student_name, phone, equipment_name, return_date, status: borrow_status } = userResult[0];
     const thai_return_date = new Date(return_date).toLocaleString("th-TH", {
@@ -259,7 +260,7 @@ exports.updateReturnStatus = async (req, res) => {
 
     res.status(200).json({ message: "Return status updated successfully" });
   } catch (error) {
-    await connection.promise().rollback();
+    await connection.rollback();
     console.error("Error updating return status:", error);
     res.status(500).json({ message: "Error updating return status", error: error.message });
   }
@@ -285,7 +286,7 @@ exports.getAllBorrowRecords = async (req, res) => {
       JOIN equipment e ON br.equipment_id = e.equipment_id
       ORDER BY bt.transaction_id DESC
     `;
-    const [rows] = await connection.promise().query(query);
+    const [rows] = await promisePool.query(query);
 
     // รวมข้อมูลให้เป็นรูปแบบ transaction เดียวโดยมี borrow_records เป็น Array
     const transactionsMap = {};
@@ -333,7 +334,7 @@ exports.getAllBorrowRecordsByUserId = async (req, res) => {
       FROM borrow_records
       WHERE user_id = ? AND status = 'Borrowed' 
     `;
-    const [countResults] = await connection.promise().query(countQuery, [user_id]);
+    const [countResults] = await promisePool.query(countQuery, [user_id]);
 
     // ดึงข้อมูลบันทึกการยืม
     const borrowQuery = `
@@ -351,7 +352,7 @@ exports.getAllBorrowRecordsByUserId = async (req, res) => {
       WHERE br.user_id = ?
       ORDER BY br.borrow_date DESC
     `;
-    const [borrowResults] = await connection.promise().query(borrowQuery, [user_id]);
+    const [borrowResults] = await promisePool.query(borrowQuery, [user_id]);
 
     // แปลงรูปแบบวันที่ให้เป็นแบบไทย
     const formattedBorrowResults = borrowResults.map(record => {
@@ -387,12 +388,13 @@ exports.deleteBorrowRecord = async (req, res) => {
   if (!record_id) {
     return res.status(400).json({ message: "Missing required record_id" });
   }
-
+  let connection;
   try {
-    await connection.promise().beginTransaction();
+      connection = await promisePool.getConnection();
+    await connection.beginTransaction();
 
     // ดึงข้อมูล borrow record ที่ต้องการลบ
-    const [records] = await connection.promise().query(
+    const [records] = await connection.query(
       `SELECT equipment_id, quantity_borrow FROM borrow_records WHERE record_id = ?`,
       [record_id]
     );
@@ -401,7 +403,7 @@ exports.deleteBorrowRecord = async (req, res) => {
 
     // ลบบันทึกการยืม
     const deleteQuery = `DELETE FROM borrow_records WHERE record_id = ?`;
-    const [deleteResult] = await connection.promise().query(deleteQuery, [record_id]);
+    const [deleteResult] = await connection.query(deleteQuery, [record_id]);
     if (deleteResult.affectedRows === 0) throw new Error("Failed to delete borrow record");
 
     // คืนจำนวนอุปกรณ์กลับไปในตาราง equipment
@@ -410,13 +412,13 @@ exports.deleteBorrowRecord = async (req, res) => {
       SET quantity = quantity + ?
       WHERE equipment_id = ?
     `;
-    await connection.promise().query(updateQuery, [quantity_borrow, equipment_id]);
+    await connection.query(updateQuery, [quantity_borrow, equipment_id]);
 
-    await connection.promise().commit();
+    await connection.commit();
     res.status(200).json({ message: "Borrow record deleted successfully" });
   } catch (error) {
     console.error("Error deleting borrow record:", error);
-    await connection.promise().rollback();
+    await connection.rollback();
     res.status(500).json({ message: "Error deleting borrow record", error: error.message });
   }
 };
@@ -444,7 +446,7 @@ exports.getBorrowRecordsByTransactionId = async (req, res) => {
       WHERE bt.transaction_id = ?
       ORDER BY br.record_id ASC
     `;
-    const [borrowResults] = await connection.promise().query(query, [transaction_id]);
+    const [borrowResults] = await promisePool.query(query, [transaction_id]);
     if (!borrowResults.length) {
       return res.status(404).json({ message: "No borrow records found for this transaction" });
     }
@@ -473,7 +475,7 @@ exports.getAllBorrowRecordsID = async (req, res) => {
       JOIN equipment e ON br.equipment_id = e.equipment_id
       WHERE br.record_id = ?
     `;
-    const [borrowResults] = await connection.promise().query(query, [record_id]);
+    const [borrowResults] = await promisePool.query(query, [record_id]);
     if (!borrowResults.length) {
       return res.status(404).json({ message: "No borrow records found" });
     }
