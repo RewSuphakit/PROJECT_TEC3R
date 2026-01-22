@@ -17,6 +17,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    volumes:
+      - ./servers/uploads:/data/rew/uploads
+      - ./servers/image_return:/data/rew/image_return
     environment:
       - NODE_ENV=development
       - API_URL=${API_URL}
