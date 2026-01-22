@@ -1,4 +1,6 @@
 require('dotenv').config();
+const connection = require('../config/db');
+const lineNotify = require('../utils/lineNotify');
 // =========================
 // 7. ดึงประวัติการยืม-คืนทั้งหมดของผู้ใช้ (History)
 // =========================
@@ -39,8 +41,7 @@ exports.getHistoryByUserId = async (req, res) => {
     res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
-const connection = require('../config/db');
-const lineNotify = require('../utils/lineNotify');
+
 
 // =========================
 // 1. เพิ่มบันทึกการยืม (Add Borrow Record)
