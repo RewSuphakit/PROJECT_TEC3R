@@ -224,6 +224,7 @@ function Header() {
                   {/* Login Card */}
                   <Link 
                     to="/RMUTI/Login" 
+                    onClick={() => document.activeElement.blur()}
                     className="block mb-3 p-4 bg-gradient-to-r from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100 rounded-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-md group"
                   >
                     <div className="flex items-center gap-4">
@@ -234,7 +235,6 @@ function Header() {
                       </div>
                       <div>
                         <p className="font-bold text-gray-800 text-sm">เข้าสู่ระบบ</p>
-                        <p className="text-xs text-gray-500">สำหรับผู้ใช้ที่มีบัญชีแล้ว</p>
                       </div>
                     </div>
                   </Link>
@@ -242,6 +242,7 @@ function Header() {
                   {/* Register Card */}
                   <Link 
                     to="/RMUTI/Register" 
+                    onClick={() => document.activeElement.blur()}
                     className="block p-4 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-md group"
                   >
                     <div className="flex items-center gap-4">
@@ -252,7 +253,6 @@ function Header() {
                       </div>
                       <div>
                         <p className="font-bold text-gray-800 text-sm">สมัครใช้งาน</p>
-                        <p className="text-xs text-gray-500">สร้างบัญชีใหม่ฟรี!</p>
                       </div>
                     </div>
                   </Link>
