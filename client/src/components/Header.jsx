@@ -190,27 +190,96 @@ function Header() {
           )}
           
           {!user?.user_id && (
-            <div className="flex items-center gap-2 sm:gap-3">
-              {/* Login Button - Elegant */}
-              <Link 
-                to="/RMUTI/Login" 
-                className="btn btn-sm sm:btn-md btn-ghost text-orange-500 hover:bg-orange-50 flex items-center gap-1 sm:gap-2 font-semibold transition-all duration-200"
-              >
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span className="text-sm sm:text-base">เข้าสู่ระบบ</span>
-              </Link>
-      
-              {/* Register Button - Premium */}
-              <Link
-                to="/RMUTI/Register"
-                className="btn btn-sm sm:btn-md bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white border-0 shadow-md hover:shadow-lg flex items-center gap-1 sm:gap-2 transition-all duration-200"
-              >
-                <img className="w-4 h-4 sm:w-5 sm:h-5" src={register} alt="register-icon" />
-                <span className="text-sm sm:text-base font-semibold">สมัครใช้งาน</span>
-              </Link>
-            </div>
+            <>
+              {/* Mobile Menu - Modern Design */}
+              <div className="dropdown dropdown-end sm:hidden">
+                <label
+                  tabIndex={0}
+                  className="btn btn-sm bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 gap-2 px-4"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 6h16M4 12h16M4 18h16"
+                    />
+                  </svg>
+                  <span className="text-xs font-semibold">เมนู</span>
+                </label>
+                
+                <div className="dropdown-content mt-3 p-4 shadow-2xl bg-white/95 backdrop-blur-lg rounded-3xl w-64 z-10 border border-orange-100">
+                  {/* Header */}
+                  <div className="text-center mb-4 pb-3 border-b border-orange-100">
+                    <p className="text-sm font-bold text-gray-800">ยินดีต้อนรับ</p>
+                    <p className="text-xs text-gray-500">เลือกเพื่อเริ่มต้นใช้งาน</p>
+                  </div>
+                  
+                  {/* Login Card */}
+                  <Link 
+                    to="/RMUTI/Login" 
+                    className="block mb-3 p-4 bg-gradient-to-r from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100 rounded-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-md group"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-orange-300/50">
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="font-bold text-gray-800 text-sm">เข้าสู่ระบบ</p>
+                        <p className="text-xs text-gray-500">สำหรับผู้ใช้ที่มีบัญชีแล้ว</p>
+                      </div>
+                    </div>
+                  </Link>
+                  
+                  {/* Register Card */}
+                  <Link 
+                    to="/RMUTI/Register" 
+                    className="block p-4 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-md group"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-blue-300/50">
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="font-bold text-gray-800 text-sm">สมัครใช้งาน</p>
+                        <p className="text-xs text-gray-500">สร้างบัญชีใหม่ฟรี!</p>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Desktop Buttons */}
+              <div className="hidden sm:flex items-center gap-3">
+                <Link 
+                  to="/RMUTI/Login" 
+                  className="btn btn-md btn-ghost text-orange-500 hover:bg-orange-50 flex items-center gap-2 font-semibold transition-all duration-200 px-4"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  <span className="text-base">เข้าสู่ระบบ</span>
+                </Link>
+        
+                <Link
+                  to="/RMUTI/Register"
+                  className="btn btn-md bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white border-0 shadow-md hover:shadow-lg flex items-center gap-2 transition-all duration-200 px-4"
+                >
+                  <img className="w-5 h-5" src={register} alt="register-icon" />
+                  <span className="text-base font-semibold">สมัครใช้งาน</span>
+                </Link>
+              </div>
+            </>
           )}
         </div>
       </nav>
