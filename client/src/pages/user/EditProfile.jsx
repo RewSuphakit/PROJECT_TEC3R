@@ -110,7 +110,7 @@ function EditProfile() {
         {user && (
           <div className="space-y-3">
             {/* รหัสนักศึกษา */}
-            <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border border-orange-100">
+            <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-100">
             <img
             src="https://img.icons8.com/?size=100&id=GhyhrWqfuHQ7&format=png&color=000000"
             alt="user icon"
@@ -123,7 +123,7 @@ function EditProfile() {
             </div>
 
             {/* ชื่อนักศึกษา */}
-            <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border border-orange-100">
+            <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-100">
                 <img
             src="https://img.icons8.com/?size=100&id=3nWSKVe0pWxx&format=png&color=000000"
             alt="user icon"
@@ -136,7 +136,7 @@ function EditProfile() {
             </div>
 
             {/* ระดับชั้น */}
-            <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border border-orange-100">
+            <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-100">
                <img
             src="https://img.icons8.com/?size=100&id=xDDWfeoi2wrD&format=png&color=000000"
             alt="user icon"
@@ -149,7 +149,7 @@ function EditProfile() {
             </div>
 
             {/* เบอร์ติดต่อ */}
-            <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border border-orange-100">
+            <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-100">
                <img
             src="https://img.icons8.com/?size=100&id=I24lanX6Nq71&format=png&color=000000"
             alt="user icon"
