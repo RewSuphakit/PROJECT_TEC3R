@@ -3,7 +3,7 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import Typed from 'typed.js';
 import bg from '../assets/bbb.png';
-import bg2 from '../assets/BG3.jpg';
+import bg2 from '../assets/bg2.png';
 import axios from 'axios';
 import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
