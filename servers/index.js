@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
+app.set('trust proxy', 1); // Enable trust proxy for rate limiter
+
 const PORT = process.env.PORT || 8000;
 const equipmentRoutes = require('./routes/equipmentRoutes');
 const userRoutes = require('./routes/userRoutes');
