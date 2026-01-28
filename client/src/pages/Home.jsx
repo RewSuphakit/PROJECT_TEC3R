@@ -295,25 +295,19 @@ function Home() {
       <ScrollToTopButton />
 
       {/* Hero Section */}
-      <div
-        className="relative bg-fixed min-h-screen flex items-center justify-center"
-        style={{
-          backgroundImage: `linear-gradient(
-            to bottom, 
-            rgba(0, 0, 0, 1), 
-            rgba(0, 0, 0, 0.4), 
-            rgba(0, 0, 0, 0.4), 
-            rgba(0, 0, 0, 0.4), 
-            rgba(0, 0, 0, 0.4)
-          ), url(${bg})`,
-          backgroundSize: 'cover',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed',
-        }}
-      >
-        <div className="absolute inset-0 bg-black bg-opacity-30" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* LCP Optimization: Use img tag instead of background-image for priority loading */}
+        <div className="absolute inset-0 z-0">
+           <img 
+            src={bg} 
+            alt="Background" 
+            className="w-full h-full object-cover"
+            fetchPriority="high"
+          />
+          <div className="absolute inset-0 bg-black/40" /> {/* Dim overlay */}
+        </div>
+
+        <div className="relative z-10 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white font-bold text-center transition-all duration-300">
             <span ref={el} />
           </h1>
