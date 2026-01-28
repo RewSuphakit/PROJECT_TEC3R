@@ -401,7 +401,7 @@ exports.getAllBorrows = async (req, res) => {
             // ต้อง pagination ที่ระดับ transaction ไม่ใช่ row
             // ดึง transaction_ids ก่อน แล้วค่อยดึง items
             const transactionIdsQuery = `
-                SELECT DISTINCT bt.transaction_id
+                SELECT DISTINCT bt.transaction_id, bt.borrow_date
                 FROM borrow_transactions bt
                 ${whereClause}
                 ORDER BY bt.borrow_date DESC
@@ -715,7 +715,10 @@ exports.getReturnedItems = async (req, res) => {
 
         // ดึง transaction_ids ที่คืนครบแล้ว (paginated)
         const transactionIdsQuery = `
-            SELECT DISTINCT bt.transaction_id
+            SELECT DISTINCT bt.transaction_id, (
+                SELECT MAX(bi3.returned_at) FROM borrow_items bi3 
+                WHERE bi3.transaction_id = bt.transaction_id
+            ) AS max_returned_at
             FROM borrow_transactions bt
             WHERE NOT EXISTS (
                 SELECT 1 FROM borrow_items bi 
@@ -726,10 +729,7 @@ exports.getReturnedItems = async (req, res) => {
                 SELECT 1 FROM borrow_items bi2 
                 WHERE bi2.transaction_id = bt.transaction_id
             )
-            ORDER BY (
-                SELECT MAX(bi3.returned_at) FROM borrow_items bi3 
-                WHERE bi3.transaction_id = bt.transaction_id
-            ) DESC
+            ORDER BY max_returned_at DESC
             LIMIT ? OFFSET ?
         `;
         const [transactionIds] = await promisePool.query(transactionIdsQuery, [limit, offset]);
