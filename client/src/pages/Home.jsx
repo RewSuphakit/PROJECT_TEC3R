@@ -53,13 +53,13 @@ function Home() {
         const sortedEquipment = response.data.equipment || [];
         const equipmentAvailable = sortedEquipment.filter(record => record.status === 'Available');
         setEquipment(equipmentAvailable);
-        sortedEquipment.sort((a, b) => new Date(b.timeupdate) - new Date(a.timeupdate));
+        sortedEquipment.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
       } else {
         // ถ้ายังไม่ login ใช้ public endpoint (ได้เฉพาะ Available)
         response = await axios.get(`${apiUrl}/api/equipment/public`);
         const sortedEquipment = response.data.equipment || [];
         setEquipment(sortedEquipment);
-        sortedEquipment.sort((a, b) => new Date(b.timeupdate) - new Date(a.timeupdate));
+        sortedEquipment.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
       }
     } catch (error) {
       console.error('Error fetching equipment:', error);
@@ -356,17 +356,17 @@ function Home() {
                     <h5 className="text-base sm:text-lg tracking-tight hover:text-sky-700 text-gray-900">
                       {item.equipment_name}
                     </h5>
-                    <p className="text-sm text-gray-600 break-all">จำนวนคงเหลือ {item.quantity}</p>
-                    <p className="text-xs text-gray-500 mt-2">อัพเดทเมื่อ: {new Date(item.timeupdate).toLocaleString()}</p>
+                    <p className="text-sm text-gray-600 break-all">จำนวนคงเหลือ {item.available_quantity}</p>
+                    <p className="text-xs text-gray-500 mt-2">อัพเดทเมื่อ: {new Date(item.updated_at).toLocaleString()}</p>
                     <hr className="w-full max-w-[12rem] h-1 mx-auto my-4 bg-gray-100 border-0 rounded" />
                     <div className="text-center pb-2">
-                      {item.quantity === 0 ? (
+                      {item.available_quantity === 0 ? (
                         <button className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-medium text-white rounded-md shadow-sm bg-red-300 cursor-not-allowed">
                           หมด
                         </button>
                       ) : user?.user_id ? (
                         <button
-                          onClick={() => handleClick(item.equipment_id, item.equipment_name, item.image, item.quantity)}
+                          onClick={() => handleClick(item.equipment_id, item.equipment_name, item.image, item.available_quantity)}
                           className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-medium text-white rounded-md shadow-sm bg-[#1B262C] hover:bg-[#273A45] focus:ring-offset-2"
                         >
                           ยืมอุปกรณ์
