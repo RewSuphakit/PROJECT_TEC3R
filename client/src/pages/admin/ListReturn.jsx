@@ -2,7 +2,11 @@ import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import bg2 from '../../assets/bg2.png';
+
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
+
+import './AdminStyles.css';
+
 function ListReturn() {
   const [tools, setTools] = useState([]);
   const [popupImage, setPopupImage] = useState(null);
@@ -59,29 +63,29 @@ function ListReturn() {
     const fetchReturnRecords = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(`${apiUrl}/api/borrowRecords/all`, {
+        const response = await axios.get(`${apiUrl}/api/borrow/all`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (response.data && Array.isArray(response.data.borrow_transactions)) {
           const filteredTransactions = response.data.borrow_transactions.filter(
             (transaction) =>
-              transaction.borrow_records.every(
-                (record) => record.status.toLowerCase() === "returned"
+              transaction.borrow_items.every(
+                (item) => item.status.toLowerCase() === "returned"
               )
           );
 
           const flattenedRecords = [];
           filteredTransactions.forEach((transaction) => {
-            transaction.borrow_records.forEach((record, index) => {
+            transaction.borrow_items.forEach((item, index) => {
               flattenedRecords.push({
                 groupId: transaction.transaction_id,
-                record_id: `${transaction.transaction_id}-${index}`,
+                item_id: `${transaction.transaction_id}-${index}`,
                 student_name: transaction.student_name,
-                equipment_name: record.equipment_name,
-                quantity: record.quantity_borrow,
-                status: record.status,
-                image_return: record.image_return,
-                return_date: transaction.return_date,
+                equipment_name: item.equipment_name,
+                quantity: item.quantity,
+                status: item.status,
+                image_return: item.image_return,
+                returned_at: item.returned_at,
               });
             });
           });
@@ -112,12 +116,11 @@ function ListReturn() {
     }, {});
   }, [tools]);
 
-  // เรียงลำดับกลุ่มตามวันที่คืน
   const groupKeys = useMemo(() => {
     return Object.keys(groupedRecords).sort(
       (a, b) =>
-        new Date(groupedRecords[b][0].return_date) -
-        new Date(groupedRecords[a][0].return_date)
+        new Date(groupedRecords[b][0].returned_at) -
+        new Date(groupedRecords[a][0].returned_at)
     );
   }, [groupedRecords]);
 
@@ -138,21 +141,36 @@ function ListReturn() {
   };
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      backgroundImage: `url(${bg2})`,
-      backgroundSize: 'cover',
-      backgroundRepeat: 'no-repeat',
-      backgroundPosition: 'center',
-      backgroundAttachment: 'fixed'
-    }}>
-      <div className="lg:pl-72">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-          {/* Header */}
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-800">📦 รายการคืนอุปกรณ์</h1>
-          
-          </div>
+    <>
+
+      <div className="relative" style={{ 
+            minHeight: '100vh', 
+            backgroundImage: `url(${bg2})`,
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed'
+          }}>
+        <div className="lg:pl-72">
+          <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-8">
+            {/* Header Section */}
+            <div className="filter-card rounded-2xl p-6 mb-6 shadow-xl">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-3 rounded-xl shadow-lg shadow-blue-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+                      รายการคืนอุปกรณ์
+                    </h1>
+                    <p className="text-gray-500 text-sm mt-1">ประวัติรายการอุปกรณ์ที่คืนแล้ว</p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
           {loading ? (
             <div className="bg-white rounded-lg shadow-md p-8 sm:p-12 text-center">
@@ -161,16 +179,16 @@ function ListReturn() {
           ) : (
             <>
               {/* Desktop Table View */}
-              <div className="hidden lg:block overflow-auto shadow-lg rounded-lg bg-white p-4">
-                <table className="table w-full">
+              <div className="hidden lg:block overflow-hidden shadow-2xl rounded-2xl bg-white">
+                <table className="min-w-full bg-white">
                   <thead>
-                    <tr className="text-sm font-semibold text-gray-700 text-center">
-                      <th className="px-4 py-3">ชื่อผู้ยืม</th>
-                      <th className="px-4 py-3">ชื่ออุปกรณ์</th>
-                      <th className="px-4 py-3">จำนวนที่คืน</th>
-                      <th className="px-4 py-3">สถานะ</th>
-                      <th className="px-4 py-3">รูปที่คืน</th>
-                      <th className="px-4 py-3">วันที่คืน</th>
+                    <tr className="bg-slate-100 text-slate-700 uppercase text-sm leading-normal">
+                      <th className="py-4 px-6 text-left font-semibold">ชื่อผู้ยืม</th>
+                      <th className="py-4 px-6 text-left font-semibold">ชื่ออุปกรณ์</th>
+                      <th className="py-4 px-6 text-center font-semibold">จำนวนที่คืน</th>
+                      <th className="py-4 px-6 text-center font-semibold">สถานะ</th>
+                      <th className="py-4 px-6 text-center font-semibold">รูปที่คืน</th>
+                      <th className="py-4 px-6 text-center font-semibold">วันที่คืน</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -180,23 +198,29 @@ function ListReturn() {
                         if (groupItems.length === 1) {
                           const item = groupItems[0];
                           return (
-                            <tr key={item.record_id} className="hover:bg-gray-50">
-                              <td className="py-4 px-4 text-center">{item.student_name}</td>
-                              <td className="py-4 px-4 text-center">{item.equipment_name}</td>
-                              <td className="py-4 px-4 text-center">{item.quantity}</td>
-                              <td className="py-4 px-4 text-center">
-                                <span className="badge badge-success text-white">คืนแล้ว</span>
+                            <tr key={item.record_id} className="table-row border-b hover:bg-gray-50">
+                              <td className="py-4 px-6 font-medium text-gray-800">{item.student_name}</td>
+                              <td className="py-4 px-6 text-gray-600">{item.equipment_name}</td>
+                              <td className="py-4 px-6 text-center">
+                                <span className="bg-blue-100 text-[#0F4C75] px-3 py-1 rounded-full font-bold">
+                                  {item.quantity}
+                                </span>
                               </td>
-                              <td className="py-4 px-4 flex items-center justify-center">
+                              <td className="py-4 px-6 text-center">
+                                <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+                                  ● คืนแล้ว
+                                </span>
+                              </td>
+                              <td className="py-4 px-6 flex items-center justify-center">
                                 <img
                                   src={`${apiUrl}/image_return/${item.image_return}`}
                                   alt="Returned"
-                                  className="w-16 h-16 rounded-lg object-cover border cursor-pointer"
+                                  className="w-12 h-12 rounded-lg object-cover border-2 border-gray-100 shadow-sm cursor-pointer hover:scale-110 transition-transform"
                                   onMouseEnter={(e) => handleImageMouseEnter(e, `${apiUrl}/image_return/${item.image_return}`)}
                                   onMouseLeave={handleImageMouseLeave}
                                 />
                               </td>
-                              <td className="py-4 px-4 text-center text-sm">{formatThaiDate(item.return_date)}</td>
+                              <td className="py-4 px-6 text-center text-gray-600">{formatThaiDate(item.returned_at)}</td>
                             </tr>
                           );
                         } else {
@@ -206,49 +230,62 @@ function ListReturn() {
                             <React.Fragment key={groupId}>
                               <tr
                                 onClick={() => toggleGroup(groupId)}
-                                className="cursor-pointer bg-gray-100 hover:bg-gray-200"
+                                className={`table-row border-b ${index % 2 === 0 ? 'bg-gray-50/50' : 'bg-white'} hover:bg-blue-50/30 transition-colors`}
                               >
-                                <td className="py-4 px-4 text-center font-semibold">
+                                <td className="py-4 px-6 font-medium text-gray-800 flex items-center gap-2">
+                                  <span className={`transition-transform duration-200 ${openGroups.includes(groupId) ? 'rotate-90' : ''}`}>
+                                    ▶
+                                  </span>
                                   {firstItem.student_name}
-                                  <span className="ml-2 text-green-500">
-                                    {openGroups.includes(groupId) ? "▾" : "▸"}
+                                  <span className="text-xs text-gray-500 ml-2">({groupItems.length} รายการ)</span>
+                                </td>
+                                <td className="py-4 px-6 text-gray-600">{firstItem.equipment_name}</td>
+                                <td className="py-4 px-6 text-center">
+                                  <span className="bg-blue-100 text-[#0F4C75] px-3 py-1 rounded-full font-bold">
+                                    {firstItem.quantity}
                                   </span>
                                 </td>
-                                <td className="py-4 px-4 text-center">{firstItem.equipment_name}</td>
-                                <td className="py-4 px-4 text-center">{firstItem.quantity}</td>
-                                <td className="py-4 px-4 text-center">
-                                  <span className="badge badge-success text-white">คืนแล้ว</span>
+                                <td className="py-4 px-6 text-center">
+                                  <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+                                    ● คืนแล้ว
+                                  </span>
                                 </td>
-                                <td className="py-4 px-4 flex items-center justify-center">
+                                <td className="py-4 px-6 flex items-center justify-center">
                                   <img
                                     src={`${apiUrl}/image_return/${firstItem.image_return}`}
                                     alt="Returned"
-                                    className="w-16 h-16 rounded-lg object-cover border cursor-pointer"
+                                    className="w-12 h-12 rounded-lg object-cover border-2 border-gray-100 shadow-sm cursor-pointer hover:scale-110 transition-transform"
                                     onMouseEnter={(e) => handleImageMouseEnter(e, `${apiUrl}/image_return/${firstItem.image_return}`)}
                                     onMouseLeave={handleImageMouseLeave}
                                   />
                                 </td>
-                                <td className="py-4 px-4 text-center text-sm">{formatThaiDate(firstItem.return_date)}</td>
+                                <td className="py-4 px-6 text-center text-gray-600">{formatThaiDate(firstItem.returned_at)}</td>
                               </tr>
                               {openGroups.includes(groupId) &&
                                 hiddenItems.map((item) => (
-                                  <tr key={item.record_id} className="bg-gray-50">
-                                    <td className="py-4 px-4 text-center"></td>
-                                    <td className="py-4 px-4 text-center">{item.equipment_name}</td>
-                                    <td className="py-4 px-4 text-center">{item.quantity}</td>
-                                    <td className="py-4 px-4 text-center">
-                                      <span className="badge badge-success text-white">คืนแล้ว</span>
+                                  <tr key={item.record_id} className="bg-white border-b">
+                                    <td className="py-4 px-6"></td>
+                                    <td className="py-4 px-6 text-gray-600 pl-10">↳ {item.equipment_name}</td>
+                                    <td className="py-4 px-6 text-center">
+                                      <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-bold text-sm">
+                                        {item.quantity}
+                                      </span>
                                     </td>
-                                    <td className="py-4 px-4 flex items-center justify-center">
+                                    <td className="py-4 px-6 text-center">
+                                      <span className="bg-green-50 text-green-600 px-3 py-1 rounded-full text-xs font-medium">
+                                        ● คืนแล้ว
+                                      </span>
+                                    </td>
+                                    <td className="py-4 px-6 flex items-center justify-center">
                                       <img
                                         src={`${apiUrl}/image_return/${item.image_return}`}
                                         alt="Returned"
-                                        className="w-16 h-16 rounded-lg object-cover border cursor-pointer"
+                                        className="w-10 h-10 rounded-lg object-cover border border-gray-100 shadow-sm cursor-pointer hover:scale-150 transition-transform"
                                         onMouseEnter={(e) => handleImageMouseEnter(e, `${apiUrl}/image_return/${item.image_return}`)}
                                         onMouseLeave={handleImageMouseLeave}
                                       />
                                     </td>
-                                    <td className="py-4 px-4 text-center text-sm">{formatThaiDate(item.return_date)}</td>
+                                    <td className="py-4 px-6 text-center text-gray-500 text-sm">{formatThaiDate(item.returned_at)}</td>
                                   </tr>
                                 ))}
                             </React.Fragment>
@@ -330,7 +367,7 @@ function ListReturn() {
                             <div className="flex flex-col sm:flex-row sm:justify-between text-xs sm:text-sm">
                               <span className="text-gray-600">วันที่คืน:</span>
                               <span className="font-medium text-gray-700 mt-1 sm:mt-0">
-                                {formatThaiDate(groupItems[0].return_date)}
+                                {formatThaiDate(groupItems[0].returned_at)}
                               </span>
                             </div>
                           </div>
@@ -435,31 +472,56 @@ function ListReturn() {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="mt-6 flex justify-center">
-              <div className="flex flex-wrap gap-1 sm:gap-2 justify-center">
+              <div className="filter-card rounded-xl p-4 shadow-lg flex flex-wrap gap-2 justify-center">
                 <button
                   onClick={() => setCurrentPage(1)}
                   disabled={currentPage === 1}
-                  className="btn btn-sm bg-green-500 hover:bg-green-600 text-white border-none px-3 sm:px-4 disabled:bg-gray-300"
+                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
                 >
                   «
                 </button>
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrentPage(i + 1)}
-                    className={`btn btn-sm ${
-                      currentPage === i + 1 
-                        ? "bg-green-500 hover:bg-green-600 text-white border-none" 
-                        : "btn-outline"
-                    } px-3 sm:px-4`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
+                >
+                  ‹
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => {
+                  if (totalPages <= 5 || i === 0 || i === totalPages - 1 || Math.abs(currentPage - (i + 1)) <= 1) {
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => setCurrentPage(i + 1)}
+                        className={`w-10 h-10 rounded-lg font-bold transition-all ${
+                          currentPage === i + 1 
+                            ? "bg-blue-600 text-white shadow-md shadow-blue-200 scale-105" 
+                            : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                        }`}
+                      >
+                        {i + 1}
+                      </button>
+                    );
+                  } else if (i === 1 && currentPage > 3) {
+                    return <span key={i} className="w-10 h-10 flex items-center justify-center text-gray-400">...</span>;
+                  } else if (i === totalPages - 2 && currentPage < totalPages - 2) {
+                    return <span key={i} className="w-10 h-10 flex items-center justify-center text-gray-400">...</span>;
+                  }
+                  return null;
+                })}
+
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
+                >
+                  ›
+                </button>
                 <button
                   onClick={() => setCurrentPage(totalPages)}
                   disabled={currentPage === totalPages}
-                  className="btn btn-sm bg-green-500 hover:bg-green-600 text-white border-none px-3 sm:px-4 disabled:bg-gray-300"
+                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
                 >
                   »
                 </button>
@@ -469,6 +531,7 @@ function ListReturn() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

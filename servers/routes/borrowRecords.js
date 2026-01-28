@@ -14,3 +14,4 @@ router.delete('/delete/:record_id', authenticate, borrowRecordsController.delete
 router.get('/transaction/:transaction_id', authenticate, borrowRecordsController.getBorrowRecordsByTransactionId);  // ดูรายละเอียด transaction
 
 module.exports = router;
+

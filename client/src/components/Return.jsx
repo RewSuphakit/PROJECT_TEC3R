@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import bg2 from '../assets/bg2.png';
 
 function Return() {
-  const { borrowedBooks, fetchBorrowRecords } = useAuth();
+  const { borrowedBooks, fetchBorrowItems } = useAuth();
   const [images, setImages] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -58,37 +58,37 @@ function Return() {
   const currentItems = borrowedBooks.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(borrowedBooks.length / itemsPerPage);
 
-  const handleCaptureImage = (capturedImage, recordId) => {
+  const handleCaptureImage = (capturedImage, itemId) => {
     setImages((prevCapturedImages) => ({
       ...prevCapturedImages,
-      [recordId]: capturedImage,
+      [itemId]: capturedImage,
     }));
   };
 
-  const handleUploadImage = (file, recordId) => {
+  const handleUploadImage = (file, itemId) => {
     setImages((prevImages) => ({
       ...prevImages,
-      [recordId]: file,
+      [itemId]: file,
     }));
   };
 
-  const handleReturned = async (recordId, status) => {
+  const handleReturned = async (itemId, status) => {
     const formData = new FormData();
     formData.append('status', status);
-    if (images[recordId]) {
-      formData.append('image_return', images[recordId]);
+    if (images[itemId]) {
+      formData.append('image_return', images[itemId]);
     }
   
     try {
       let token = localStorage.getItem('token');
-      await axios.put(`${apiUrl}/api/borrowRecords/update/${recordId}`, formData, {
+      await axios.put(`${apiUrl}/api/borrow/update/${itemId}`, formData, {
         headers: { 
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`
         },
       });
       toast.success('คืนอุปกรณ์สำเร็จเรียบร้อย');
-      await fetchBorrowRecords();
+      await fetchBorrowItems();
     } catch (error) {
       console.error('Error returned equipment:', error);
       toast.warn('เกิดข้อผิดพลาดในการคืนอุปกรณ์');
@@ -142,9 +142,9 @@ function Return() {
                 <tbody className="bg-white divide-y divide-gray-100">
                   {currentItems.length > 0 ? (
                     currentItems.map((item, index) => (
-                      <tr key={item.record_id} 
+                      <tr key={item.item_id} 
                           className={`hover:bg-blue-50/40 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}>
-                        <td className="px-4 py-3 text-sm font-mono text-gray-500 text-center">{item.record_id}</td>
+                        <td className="px-4 py-3 text-sm font-mono text-gray-500 text-center">{item.item_id}</td>
                         <td className="px-4 py-2">
                           <div className="relative h-12 w-12 mx-auto group">
                             <img
@@ -156,19 +156,19 @@ function Return() {
                         </td>
                         <td className="px-4 py-3 text-sm font-semibold text-gray-700">{item.equipment_name}</td>
                         <td className="px-4 py-3 text-sm text-center">
-                          <span className="px-2 py-1 rounded bg-gray-100 font-medium text-gray-600">{item.quantity_borrow}</span>
+                          <span className="px-2 py-1 rounded bg-gray-100 font-medium text-gray-600">{item.quantity}</span>
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap text-center">{item.borrow_date}</td>
                         <td className="px-4 py-2">
                           <div className="flex justify-center gap-2 items-center scale-90 origin-center">
-                            <CameraCapture onCapture={handleCaptureImage} recordId={item.record_id} />
-                            <ImageUpload onImageUpload={handleUploadImage} recordId={item.record_id} />
+                            <CameraCapture onCapture={handleCaptureImage} recordId={item.item_id} />
+                            <ImageUpload onImageUpload={handleUploadImage} recordId={item.item_id} />
                           </div>
                         </td>
                         <td className="px-4 py-2 text-center">
-                          {images[item.record_id] ? (
+                          {images[item.item_id] ? (
                             <button
-                              onClick={() => handleReturned(item.record_id, 'Returned')}
+                              onClick={() => handleReturned(item.item_id, 'Returned')}
                               className="inline-flex items-center px-4 py-1.5 border border-transparent rounded-full shadow-md text-xs font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 focus:outline-none transform hover:-translate-y-0.5 transition-all duration-200"
                             >
                               <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -200,7 +200,7 @@ function Return() {
             <div className="md:hidden space-y-3 overflow-y-auto pb-2 -mx-2 px-2 scrollbar-none">
               {currentItems.length > 0 ? (
                 currentItems.map((item) => (
-                  <div key={item.record_id} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm relative overflow-hidden">
+                  <div key={item.item_id} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-blue-50 to-transparent rounded-bl-full -mr-4 -mt-4 z-0"></div>
                     
                     <div className="flex gap-4 relative z-10">
@@ -213,10 +213,10 @@ function Return() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-bold text-gray-800 text-lg truncate">{item.equipment_name}</h3>
-                        <div className="text-xs text-gray-500 mb-2">ID: {item.record_id}</div>
+                        <div className="text-xs text-gray-500 mb-2">ID: {item.item_id}</div>
                         
                         <div className="flex gap-3 text-sm mb-1">
-                           <span className="px-2 py-0.5 bg-gray-100 rounded text-gray-600 text-xs">จำนวน: {item.quantity_borrow}</span>
+                           <span className="px-2 py-0.5 bg-gray-100 rounded text-gray-600 text-xs">จำนวน: {item.quantity}</span>
                         </div>
                         <p className="text-xs text-gray-400 mb-3">ยืมเมื่อ: {item.borrow_date}</p>
                       </div>
@@ -224,13 +224,13 @@ function Return() {
 
                     <div className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-2 gap-3 items-end">
                        <div className="col-span-1 flex gap-1 justify-start">
-                          <CameraCapture onCapture={handleCaptureImage} recordId={item.record_id} />
-                          <ImageUpload onImageUpload={handleUploadImage} recordId={item.record_id} />
+                          <CameraCapture onCapture={handleCaptureImage} recordId={item.item_id} />
+                          <ImageUpload onImageUpload={handleUploadImage} recordId={item.item_id} />
                        </div>
                        <div className="col-span-1">
-                          {images[item.record_id] ? (
+                          {images[item.item_id] ? (
                              <button
-                             onClick={() => handleReturned(item.record_id, 'Returned')}
+                             onClick={() => handleReturned(item.item_id, 'Returned')}
                              className="w-full flex justify-center items-center py-2 px-3 border border-transparent rounded-lg shadow-sm text-xs font-bold text-white bg-green-600 hover:bg-green-700 transition-all active:scale-95"
                            >
                              ยืนยันการคืน

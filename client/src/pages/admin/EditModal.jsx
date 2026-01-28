@@ -42,8 +42,8 @@ const EditModal = ({ tool, onSubmit, onCancel }) => {
             </label>
             <input
               type="number"
-              name="quantity"
-              defaultValue={tool?.quantity}
+              name="total_quantity"
+              defaultValue={tool?.total_quantity}
               className="input input-bordered w-full"
               min="1"
             />
@@ -71,7 +71,7 @@ const EditModal = ({ tool, onSubmit, onCancel }) => {
             <button onClick={onCancel} type="button" className="btn btn-outline">
               ยกเลิก
             </button>
-            <button type="submit" className="btn btn-primary">
+            <button type="submit" className="btn bg-blue-600 hover:bg-blue-700 text-white border-none">
               บันทึก
             </button>
           </div>

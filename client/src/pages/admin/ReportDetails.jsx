@@ -8,7 +8,7 @@ import bg2 from '../../assets/bg2.png';
 
 function ReportDetails() {
   const { transaction_id } = useParams();
-  const [borrowRecords, setBorrowRecords] = useState([]);
+  const [borrowItems, setBorrowItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
@@ -17,10 +17,10 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
       try {
         setLoading(true);
         const token = localStorage.getItem('token');
-        const response = await axios.get(`${apiUrl}/api/borrowRecords/transaction/${transaction_id}`, {
+        const response = await axios.get(`${apiUrl}/api/borrow/transaction/${transaction_id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        setBorrowRecords(response.data);
+        setBorrowItems(response.data);
         setError(null);
       } catch (err) {
         console.error('Error fetching report details:', err);
@@ -59,7 +59,7 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
   // --- ฟังก์ชัน Export PDF ---
   const handleExportPDF = async () => {
     try {
-      if (!borrowRecords || borrowRecords.length === 0) {
+      if (!borrowItems || borrowItems.length === 0) {
         alert("ไม่มีข้อมูลสำหรับออกรายงาน");
         return;
       }
@@ -79,7 +79,7 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
       doc.addFont('THSarabunNew.ttf', 'THSarabunNew', 'normal');
       doc.setFont('THSarabunNew');
 
-      const borrower = borrowRecords[0];
+      const borrower = borrowItems[0];
       let yPosition = 20;
 
       // หัวเรื่อง
@@ -108,9 +108,9 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
       yPosition += 10;
 
       // วาดตาราง
-      doc.setFontSize(11);
-      const tableHeaders = ['ลำดับ', 'ชื่ออุปกรณ์', 'จำนวน', 'สถานะ', 'วันที่ยืม'];
-      const colWidths = [15, 60, 25, 30, 50];
+      doc.setFontSize(10); // ลดขนาดฟอนต์ลงเล็กน้อยเพื่อความพอดี
+      const tableHeaders = ['ลำดับ', 'ชื่ออุปกรณ์', 'จำนวน', 'สถานะ', 'วันที่ยืม', 'วันที่คืน'];
+      const colWidths = [10, 50, 15, 20, 42, 42];
       let xPosition = 20;
 
       // พื้นหลังหัวตาราง
@@ -124,32 +124,47 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
       yPosition += 8;
 
       // วาดข้อมูลในตาราง
-      borrowRecords.forEach((record, index) => {
+      borrowItems.forEach((item, index) => {
         xPosition = 20;
         
-        const borrowDate = record.borrow_date 
-          ? new Date(record.borrow_date).toLocaleDateString('th-TH', {
+        const borrowDate = item.borrow_date 
+          ? new Date(item.borrow_date).toLocaleString('th-TH', {
               year: 'numeric',
               month: 'short',
-              day: 'numeric'
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
             })
           : '-';
 
-        const status = record.status === 'Returned' ? 'คืนแล้ว' : 'ยังไม่คืน';
+        const returnDate = item.returned_at
+          ? new Date(item.returned_at).toLocaleString('th-TH', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })
+          : '-';
+
+        const status = item.status === 'Returned' ? 'คืนแล้ว' : 'ยังไม่คืน';
 
         doc.text((index + 1).toString(), xPosition, yPosition);
         xPosition += colWidths[0];
         
-        doc.text(record.equipment_name || '-', xPosition, yPosition);
+        doc.text(item.equipment_name || '-', xPosition, yPosition);
         xPosition += colWidths[1];
         
-        doc.text((record.quantity_borrow || 0).toString(), xPosition, yPosition);
+        doc.text((item.quantity || 0).toString(), xPosition, yPosition);
         xPosition += colWidths[2];
         
         doc.text(status, xPosition, yPosition);
         xPosition += colWidths[3];
         
         doc.text(borrowDate, xPosition, yPosition);
+        xPosition += colWidths[4];
+
+        doc.text(returnDate, xPosition, yPosition);
         
         yPosition += 8;
 
@@ -215,7 +230,7 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
   }
 
   // --- Render No Data ---
-  if (borrowRecords.length === 0) {
+  if (borrowItems.length === 0) {
     return (
       <div style={{ 
         minHeight: '100vh', 
@@ -236,7 +251,7 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
     );
   }
 
-  const borrower = borrowRecords[0];
+  const borrower = borrowItems[0];
 
   // --- Render Main Content ---
   return (
@@ -287,7 +302,7 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
               <div className="flex items-start justify-center lg:justify-end">
                 <button
                   onClick={handleExportPDF}
-                  className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none shadow-md transition-colors text-sm sm:text-base font-medium"
+                  className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-red-500 text-white rounded-lg hover:bg-orange-600 focus:outline-none shadow-md transition-colors text-sm sm:text-base font-medium"
                 >
                   📄 Export as PDF
                 </button>
@@ -309,12 +324,12 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
                 </tr>
               </thead>
               <tbody>
-                {borrowRecords.map(record => (
-                  <tr key={record.record_id} className="hover:bg-gray-50">
-                    <td className="py-3 px-4 border-b text-center">{record.equipment_name}</td>
-                    <td className="py-3 px-4 border-b text-center">{record.quantity_borrow}</td>
+                {borrowItems.map(item => (
+                  <tr key={item.item_id} className="hover:bg-gray-50">
+                    <td className="py-3 px-4 border-b text-center">{item.equipment_name}</td>
+                    <td className="py-3 px-4 border-b text-center">{item.quantity}</td>
                     <td className="py-3 px-4 border-b text-center">
-                      {record.status === 'Returned' ? (
+                      {item.status === 'Returned' ? (
                         <span className="badge badge-success text-white">คืนแล้ว</span>
                       ) : (
                         <span className="badge badge-warning text-white">ยังไม่คืน</span>
@@ -322,22 +337,22 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
                     </td>
                     <td className="py-3 px-4 border-b">
                       <div className="flex justify-center">
-                        {record.status === 'Returned' && record.image_return ? (
+                        {item.status === 'Returned' && item.image_return ? (
                           <img
-                            src={`${apiUrl}/image_return/${record.image_return}`}
+                            src={`${apiUrl}/image_return/${item.image_return}`}
                             alt="Returned"
                             className="h-16 w-16 rounded-lg object-cover border"
                           />
                         ) : (
                           <span className="text-gray-400 text-sm">
-                            {record.status === 'Borrowed' ? 'ยังไม่คืน' : '-'}
+                            {item.status === 'Borrowed' ? 'ยังไม่คืน' : '-'}
                           </span>
                         )}
                       </div>
                     </td>
                     <td className="py-3 px-4 border-b text-center text-sm">
-                      {record.borrow_date ? (
-                        new Date(record.borrow_date).toLocaleString('th-TH', {
+                      {item.borrow_date ? (
+                        new Date(item.borrow_date).toLocaleString('th-TH', {
                           timeZone: 'Asia/Bangkok',
                           year: 'numeric',
                           month: 'long',
@@ -348,8 +363,8 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
                       ) : '-'}
                     </td>
                     <td className="py-3 px-4 border-b text-center text-sm">
-                      {record.status === 'Returned' && record.return_date ? (
-                        new Date(record.return_date).toLocaleString('th-TH', {
+                      {item.status === 'Returned' && item.returned_at ? (
+                        new Date(item.returned_at).toLocaleString('th-TH', {
                           timeZone: 'Asia/Bangkok',
                           year: 'numeric',
                           month: 'long',
@@ -359,7 +374,7 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
                         })
                       ) : (
                         <span className="text-gray-400 text-sm">
-                          {record.status === 'Borrowed' ? 'ยังไม่คืน' : '-'}
+                          {item.status === 'Borrowed' ? 'ยังไม่คืน' : '-'}
                         </span>
                       )}
                     </td>
@@ -371,30 +386,30 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
           {/* Mobile Card View */}
           <div className="lg:hidden space-y-4">
-            {borrowRecords.map(record => (
-              <div key={record.record_id} className="bg-white rounded-lg shadow-md p-4">
+            {borrowItems.map(item => (
+              <div key={item.item_id} className="bg-white rounded-lg shadow-md p-4">
                 <div className="flex justify-between items-start mb-3">
                   <h3 className="font-semibold text-base text-gray-800">
-                    🔧 {record.equipment_name}
+                    🔧 {item.equipment_name}
                   </h3>
                   <span className={`badge badge-sm ${
-                    record.status === 'Returned' ? 'badge-success' : 'badge-warning'
+                    item.status === 'Returned' ? 'badge-success' : 'badge-warning'
                   } text-white`}>
-                    {record.status === 'Returned' ? 'คืนแล้ว' : 'ยังไม่คืน'}
+                    {item.status === 'Returned' ? 'คืนแล้ว' : 'ยังไม่คืน'}
                   </span>
                 </div>
 
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">จำนวน:</span>
-                    <span className="font-medium">{record.quantity_borrow} ชิ้น</span>
+                    <span className="font-medium">{item.quantity} ชิ้น</span>
                   </div>
                   
-                  {record.status === 'Returned' && record.image_return && (
+                  {item.status === 'Returned' && item.image_return && (
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">รูปที่คืน:</span>
                       <img
-                        src={`${apiUrl}/image_return/${record.image_return}`}
+                        src={`${apiUrl}/image_return/${item.image_return}`}
                         alt="Returned"
                         className="h-16 w-16 rounded-lg object-cover border"
                       />
@@ -404,8 +419,8 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
                   <div className="flex flex-col pt-2 border-t">
                     <span className="text-gray-600">วันที่ยืม:</span>
                     <span className="font-medium text-gray-800 mt-1">
-                      {record.borrow_date ? (
-                        new Date(record.borrow_date).toLocaleString('th-TH', {
+                      {item.borrow_date ? (
+                        new Date(item.borrow_date).toLocaleString('th-TH', {
                           timeZone: 'Asia/Bangkok',
                           year: 'numeric',
                           month: 'long',
@@ -417,12 +432,12 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
                     </span>
                   </div>
                   
-                  {record.status === 'Returned' && (
+                  {item.status === 'Returned' && (
                     <div className="flex flex-col">
                       <span className="text-gray-600">วันที่คืน:</span>
                       <span className="font-medium text-green-600 mt-1">
-                        {record.return_date ? (
-                          new Date(record.return_date).toLocaleString('th-TH', {
+                        {item.returned_at ? (
+                          new Date(item.returned_at).toLocaleString('th-TH', {
                             timeZone: 'Asia/Bangkok',
                             year: 'numeric',
                             month: 'long',
@@ -442,7 +457,7 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
           {/* Back Button */}
           <div className="mt-6 flex justify-center sm:justify-start">
             <Link
-              to="/RMUTI/ReportResults"
+              to="/RMUTI/Report"
               className="w-full sm:w-auto px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none shadow-md transition-colors text-center"
             >
               ← กลับไปยังหน้ารายงาน

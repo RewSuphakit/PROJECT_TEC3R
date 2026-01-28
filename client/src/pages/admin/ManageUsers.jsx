@@ -4,6 +4,10 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import bg2 from '../../assets/bg2.png';
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
+
+import './AdminStyles.css';
+
+
 function ManageUsers() {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
@@ -180,32 +184,47 @@ function ManageUsers() {
       backgroundPosition: 'center',
       backgroundAttachment: 'fixed'
     }}>
+
       <div className="lg:pl-72">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
           {/* Header */}
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-800">⚙️ จัดการผู้ใช้</h1>
-          </div>
+            <div className="filter-card rounded-2xl p-6 mb-6 shadow-xl">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-3 rounded-xl shadow-lg shadow-blue-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+                      จัดการผู้ใช้
+                    </h1>
+                    <p className="text-gray-500 text-sm mt-1">จัดการรายชื่อผู้ใช้งานและกำหนดสิทธิ์</p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
           {/* Desktop Table View */}
-          <div className="hidden lg:block overflow-auto shadow-lg rounded-lg bg-white p-4">
-            <table className="table w-full">
+          <div className="hidden lg:block overflow-hidden shadow-2xl rounded-2xl bg-white">
+            <table className="min-w-full bg-white">
               <thead>
-                <tr className="text-sm font-semibold text-gray-700 text-center">
-                  <th className="px-4 py-3">รหัสนักศึกษา</th>
-                  <th className="px-4 py-3">ชื่อนักศึกษา</th>
-                  <th className="px-4 py-3">ระดับชั้น</th>
-                  <th className="px-4 py-3">อีเมลนักศึกษา</th>
-                  <th className="px-4 py-3">เบอร์</th>
-                  <th className="px-4 py-3">ระดับผู้ใช้</th>
-                  <th className="px-4 py-3">แก้ไข</th>
-                  <th className="px-4 py-3">ลบ</th>
+                <tr className="bg-slate-100 text-slate-700 uppercase text-sm leading-normal">
+                  <th className="px-4 py-3 font-semibold">รหัสนักศึกษา</th>
+                  <th className="px-4 py-3 font-semibold">ชื่อนักศึกษา</th>
+                  <th className="px-4 py-3 font-semibold">ระดับชั้น</th>
+                  <th className="px-4 py-3 font-semibold">อีเมลนักศึกษา</th>
+                  <th className="px-4 py-3 font-semibold">เบอร์</th>
+                  <th className="px-4 py-3 font-semibold">ระดับผู้ใช้</th>
+                  <th className="px-4 py-3 font-semibold">แก้ไข</th>
+                  <th className="px-4 py-3 font-semibold">ลบ</th>
                 </tr>
               </thead>
               <tbody>
                 {currentUsers.length ? (
                   currentUsers.map((user) => (
-                    <tr key={user.user_id} className="hover:bg-gray-50">
+                    <tr key={user.user_id} className="table-row border-b hover:bg-blue-50/30 transition-colors">
                       <td className="py-4 px-2 text-center">{user.student_id}</td>
                       <td className="py-4 px-2 text-center">{user.student_name}</td>
                       <td className="py-4 px-2 text-center">{user.year_of_study}</td>
@@ -223,7 +242,7 @@ function ManageUsers() {
                       <td className="py-4 px-2 text-center">
                         <button
                           onClick={() => openEditModal(user)}
-                          className="btn btn-sm bg-yellow-500 hover:bg-yellow-600 text-white border-none rounded-lg shadow-md"
+                          className="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg shadow hover:shadow-lg transition-all hover:-translate-y-0.5 text-sm"
                         >
                           แก้ไข
                         </button>
@@ -231,7 +250,7 @@ function ManageUsers() {
                       <td className="py-4 px-2 text-center">
                         <button
                           onClick={() => openDeleteModal(user)}
-                          className="btn btn-sm bg-red-500 hover:bg-red-600 text-white border-none rounded-lg shadow-md"
+                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg shadow hover:shadow-lg transition-all hover:-translate-y-0.5 text-sm"
                         >
                           ลบ
                         </button>
@@ -290,7 +309,7 @@ function ManageUsers() {
                   <div className="flex gap-2 mt-4">
                     <button
                       onClick={() => openEditModal(user)}
-                      className="flex-1 btn btn-sm bg-yellow-500 hover:bg-yellow-600 text-white border-none"
+                      className="flex-1 btn btn-sm bg-amber-500 hover:bg-amber-600 text-white border-none"
                     >
                       แก้ไข
                     </button>
@@ -314,31 +333,56 @@ function ManageUsers() {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="mt-6 flex justify-center">
-              <div className="flex flex-wrap gap-1 sm:gap-2 justify-center">
+              <div className="filter-card rounded-xl p-4 shadow-lg flex flex-wrap gap-2 justify-center">
                 <button
                   onClick={() => setCurrentPage(1)}
                   disabled={currentPage === 1}
-                  className="btn btn-sm bg-blue-500 hover:bg-blue-600 text-white border-none px-3 sm:px-4 disabled:bg-gray-300"
+                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all flex items-center justify-center"
                 >
                   «
                 </button>
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrentPage(i + 1)}
-                    className={`btn btn-sm ${
-                      currentPage === i + 1 
-                        ? "bg-blue-500 hover:bg-blue-600 text-white border-none" 
-                        : "btn-outline"
-                    } px-3 sm:px-4`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all flex items-center justify-center"
+                >
+                  ‹
+                </button>
+                
+                {Array.from({ length: totalPages }, (_, i) => {
+                  if (totalPages <= 5 || i === 0 || i === totalPages - 1 || Math.abs(currentPage - (i + 1)) <= 1) {
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => setCurrentPage(i + 1)}
+                        className={`w-10 h-10 rounded-lg font-bold transition-all flex items-center justify-center ${
+                          currentPage === i + 1 
+                            ? "bg-blue-600 text-white shadow-md shadow-blue-200 scale-105" 
+                            : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                        }`}
+                      >
+                        {i + 1}
+                      </button>
+                    );
+                  } else if (i === 1 && currentPage > 3) {
+                    return <span key={i} className="w-10 h-10 flex items-center justify-center text-gray-400">...</span>;
+                  } else if (i === totalPages - 2 && currentPage < totalPages - 2) {
+                    return <span key={i} className="w-10 h-10 flex items-center justify-center text-gray-400">...</span>;
+                  }
+                  return null;
+                })}
+
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all flex items-center justify-center"
+                >
+                  ›
+                </button>
                 <button
                   onClick={() => setCurrentPage(totalPages)}
                   disabled={currentPage === totalPages}
-                  className="btn btn-sm bg-blue-500 hover:bg-blue-600 text-white border-none px-3 sm:px-4 disabled:bg-gray-300"
+                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all flex items-center justify-center"
                 >
                   »
                 </button>
@@ -357,13 +401,13 @@ function ManageUsers() {
                 <div className="mt-4 flex flex-col sm:flex-row justify-end gap-2">
                   <button
                     onClick={closeDeleteModal}
-                    className="btn btn-sm bg-red-500 hover:bg-red-600 text-white border-none w-full sm:w-auto"
+                    className="btn btn-sm bg-gray-200 hover:bg-gray-300 text-gray-700 border-none w-full sm:w-auto"
                   >
                     ยกเลิก
                   </button>
                   <button
                     onClick={() => deleteUser(userToDelete?.user_id)}
-                    className="btn btn-sm bg-green-500 hover:bg-green-600 text-white border-none w-full sm:w-auto"
+                    className="btn btn-sm bg-red-500 hover:bg-red-600 text-white border-none w-full sm:w-auto"
                   >
                     ลบ
                   </button>
@@ -474,13 +518,13 @@ function ManageUsers() {
                     <button
                       onClick={closeEditModal}
                       type="button"
-                      className="btn btn-sm bg-red-500 hover:bg-red-600 text-white border-none w-full sm:w-auto"
+                      className="btn btn-sm bg-gray-200 hover:bg-gray-300 text-gray-700 border-none w-full sm:w-auto"
                     >
                       ยกเลิก
                     </button>
                     <button 
                       type="submit" 
-                      className="btn btn-sm bg-green-500 hover:bg-green-600 text-white border-none w-full sm:w-auto"
+                      className="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-none w-full sm:w-auto"
                     >
                       บันทึก
                     </button>

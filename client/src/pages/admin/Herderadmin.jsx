@@ -101,20 +101,13 @@ function Herderadmin() {
             </button>
 
             <div className={`${isReportsDropdownOpen ? 'block' : 'hidden'} pl-11 mt-1 space-y-1`}>
-              <Link to="/RMUTI/ReportBorrow" className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200">
+              <Link to="/RMUTI/Report" className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200">
                 <i className="fas fa-file w-5" />
-                <span>รายงานการยืมอุปกรณ์</span>
-              </Link>
-              <Link to="/RMUTI/ReportResults" className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200">
-                <i className="fas fa-undo w-5" />
-                <span>รายงานการคืนอุปกรณ์</span>
+                <span>รายงานการยืม-คืน</span>
               </Link>
             </div>
           </div>
-          {/* <Link to="/RMUTI/ReportResults" className="flex items-center gap-3 px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group">
-            <i className="fas fa-chart-bar w-5 transition-transform group-hover:scale-110" />
-            <span>รายงานการคืน</span>
-          </Link> */}
+    
 
           <div className="pt-4 pb-2">
             <p className="px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">บัญชี</p>

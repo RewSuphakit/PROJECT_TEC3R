@@ -3,8 +3,12 @@ import axios from "axios";
 import Activity from "../admin/Activity";
 import AddTool from '../admin/addTool';
 import bg2 from '../../assets/bg2.png';
-
+import { Link } from "react-router-dom";
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
+
+import './AdminStyles.css';
+
+
 function Dashboard() {
   const [statsData, setStatsData] = useState({});
 
@@ -31,17 +35,32 @@ function Dashboard() {
       backgroundAttachment: 'fixed'
     }}>
       <div className="lg:pl-72">
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">แดชบอร์ด</h1>
+          
+          {/* Header Section */}
+          <div className="filter-card rounded-2xl p-6 mb-6 shadow-xl">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-3 rounded-xl shadow-lg shadow-blue-500/20">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                </div>
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+                    แดชบอร์ด
+                  </h1>
+                  <p className="text-gray-500 text-sm mt-1">ภาพรวมระบบและสถิติการใช้งาน</p>
+                </div>
+              </div>
+              <AddTool />
             </div>
-           
-            <AddTool />
           </div>
 
           {/* Grid Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <Link to="/RMUTI/ManageTools">
             {/* Equipment Card */}
             <div className="md:col-span-3 lg:col-span-1 bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
               <div className="flex items-center justify-between">
@@ -49,51 +68,56 @@ function Dashboard() {
                   <h3 className="text-3xl font-bold text-gray-800 mt-2">
                     {statsData.total_equipment || 0}
                   </h3>
-                  <p className="text-blue-500 text-sm font-medium mt-2 flex items-center gap-1">
+                  <p className="text-gray-500 text-sm font-medium mt-2 flex items-center gap-1">
                     <i className="fa-solid fa-box text-xs" />
                     <span>อุปกรณ์ทั้งหมด</span>
                   </p>
                 </div>
                 <div className="bg-blue-50 p-4 rounded-xl">
-                  <i className="fas fa-boxes text-2xl text-blue-500" />
+                  <i className="fas fa-boxes text-2xl text-blue-600" />
                 </div>
               </div>
             </div>
-
+            </Link>
             {/* Borrowed Card */}
             <div className="md:col-span-3 lg:col-span-1 bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
+              <Link to="/RMUTI/ListBorrow">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-3xl font-bold text-gray-800 mt-2">
                     {statsData.total_borrowed || 0}
                   </h3>
-                  <p className="text-green-500 text-sm font-medium mt-2 flex items-center gap-1">
+                  <p className="text-gray-500 text-sm font-medium mt-2 flex items-center gap-1">
                     <i className="fas fa-exchange-alt text-xs" />
                     <span>รายการอุปกรณ์ที่ถูกยืม</span>
                   </p>
                 </div>
-                <div className="bg-green-50 p-4 rounded-xl">
-                  <i className="fas fa-exchange-alt text-2xl text-green-500" />
+                <div className="bg-orange-50 p-4 rounded-xl">
+                  <i className="fas fa-exchange-alt text-2xl text-orange-500" />
                 </div>
+                
               </div>
+              </Link>
             </div>
 
             {/* Users Card */}
             <div className="md:col-span-3 lg:col-span-1 bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
+              <Link to="/RMUTI/ManageUsers">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-3xl font-bold text-gray-800 mt-2">
                     {statsData.total_users || 0}
                   </h3>
-                  <p className="text-blue-800 text-sm font-medium mt-2 flex items-center gap-1">
+                  <p className="text-gray-500 text-sm font-medium mt-2 flex items-center gap-1">
                     <i className="fas fa-users text-xs" />
                     <span>ผู้ใช้งานในเว็บไซต์ทั้งหมด</span>
                   </p>
                 </div>
-                <div className="bg-purple-50 p-4 rounded-xl">
-                  <i className="fas fa-users text-2xl text-blue-800" />
+                <div className="bg-cyan-50 p-4 rounded-xl">
+                  <i className="fas fa-users text-2xl text-cyan-600" />
                 </div>
               </div>
+              </Link>
             </div>
           </div>
 

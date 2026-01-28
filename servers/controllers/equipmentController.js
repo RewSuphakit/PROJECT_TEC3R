@@ -5,11 +5,12 @@ const sharp = require('sharp');
 
 // เพิ่มอุปกรณ์
 exports.addEquipment = (req, res) => {
-  const { equipment_name, quantity } = req.body;
-  const image = req.file ? req.file.filename : '';  // ใช้ไฟล์ที่อัพโหลดหรือค่าว่าง
+  const { equipment_name, total_quantity } = req.body;
+  const image = req.file ? req.file.filename : '';
+  const available_quantity = total_quantity || 0;
 
-  const query = 'INSERT INTO equipment (equipment_name,  quantity, image) VALUES (?, ?, ?)';
-  pool.query(query, [equipment_name, quantity, image], (err, result) => {
+  const query = 'INSERT INTO equipment (equipment_name, total_quantity, available_quantity, image) VALUES (?, ?, ?, ?)';
+  pool.query(query, [equipment_name, total_quantity, available_quantity, image], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Server error' });
@@ -20,7 +21,7 @@ exports.addEquipment = (req, res) => {
 
 // ดึงข้อมูลอุปกรณ์ทั้งหมด (ต้อง login)
 exports.getAllEquipment = (req, res) => {
-  const query = 'SELECT * FROM equipment';
+  const query = 'SELECT equipment_id, equipment_name, total_quantity, available_quantity, status, image, created_at, updated_at FROM equipment';
   pool.query(query, (err, results) => {
     if (err) {
       console.error(err);
@@ -32,7 +33,7 @@ exports.getAllEquipment = (req, res) => {
 
 // ดึงข้อมูลอุปกรณ์สำหรับ Public (ไม่ต้อง login) - เฉพาะอุปกรณ์ที่ Available
 exports.getPublicEquipment = (req, res) => {
-  const query = 'SELECT equipment_id, equipment_name, quantity, image, status, timeupdate FROM equipment WHERE status = ?';
+  const query = 'SELECT equipment_id, equipment_name, total_quantity, available_quantity, image, status, updated_at FROM equipment WHERE status = ? AND available_quantity > 0';
   pool.query(query, ['Available'], (err, results) => {
     if (err) {
       console.error(err);
@@ -57,6 +58,8 @@ exports.getEquipmentById = (req, res) => {
     res.status(200).json({ equipment: results[0] });
   });
 };
+
+// อัปเดตสถานะของอุปกรณ์ (เฉพาะ status)
 exports.updateEquipmentStatus = (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
@@ -80,10 +83,11 @@ exports.updateEquipmentStatus = (req, res) => {
     });
   });
 };
+
 // อัปเดตข้อมูลอุปกรณ์ (รวมการอัปเดตไฟล์ภาพ)
 exports.updateEquipment = (req, res) => {
   const { id } = req.params;
-  const { equipment_name, quantity } = req.body;
+  const { equipment_name, total_quantity } = req.body;
   const newImage = req.file ? req.file.filename : null;
 
   const query = 'SELECT * FROM equipment WHERE equipment_id = ?';
@@ -93,7 +97,9 @@ exports.updateEquipment = (req, res) => {
       return res.status(404).json({ message: 'Equipment not found' });
     }
 
-    const oldImage = results[0].image;
+    const oldEquipment = results[0];
+    const oldImage = oldEquipment.image;
+    const oldTotalQuantity = oldEquipment.total_quantity;
 
     // ถ้ามีการอัปโหลดไฟล์ใหม่ ให้ลบรูปเก่า
     if (newImage && oldImage) {
@@ -113,12 +119,18 @@ exports.updateEquipment = (req, res) => {
     // ใช้รูปเดิมถ้าไม่มีการอัปโหลดใหม่
     const updatedImage = newImage || oldImage;
 
+    // คำนวณ available_quantity ใหม่
+    // ถ้า total_quantity เปลี่ยน ให้ปรับ available_quantity ตามส่วนต่าง
+    const newTotalQuantity = parseInt(total_quantity) || oldTotalQuantity;
+    const quantityDiff = newTotalQuantity - oldTotalQuantity;
+    const newAvailableQuantity = Math.max(0, oldEquipment.available_quantity + quantityDiff);
+
     const updateQuery = `
       UPDATE equipment
-      SET equipment_name = ?,  quantity = ?, image = ?
+      SET equipment_name = ?, total_quantity = ?, available_quantity = ?, image = ?
       WHERE equipment_id = ?
     `;
-    pool.query(updateQuery, [equipment_name, quantity, updatedImage, id], (err, results) => {
+    pool.query(updateQuery, [equipment_name, newTotalQuantity, newAvailableQuantity, updatedImage, id], (err, results) => {
       if (err) {
         console.error(err);
         return res.status(500).json({ message: 'Server error' });
@@ -127,10 +139,6 @@ exports.updateEquipment = (req, res) => {
     });
   });
 };
-
-
-// อัปเดตสถานะของอุปกรณ์ (เฉพาะ status)
-// Endpoint นี้จะใช้สำหรับ toggle สถานะ โดยไม่กระทบกับข้อมูลอื่น ๆ
 
 // ลบอุปกรณ์
 exports.deleteEquipment = (req, res) => {
@@ -143,7 +151,7 @@ exports.deleteEquipment = (req, res) => {
       return res.status(404).json({ message: 'Equipment not found' });
     }
 
-    const oldImage = results[0].image; // ดึงชื่อไฟล์ภาพ
+    const oldImage = results[0].image;
 
     if (oldImage) {
       const filePath = path.join(__dirname, '..', 'uploads', oldImage);

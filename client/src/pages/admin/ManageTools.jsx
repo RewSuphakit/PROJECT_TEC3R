@@ -4,7 +4,11 @@ import { toast } from "react-toastify";
 import DeleteModal from "./DeleteModal";
 import EditModal from "./EditModal";
 import bg2 from '../../assets/bg2.png';
+
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
+
+import './AdminStyles.css';
+
 function ManageTools() {
   const [tools, setTools] = useState([]);
   const [popupImage, setPopupImage] = useState(null);
@@ -63,7 +67,7 @@ function ManageTools() {
     try {
       const formData = new FormData();
       formData.append("equipment_name", e.target.equipment_name.value);
-      formData.append("quantity", e.target.quantity.value);
+      formData.append("total_quantity", e.target.total_quantity.value);
   
       if (e.target.image.files[0]) {
         formData.append("image", e.target.image.files[0]);
@@ -81,7 +85,7 @@ function ManageTools() {
         updatedTool = {
           ...currentTool,
           equipment_name: e.target.equipment_name.value,
-          quantity: e.target.quantity.value,
+          total_quantity: e.target.total_quantity.value,
           image: e.target.image ? currentTool.image : currentTool.image,
         };
       }
@@ -160,34 +164,50 @@ function ManageTools() {
   };
 
   return (
-    <div className="relative" style={{ 
-          minHeight: '100vh', 
-          backgroundImage: `url(${bg2})`,
-          backgroundSize: 'cover',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed'
-        }}>
-      <div className="lg:pl-72">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-8 gap-2">
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-800">🧰 จัดการอุปกรณ์</h1>
-             
+    <>
+
+      <div className="relative" style={{ 
+            minHeight: '100vh', 
+            backgroundImage: `url(${bg2})`,
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed'
+          }}>
+        <div className="lg:pl-72">
+          <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-8">
+            
+            {/* Header Section */}
+            <div className="filter-card rounded-2xl p-6 mb-6 shadow-xl">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-3 rounded-xl shadow-lg shadow-blue-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+                      จัดการอุปกรณ์
+                    </h1>
+                    <p className="text-gray-500 text-sm mt-1">เพิ่ม ลบ แก้ไข รายการอุปกรณ์ในระบบ</p>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
 
           {/* Desktop Table View */}
-          <div className="hidden md:block overflow-x-auto shadow-md rounded-lg bg-white">
-            <table className="table w-full">
+          <div className="hidden md:block overflow-hidden shadow-2xl rounded-2xl bg-white">
+            <table className="min-w-full bg-white">
               <thead>
-                <tr className="text-sm font-semibold text-gray-700 text-center">
-                  <th>รหัส</th>
-                  <th>ชื่อ</th>
-                  <th>มีอยู่</th>
-                  <th>สถานะ ไม่พร้อมใช้งาน-พร้อมใช้งาน</th>
-                  <th>รูป</th>
-                  <th>จัดการ</th>
+                <tr className="bg-slate-100 text-slate-700 uppercase text-sm leading-normal">
+                  <th className="py-4 px-6 text-center font-semibold">รหัส</th>
+                  <th className="py-4 px-6 text-left font-semibold">ชื่ออุปกรณ์</th>
+                  <th className="py-4 px-6 text-center font-semibold">จำนวน</th>
+                  <th className="py-4 px-6 text-center font-semibold">สถานะ</th>
+                  <th className="py-4 px-6 text-center font-semibold">รูปภาพ</th>
+                  <th className="py-4 px-6 text-center font-semibold">จัดการ</th>
                 </tr>
               </thead>
               <tbody>
@@ -195,59 +215,60 @@ function ManageTools() {
                   currentTools.map((tool) => (
                     <tr
                       key={tool.equipment_id}
-                      className="hover:bg-gray-100 transition-colors duration-300"
+                      className="table-row border-b hover:bg-blue-50/30 transition-colors"
                     >
-                      <td className="py-4 px-2 text-center">{tool.equipment_id}</td>
-                      <td className="py-4 px-2 text-center">{tool.equipment_name}</td>
-                      <td className="py-4 px-2 text-center">{tool.quantity}</td>
-                      <td className="py-4 px-2 text-center">
-                        <div
-                          className={`tooltip ${
-                            tool.status === "Available"
-                              ? "tooltip-success"
-                              : "tooltip-warning"
-                          }`}
-                          data-tip={
-                            tool.status === "Available"
-                              ? "พร้อมใช้งาน"
-                              : "ไม่พร้อมใช้งาน"
-                          }
-                        >
+                      <td className="py-4 px-6 text-center">
+                        <span className="bg-blue-100 text-[#0F4C75] px-3 py-1 rounded-full text-sm font-medium">
+                          #{tool.equipment_id}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 font-medium text-gray-800">{tool.equipment_name}</td>
+                      <td className="py-4 px-6 text-center">
+                        <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-bold">
+                          {tool.available_quantity} / {tool.total_quantity}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 text-center">
+                        <div className="flex justify-center items-center gap-2">
+                          <span className={`text-xs font-semibold ${tool.status === "Available" ? "text-green-600" : "text-yellow-600"}`}>
+                            {tool.status === "Available" ? "พร้อม" : "ไม่พร้อม"}
+                          </span>
                           <input
                             type="checkbox"
-                            className={`toggle ${
+                            className={`toggle toggle-sm ${
                               tool.status === "Available"
-                                ? "toggle-success"
-                                : "toggle-warning"
+                              ? "toggle-success"
+                              : "toggle-warning"
                             }`}
                             checked={tool.status === "Available"}
                             onChange={() => toggleToolStatus(tool)}
                           />
                         </div>
                       </td>
-                      <td className="py-4 px-2 flex justify-center">
+                      <td className="py-4 px-6 flex justify-center">
                         <img
                           src={`${apiUrl}/uploads/${tool.image}`}
                           alt={tool.equipment_name}
-                          className="w-16 h-16 rounded-lg object-cover border cursor-pointer"
+                          className="w-12 h-12 rounded-lg object-cover border-2 border-gray-100 shadow-sm cursor-pointer hover:scale-110 transition-transform"
                           onMouseEnter={(e) => handleImageMouseEnter(e, `${apiUrl}/uploads/${tool.image}`)}
                           onMouseLeave={handleImageMouseLeave}
                         />
                       </td>
-                      <td className="py-4 px-2 text-center">
-                        <button
-                          onClick={() => openEditModal(tool)}
-                          className="btn btn-warning btn-sm"
-                        >
-                          แก้ไข
-                        </button>
-                        <span className="mx-2"></span>
-                        <button
-                          onClick={() => openDeleteModal(tool)}
-                          className="btn btn-error btn-sm text-white"
-                        >
-                          ลบ
-                        </button>
+                      <td className="py-4 px-6 text-center">
+                        <div className="flex justify-center gap-2">
+                          <button
+                            onClick={() => openEditModal(tool)}
+                            className="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg shadow hover:shadow-lg transition-all hover:-translate-y-0.5 text-sm"
+                          >
+                            แก้ไข
+                          </button>
+                          <button
+                            onClick={() => openDeleteModal(tool)}
+                            className="bg-gradient-to-r from-red-500 to-pink-600 text-white px-3 py-1.5 rounded-lg shadow hover:shadow-lg transition-all hover:-translate-y-0.5 text-sm"
+                          >
+                            ลบ
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -298,7 +319,7 @@ function ManageTools() {
                             tool.status === "Available"
                               ? "toggle-success"
                               : "toggle-warning"
-                          }`}
+                            }`}
                           checked={tool.status === "Available"}
                           onChange={() => toggleToolStatus(tool)}
                         />
@@ -306,7 +327,7 @@ function ManageTools() {
 
                       <div className="text-xs sm:text-sm text-gray-600 mb-2">
                         <span className="inline-block bg-gray-100 px-2 py-1 rounded">
-                          มีอยู่: {tool.quantity} ชิ้น
+                          มีอยู่: {tool.available_quantity} / {tool.total_quantity} ชิ้น
                         </span>
                       </div>
 
@@ -328,7 +349,7 @@ function ManageTools() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => openEditModal(tool)}
-                          className="btn btn-warning btn-xs sm:btn-sm flex-1"
+                          className="btn btn-sm bg-amber-500 hover:bg-amber-600 text-white border-none flex-1"
                         >
                           แก้ไข
                         </button>
@@ -352,32 +373,61 @@ function ManageTools() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="mt-4 sm:mt-6 flex justify-center flex-wrap gap-1">
-              <button
-                onClick={() => setCurrentPage(1)}
-                disabled={currentPage === 1}
-                className="btn btn-xs sm:btn-sm btn-primary px-2 sm:px-4"
-              >
-                «
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => (
+            <div className="mt-6 flex justify-center">
+              <div className="filter-card rounded-xl p-4 shadow-lg flex flex-wrap gap-2 justify-center">
                 <button
-                  key={i}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={`btn btn-xs sm:btn-sm ${
-                    currentPage === i + 1 ? "btn-accent" : "btn-primary"
-                  } px-2 sm:px-4`}
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
                 >
-                  {i + 1}
+                  «
                 </button>
-              ))}
-              <button
-                onClick={() => setCurrentPage(totalPages)}
-                disabled={currentPage === totalPages}
-                className="btn btn-xs sm:btn-sm btn-primary px-2 sm:px-4"
-              >
-                »
-              </button>
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
+                >
+                  ‹
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => {
+                  if (totalPages <= 5 || i === 0 || i === totalPages - 1 || Math.abs(currentPage - (i + 1)) <= 1) {
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => setCurrentPage(i + 1)}
+                        className={`w-10 h-10 rounded-lg font-bold transition-all ${
+                          currentPage === i + 1 
+                            ? "bg-blue-600 text-white shadow-md shadow-blue-200 scale-105" 
+                            : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                        }`}
+                      >
+                        {i + 1}
+                      </button>
+                    );
+                  } else if (i === 1 && currentPage > 3) {
+                    return <span key={i} className="w-10 h-10 flex items-center justify-center text-gray-400">...</span>;
+                  } else if (i === totalPages - 2 && currentPage < totalPages - 2) {
+                    return <span key={i} className="w-10 h-10 flex items-center justify-center text-gray-400">...</span>;
+                  }
+                  return null;
+                })}
+
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
+                >
+                  ›
+                </button>
+                <button
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
+                >
+                  »
+                </button>
+              </div>
             </div>
           )}
 
@@ -425,6 +475,7 @@ function ManageTools() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

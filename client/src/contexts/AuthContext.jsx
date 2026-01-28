@@ -45,9 +45,9 @@ function AuthContextProvider({ children }) {
   };
 
   // ==========================
-  // Fetch Borrow Records
+  // Fetch Borrow Items
   // ==========================
-  const fetchBorrowRecords = async (userId = user?.user_id) => {
+  const fetchBorrowItems = async (userId = user?.user_id) => {
     if (!userId) return;
 
     const token = getToken();
@@ -58,7 +58,7 @@ function AuthContextProvider({ children }) {
 
     try {
       const response = await axios.get(
-        `${apiUrl}/api/borrowRecords/all/${userId}`,
+        `${apiUrl}/api/borrow/all/${userId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -67,13 +67,13 @@ function AuthContextProvider({ children }) {
       setBorrowedCount(data.borrowed_count || 0);
       setReturnedCount(data.returned_count || 0);
 
-      const borrowedRecords = (data.borrow_records || []).filter(
-        (record) => record.status !== 'Returned'
+      const borrowedItems = (data.borrow_items || []).filter(
+        (item) => item.status !== 'Returned'
       );
-      setBorrowedBooks(borrowedRecords);
-      setBorrowedCount(borrowedRecords.length);
+      setBorrowedBooks(borrowedItems);
+      setBorrowedCount(borrowedItems.length);
     } catch (error) {
-      console.error('Error fetching borrow records:', error.message);
+      console.error('Error fetching borrow items:', error.message);
       setBorrowedCount(0);
       setReturnedCount(0);
       setBorrowedBooks([]);
@@ -103,7 +103,7 @@ function AuthContextProvider({ children }) {
   // ==========================
   useEffect(() => {
     if (user?.user_id) {
-      fetchBorrowRecords();
+      fetchBorrowItems();
     }
   }, [user]);
 
@@ -118,7 +118,7 @@ function AuthContextProvider({ children }) {
         borrowedCount,
         returnedCount,
         borrowedBooks,
-        fetchBorrowRecords,
+        fetchBorrowItems,
       }}
     >
       {children}

@@ -1,0 +1,116 @@
+/* Animation Keyframes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.02);
+    }
+}
+
+/* Common Components */
+.filter-card {
+    backdrop-filter: blur(20px);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.table-row {
+    transition: all 0.2s ease;
+}
+
+.table-row:hover {
+    transform: scale(1.01);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Modal Animations */
+.modal-overlay {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+    animation: slideUp 0.4s ease-out;
+}
+
+/* Report Page Specific Styles */
+.month-btn {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: white;
+    border: 1px solid #E5E7EB;
+}
+
+.month-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(61, 167, 216, 0.3);
+}
+
+.month-btn.selected {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    transform: scale(1.05);
+    animation: pulse 0.3s ease;
+}
+
+.year-btn {
+    transition: all 0.2s ease;
+}
+
+.year-btn:hover {
+    transform: scale(1.05);
+}
+
+.gradient-btn {
+    background-color: #2563EB;
+    /* Blue */
+    transition: all 0.2s ease;
+}
+
+.gradient-btn:hover {
+    background-color: #1D4ED8;
+    /* Darker Blue */
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.reset-btn {
+    background-color: #F3F4F6;
+    /* Light Gray */
+    color: #4B5563;
+    /* Dark Gray Text */
+    transition: all 0.2s ease;
+}
+
+.reset-btn:hover {
+    background-color: #E5E7EB;
+    /* Slightly Darker Gray */
+    color: #1F2937;
+    /* Darkest Gray Text */
+}

@@ -16,7 +16,7 @@ exports.getHistoryByUserId = async (req, res) => {
       WHERE br.user_id = ?
       ORDER BY br.borrow_date DESC
     `;
-     const [results] = await promisePool.query(query, [user_id]);
+    const [results] = await promisePool.query(query, [user_id]);
 
     // Format date to Thai locale
     const formattedResults = results.map(record => ({
@@ -113,13 +113,14 @@ exports.addBorrowRecord = async (req, res) => {
     if (userResult.length === 0) throw new Error("User not found");
 
     const selectRecordsQuery = `
-      SELECT br.record_id, br.quantity_borrow, e.equipment_name
+      SELECT br.record_id, br.quantity_borrow, e.equipment_name, e.equipment_id
       FROM borrow_records br
       JOIN equipment e ON br.equipment_id = e.equipment_id
       WHERE br.transaction_id = ?
     `;
     const [recordsResult] = await connection.query(selectRecordsQuery, [transaction_id]);
     if (recordsResult.length === 0) throw new Error("Borrow records not found");
+
 
     // 5. จัดรูปแบบข้อมูลสำหรับ response
     const responseData = {
@@ -183,7 +184,7 @@ exports.updateReturnStatus = async (req, res) => {
   if (!record_id) {
     return res.status(400).json({ message: "Missing required record_id" });
   }
-let connection;
+  let connection;
   try {
     connection = await promisePool.getConnection();
     await connection.beginTransaction();
@@ -218,6 +219,8 @@ let connection;
       WHERE equipment_id = ?
     `;
     await connection.query(restoreQuery, [quantity_borrow, equipment_id]);
+
+
 
     await connection.commit();
 
@@ -388,10 +391,10 @@ exports.deleteBorrowRecord = async (req, res) => {
   if (!record_id) {
     return res.status(400).json({ message: "Missing required record_id" });
   }
-  let connection;
+  let connection;
   try {
-      connection = await promisePool.getConnection();
-    await connection.beginTransaction();
+    connection = await promisePool.getConnection();
+    await connection.beginTransaction();
 
     // ดึงข้อมูล borrow record ที่ต้องการลบ
     const [records] = await connection.query(
@@ -506,3 +509,5 @@ exports.getAllBorrowRecordsID = async (req, res) => {
     res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
+
+

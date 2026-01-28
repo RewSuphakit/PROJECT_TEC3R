@@ -20,7 +20,7 @@ function History() {
         const token = localStorage.getItem("token");
         const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
         const response = await axios.get(
-          `${apiUrl}/api/borrowRecords/history/${user.user_id}`,
+          `${apiUrl}/api/borrow/history/${user.user_id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -151,22 +151,22 @@ function History() {
                         </td>
                       </tr>
                     ) : (
-                      currentItems.map((record) => (
+                        currentItems.map((record) => (
                         <tr
-                          key={record.record_id}
+                          key={record.item_id}
                           className="hover:bg-gray-50 transition-colors"
                         >
                           <td className="px-4 lg:px-6 py-4 text-sm text-gray-800">
                             {record.equipment_name}
                           </td>
                           <td className="px-4 lg:px-6 py-4 text-sm text-center text-gray-800">
-                            {record.quantity_borrow}
+                            {record.quantity}
                           </td>
                           <td className="px-4 lg:px-6 py-4 text-sm text-center text-gray-600">
                             {record.borrow_date || "-"}
                           </td>
                           <td className="px-4 lg:px-6 py-4 text-sm text-center text-gray-600">
-                            {record.return_date || "-"}
+                            {record.returned_at || "-"}
                           </td>
                           <td className="px-4 lg:px-6 py-4 text-center">
                             <span
@@ -243,7 +243,7 @@ function History() {
               ) : (
                 currentItems.map((record) => (
                   <div
-                    key={record.record_id}
+                    key={record.item_id}
                     className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm"
                   >
                     <div className="flex justify-between items-start mb-3">
@@ -264,7 +264,7 @@ function History() {
                       <div className="flex justify-between">
                         <span className="text-gray-600">จำนวน:</span>
                         <span className="text-gray-800 font-medium">
-                          {record.quantity_borrow}
+                          {record.quantity}
                         </span>
                       </div>
                       <div className="flex justify-between">
@@ -276,7 +276,7 @@ function History() {
                       <div className="flex justify-between">
                         <span className="text-gray-600">วันที่คืน:</span>
                         <span className="text-gray-800">
-                          {record.return_date || "-"}
+                          {record.returned_at || "-"}
                         </span>
                       </div>
                     </div>

@@ -11,7 +11,7 @@ function Activity() {
     const fetchTransactions = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(`${apiUrl}/api/borrowRecords/all`, {
+        const response = await axios.get(`${apiUrl}/api/borrow/all`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const filtered = response.data.borrow_transactions?.filter(transaction => {
@@ -94,9 +94,9 @@ const TransactionItem = ({ transaction, now }) => {
         <p className="text-xs text-gray-500 mt-1">
           ยืม: {borrowTime} {returnTime && `| คืน: ${returnTime}`}
         </p>
-        {transaction.borrow_records && transaction.borrow_records.length > 0 && (
+        {transaction.borrow_items && transaction.borrow_items.length > 0 && (
           <p className="text-xs text-gray-500 mt-1">
-            อุปกรณ์: {transaction.borrow_records.map(record => record.equipment_name).join(", ")}
+            อุปกรณ์: {transaction.borrow_items.map(item => item.equipment_name).join(", ")}
           </p>
         )}
       </div>
