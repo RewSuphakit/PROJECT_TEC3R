@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 import ScrollToTopButton from '../components/ScrollToTopButton';
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function Home() {
-  const { user, fetchBorrowRecords } = useAuth();
+  const { user, fetchBorrowItems } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [equipment, setEquipment] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -133,9 +133,14 @@ function Home() {
       });
 
       if (result.isConfirmed) {
+        const payloadItems = items.map(item => ({
+          equipment_id: item.equipment_id,
+          quantity: item.quantity_borrow || item.quantity
+        }));
+
         await axios.post(
-          `${apiUrl}/api/borrowRecords/add`,
-          { user_id: user.user_id, items },
+          `${apiUrl}/api/borrow/add`,
+          { user_id: user.user_id, items: payloadItems },
           { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
         );
         await swalWithBootstrapButtons.fire({
@@ -145,7 +150,7 @@ function Home() {
         });
         removeBorrowItems();
         await fetchEquipment();
-        await fetchBorrowRecords();
+        await fetchBorrowItems();
       } else if (result.isDenied) {
         removeBorrowItems();
         await swalWithBootstrapButtons.fire({
@@ -243,9 +248,14 @@ function Home() {
         });
 
         if (confirmBorrow.isConfirmed) {
+          const payloadItems = items.map(item => ({
+            equipment_id: item.equipment_id,
+            quantity: item.quantity_borrow || item.quantity
+          }));
+
           await axios.post(
-            `${apiUrl}/api/borrowRecords/add`,
-            { user_id: user.user_id, items },
+            `${apiUrl}/api/borrow/add`,
+            { user_id: user.user_id, items: payloadItems },
             { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
           );
           await swalWithBootstrapButtons.fire({
@@ -255,7 +265,7 @@ function Home() {
           });
           removeBorrowItems();
           await fetchEquipment();
-          await fetchBorrowRecords();
+          await fetchBorrowItems();
         }
       } else if (result.isDenied) {
         await confirmBorrowFromStorage();
