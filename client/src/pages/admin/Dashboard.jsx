@@ -12,7 +12,7 @@ import './AdminStyles.css';
 function Dashboard() {
   const [statsData, setStatsData] = useState({});
 
-  useEffect(() => {
+  const fetchStats = () => {
     const token = localStorage.getItem('token');
     axios.get(`${apiUrl}/api/stats/stats/`, {
       headers: { Authorization: `Bearer ${token}` }
@@ -23,6 +23,10 @@ function Dashboard() {
       .catch((error) => {
         console.error("Error fetching stats:", error);
       });
+  };
+
+  useEffect(() => {
+    fetchStats();
   }, []);
 
   return (
@@ -54,7 +58,7 @@ function Dashboard() {
                   <p className="text-gray-500 text-sm mt-1">ภาพรวมระบบและสถิติการใช้งาน</p>
                 </div>
               </div>
-              <AddTool />
+              <AddTool onAddSuccess={fetchStats} />
             </div>
           </div>
 

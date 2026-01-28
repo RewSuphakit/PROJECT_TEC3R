@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
-function AddTool() {
+function AddTool({ onAddSuccess }) {
   const [showModal, setShowModal] = useState(false);
   const [equipmentName, setEquipmentName] = useState("");
   const [totalQuantity, setTotalQuantity] = useState("");
@@ -29,9 +29,12 @@ function AddTool() {
       });
 
       toast.success("เพิ่มอุปกรณ์สำเร็จ!");
+      if (onAddSuccess) {
+        onAddSuccess();
+      } else {
+        window.location.reload();
+      }
       closeModal();
-      // Reload the page to show the new equipment
-      window.location.reload();
     } catch (error) {
       toast.error("เกิดข้อผิดพลาดในการเพิ่มอุปกรณ์");
     }
