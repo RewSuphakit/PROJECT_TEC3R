@@ -16,6 +16,8 @@ const Register = () => {
   const [message, setMessage] = useState("");
   const [emailValid, setEmailValid] = useState(true);
   const [emailDuplicate, setEmailDuplicate] = useState(false);
+  const [phoneValid, setPhoneValid] = useState(true);
+  const [studentIdValid, setStudentIdValid] = useState(true);
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
   
   const handleRegister = async (e) => {
@@ -31,7 +33,7 @@ const Register = () => {
       !role
     ) {
       toast.warn("กรุณากรอกข้อมูลให้ครบทุกช่อง", {
-        position: "top-center"
+        position: "top-right"
       });
       return;
     }
@@ -43,8 +45,29 @@ const Register = () => {
       return;
     }
 
+    // ตรวจสอบรหัสนักศึกษา 13 หลัก (รูปแบบ: 1xxxxxxxxxx-x)
+    const studentIdPattern = /^\d{11}-\d{1}$/;
+    if (!studentIdPattern.test(student_id)) {
+      setStudentIdValid(false);
+      toast.warn("กรุณากรอกรหัสนักศึกษาให้ถูกต้อง (รูปแบบ: 12345678901-2)", {
+        position: "top-center"
+      });
+      return;
+    }
+
+    // ตรวจสอบเบอร์โทรให้ครบ 10 หลัก
+    if (phone.length !== 10) {
+      setPhoneValid(false);
+      toast.warn("กรุณากรอกเบอร์โทรให้ครบ 10 หลัก", {
+        position: "top-center"
+      });
+      return;
+    }
+
     setEmailValid(true);
     setEmailDuplicate(false);
+    setPhoneValid(true);
+    setStudentIdValid(true);
 
     try {
       const response = await axios.post(`${apiUrl}/api/users/register`, {
@@ -58,19 +81,19 @@ const Register = () => {
       });
       setMessage(response.data.message);
       toast.success("สมัครสมาชิกสำเร็จ!", {
-        position: "top-center"
+        position: "top-right"
       });
       navigate("/RMUTI/Login");
     } catch (error) {
       if (error.response?.data?.message === 'User with this email already exists') {
         setEmailDuplicate(true);
         toast.error("อีเมลนี้ถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น", {
-          position: "top-center"
+          position: "top-right"
         });
       } else {
         setMessage("การสมัครสมาชิกไม่สำเร็จ กรุณาลองอีกครั้ง");
         toast.error("การสมัครสมาชิกไม่สำเร็จ กรุณาลองอีกครั้ง", {
-          position: "top-center"
+          position: "top-right"
         });
       }
     }
@@ -163,12 +186,23 @@ const Register = () => {
                     id="student_id"
                     name="student_id"
                     value={student_id}
-                    onChange={(e) => setStudentId(e.target.value)}
-                    className="w-full border rounded-lg pl-10 pr-4 py-2 text-sm bg-white focus:ring-2 focus:ring-[#0F4C75] focus:outline-none"
-                    placeholder="กรุณากรอกรหัสนักศึกษา"
+                    maxLength={13}
+                    onChange={(e) => {
+                      // อนุญาตให้กรอกตัวเลขและ - เท่านั้น
+                      const value = e.target.value.replace(/[^\d-]/g, '');
+                      setStudentId(value);
+                      setStudentIdValid(true);
+                    }}
+                    className={`w-full border rounded-lg pl-10 pr-4 py-2 text-sm bg-white focus:ring-2 focus:ring-[#0F4C75] focus:outline-none ${
+                      !studentIdValid ? "border-red-500 bg-red-50" : ""
+                    }`}
+                    placeholder="เช่น 12345678901-2"
                     aria-label="รหัสนักศึกษา"
                   />
                 </div>
+                {!studentIdValid && (
+                  <p className="text-red-500 text-xs mt-1">รหัสนักศึกษาต้องเป็น 13 หลัก (รูปแบบ: 12345678901-2)</p>
+                )}
               </div>
 
               {/* อีเมล */}
@@ -244,12 +278,23 @@ const Register = () => {
                     id="phone"
                     name="phone"
                     value={phone}
-                    onChange={(e) => setStudentPhone(e.target.value)}
-                    className="w-full border rounded-lg pl-10 pr-4 py-2 text-sm bg-white focus:ring-2 focus:ring-[#0F4C75] focus:outline-none"
+                    maxLength={10}
+                    onChange={(e) => {
+                      // กรองให้กรอกได้เฉพาะตัวเลข
+                      const value = e.target.value.replace(/\D/g, '');
+                      setStudentPhone(value);
+                      setPhoneValid(true);
+                    }}
+                    className={`w-full border rounded-lg pl-10 pr-4 py-2 text-sm bg-white focus:ring-2 focus:ring-[#0F4C75] focus:outline-none ${
+                      !phoneValid ? "border-red-500 bg-red-50" : ""
+                    }`}
                     placeholder="กรุณากรอกเบอร์โทร"
                     aria-label="เบอร์โทร"
                   />
                 </div>
+                {!phoneValid && (
+                  <p className="text-red-500 text-xs mt-1">กรุณากรอกเบอร์โทรให้ครบ 10 หลัก</p>
+                )}
               </div>
 
               {/* บทบาท */}
