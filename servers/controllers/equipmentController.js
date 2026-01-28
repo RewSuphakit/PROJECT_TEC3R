@@ -23,24 +23,86 @@ exports.addEquipment = async (req, res) => {
   }
 };
 
-// ดึงข้อมูลอุปกรณ์ทั้งหมด (ต้อง login)
+// ดึงข้อมูลอุปกรณ์ทั้งหมด (ต้อง login) - รองรับ pagination
 exports.getAllEquipment = async (req, res) => {
   try {
-    const query = 'SELECT equipment_id, equipment_name, total_quantity, available_quantity, status, image, created_at, updated_at FROM equipment';
-    const [results] = await promisePool.query(query);
-    res.status(200).json({ equipment: results });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    // นับจำนวนทั้งหมด
+    const [countResult] = await promisePool.query('SELECT COUNT(*) as total FROM equipment');
+    const totalCount = countResult[0].total;
+    const totalPages = Math.ceil(totalCount / limit);
+
+    // ดึงข้อมูลตาม pagination
+    const query = `
+      SELECT equipment_id, equipment_name, total_quantity, available_quantity, status, image, created_at, updated_at 
+      FROM equipment 
+      ORDER BY updated_at DESC 
+      LIMIT ? OFFSET ?
+    `;
+    const [results] = await promisePool.query(query, [limit, offset]);
+
+    res.status(200).json({
+      equipment: results,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        limit
+      }
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
   }
 };
 
-// ดึงข้อมูลอุปกรณ์สำหรับ Public (ไม่ต้อง login) - เฉพาะอุปกรณ์ที่ Available
+// ดึงข้อมูลอุปกรณ์สำหรับ Public (ไม่ต้อง login) - เฉพาะอุปกรณ์ที่ Available - รองรับ pagination
 exports.getPublicEquipment = async (req, res) => {
   try {
-    const query = 'SELECT equipment_id, equipment_name, total_quantity, available_quantity, image, status, updated_at FROM equipment WHERE status = ? AND available_quantity > 0';
-    const [results] = await promisePool.query(query, ['Available']);
-    res.status(200).json({ equipment: results });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    const search = req.query.search || '';
+
+    // สร้างเงื่อนไข search
+    let whereClause = 'WHERE status = ? AND available_quantity > 0';
+    let queryParams = ['Available'];
+
+    if (search) {
+      whereClause += ' AND equipment_name LIKE ?';
+      queryParams.push(`%${search}%`);
+    }
+
+    // นับจำนวนทั้งหมด (ตาม filter)
+    const [countResult] = await promisePool.query(
+      `SELECT COUNT(*) as total FROM equipment ${whereClause}`,
+      queryParams
+    );
+    const totalCount = countResult[0].total;
+    const totalPages = Math.ceil(totalCount / limit);
+
+    // ดึงข้อมูลตาม pagination
+    const query = `
+      SELECT equipment_id, equipment_name, total_quantity, available_quantity, image, status, updated_at 
+      FROM equipment 
+      ${whereClause}
+      ORDER BY updated_at DESC 
+      LIMIT ? OFFSET ?
+    `;
+    const [results] = await promisePool.query(query, [...queryParams, limit, offset]);
+
+    res.status(200).json({
+      equipment: results,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        limit
+      }
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });

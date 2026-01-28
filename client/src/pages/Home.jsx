@@ -14,9 +14,12 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function Home() {
   const { user, fetchBorrowItems } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [equipment, setEquipment] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10); // จำนวนต่อหน้า
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const itemsPerPage = 10; // จำนวนต่อหน้า
 
   // ======= LocalStorage helper แยกตาม user_id =======
   const getBorrowItems = () => {
@@ -38,37 +41,61 @@ function Home() {
     localStorage.setItem('borrowItems', JSON.stringify(allItems));
   };
 
-  // ======= ดึงข้อมูลอุปกรณ์ =======
-  // ใช้ public endpoint สำหรับ Guest, protected endpoint สำหรับ User ที่ login แล้ว
-  const fetchEquipment = async () => {
+  // ======= ดึงข้อมูลอุปกรณ์ (Server-side Pagination) =======
+  const fetchEquipment = async (page = 1, search = '') => {
     try {
+      setIsLoading(true);
       const token = localStorage.getItem('token');
       let response;
       
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: itemsPerPage.toString(),
+        ...(search && { search })
+      });
+      
       if (token) {
         // ถ้า login แล้ว ใช้ protected endpoint
-        response = await axios.get(`${apiUrl}/api/equipment/equipment`, {
+        response = await axios.get(`${apiUrl}/api/equipment/equipment?${params}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        const sortedEquipment = response.data.equipment || [];
-        const equipmentAvailable = sortedEquipment.filter(record => record.status === 'Available');
-        setEquipment(equipmentAvailable);
-        sortedEquipment.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
       } else {
-        // ถ้ายังไม่ login ใช้ public endpoint (ได้เฉพาะ Available)
-        response = await axios.get(`${apiUrl}/api/equipment/public`);
-        const sortedEquipment = response.data.equipment || [];
-        setEquipment(sortedEquipment);
-        sortedEquipment.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+        // ถ้ายังไม่ login ใช้ public endpoint
+        response = await axios.get(`${apiUrl}/api/equipment/public?${params}`);
       }
+      
+      const equipmentData = response.data.equipment || [];
+      const pagination = response.data.pagination || { totalPages: 1, currentPage: 1 };
+      
+      // กรอง status === 'Available' สำหรับ logged-in user
+      if (token) {
+        const availableEquipment = equipmentData.filter(record => record.status === 'Available');
+        setEquipment(availableEquipment);
+      } else {
+        setEquipment(equipmentData);
+      }
+      
+      setTotalPages(pagination.totalPages || 1);
     } catch (error) {
       console.error('Error fetching equipment:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  // Debounce search query (300ms)
   useEffect(() => {
-    fetchEquipment();
-  }, [user]); // เพิ่ม user เป็น dependency เพื่อ refetch เมื่อ login/logout
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setCurrentPage(1); // Reset to page 1 when search changes
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Fetch data when page, search, or user changes
+  useEffect(() => {
+    fetchEquipment(currentPage, debouncedSearch);
+  }, [currentPage, debouncedSearch, user]);
 
   useEffect(() => {
     AOS.init({ duration: 1000 });
@@ -149,7 +176,7 @@ function Home() {
           icon: "success",
         });
         removeBorrowItems();
-        await fetchEquipment();
+        await fetchEquipment(currentPage, debouncedSearch);
         await fetchBorrowItems();
       } else if (result.isDenied) {
         removeBorrowItems();
@@ -264,7 +291,7 @@ function Home() {
             icon: "success",
           });
           removeBorrowItems();
-          await fetchEquipment();
+          await fetchEquipment(currentPage, debouncedSearch);
           await fetchBorrowItems();
         }
       } else if (result.isDenied) {
@@ -275,16 +302,7 @@ function Home() {
     }
   };
 
-  // ======= Filter และ Pagination =======
-  const filteredEquipment = equipment.filter(item =>
-    item.equipment_name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredEquipment.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredEquipment.length / itemsPerPage);
-  const loadingData = equipment.length === 0;
+  const loadingData = isLoading || equipment.length === 0;
   return (
     <div style={{ backgroundImage: `url(${bg2})`,
       backgroundSize: 'cover',
@@ -343,8 +361,8 @@ function Home() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
             {loadingData ? (
               <div className="col-span-full text-center text-gray-500">กำลังโหลดข้อมูล...</div>
-            ) : currentItems.length > 0 ? (
-              currentItems.map((item) => (
+            ) : equipment.length > 0 ? (
+              equipment.map((item) => (
                 <div key={item.equipment_id} className="relative bg-white border rounded-lg shadow-md transform transition duration-500 hover:scale-105 flex flex-col h-full">
                   <div className="aspect-w-16 aspect-h-9 p-2">
                     <img
