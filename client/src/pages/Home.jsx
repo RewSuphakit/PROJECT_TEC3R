@@ -341,8 +341,8 @@ function Home() {
               <div className="col-span-full text-center text-gray-500">กำลังโหลดข้อมูล...</div>
             ) : currentItems.length > 0 ? (
               currentItems.map((item) => (
-                <div key={item.equipment_id} className="relative bg-white border rounded-lg shadow-md transform transition duration-500 hover:scale-105 flex flex-col h-full">
-                  <div className="w-full h-48 bg-white rounded-t-lg overflow-hidden flex items-center justify-center p-4">
+                <div key={item.equipment_id} className="relative bg-white border rounded-lg shadow-md transform transition duration-500 hover:scale-105">
+                  <div className="aspect-w-16 aspect-h-9 p-2">
                     <img
                       className="max-h-full max-w-full object-contain"
                       src={item.image ? `${apiUrl}/uploads/${item.image.replace(/\\/g, "/")}` : null}
@@ -350,15 +350,15 @@ function Home() {
                       loading="lazy"
                     />
                   </div>
-                  <div className="px-4 pb-3 flex flex-col flex-1">
-                    <h5 className="text-base sm:text-lg tracking-tight hover:text-sky-700 text-gray-900 line-clamp-2 h-[3.5rem] overflow-hidden" title={item.equipment_name}>
+                  <div className="px-4 pb-3">
+                    <h5 className="text-base sm:text-lg tracking-tight hover:text-sky-700 text-gray-900">
                       {item.equipment_name}
                     </h5>
                     <p className="text-sm text-gray-600 truncate">จำนวนคงเหลือ {item.available_quantity}</p>
                     <p className="text-xs text-gray-500 mt-2 truncate">อัพเดทเมื่อ: {new Date(item.updated_at).toLocaleString()}</p>
                     <hr className="w-full max-w-[12rem] h-1 mx-auto my-4 bg-gray-100 border-0 rounded" />
-                    <div className="text-center pb-2 mt-auto">
-                      {item.available_quantity === 0 ? (
+                    <div className="text-center pb-2">
+                      {item.quantity === 0 ? (
                         <button className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-medium text-white rounded-md shadow-sm bg-red-300 cursor-not-allowed">
                           หมด
                         </button>
