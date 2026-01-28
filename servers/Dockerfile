@@ -8,6 +8,8 @@ RUN npm install
 
 COPY . .
 
+RUN mkdir app/uploads && mkdir app/image_return
+
 EXPOSE 8000
 
 # CMD ["node", "index.js"]
