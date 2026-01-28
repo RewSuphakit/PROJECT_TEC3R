@@ -1,6 +1,6 @@
 
 import icon from '../assets/rmutikkc.png'
-import qrCode from '../assets/Ozff.png'
+import qrCode from '../assets/linePbig.jpg'
 import { createPortal } from 'react-dom';
 
 const ContactAdminModal = ({ isOpen, onClose }) => {
