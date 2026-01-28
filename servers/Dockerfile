@@ -6,9 +6,10 @@ COPY package*.json ./
 
 RUN npm install
 
+RUN mkdir uploads/ && mkdir image_return/
+
 COPY . .
 
-RUN mkdir app/uploads && mkdir app/image_return
 
 EXPOSE 8000
 
