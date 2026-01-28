@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 import ScrollToTopButton from '../components/ScrollToTopButton';
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function Home() {
-  const { user, fetchBorrowItems } = useAuth();
+  const { user, fetchBorrowRecords } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [equipment, setEquipment] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -94,7 +94,7 @@ function Home() {
   const confirmBorrowFromStorage = async () => {
     try {
       const items = getBorrowItems();
-      const pendingCount = items.reduce((sum, item) => sum + item.quantity, 0);
+      const pendingCount = items.reduce((sum, item) => sum + item.quantity_borrow, 0);
 
       if (items.length === 0) {
         return Swal.fire({
@@ -134,7 +134,7 @@ function Home() {
 
       if (result.isConfirmed) {
         await axios.post(
-          `${apiUrl}/api/borrow/add`,
+          `${apiUrl}/api/borrowRecords/add`,
           { user_id: user.user_id, items },
           { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
         );
@@ -145,7 +145,7 @@ function Home() {
         });
         removeBorrowItems();
         await fetchEquipment();
-        await fetchBorrowItems();
+        await fetchBorrowRecords();
       } else if (result.isDenied) {
         removeBorrowItems();
         await swalWithBootstrapButtons.fire({
@@ -173,7 +173,7 @@ function Home() {
       });
 
       const pendingItems = getBorrowItems();
-      const pendingCount = pendingItems.reduce((sum, item) => sum + item.quantity, 0);
+      const pendingCount = pendingItems.reduce((sum, item) => sum + item.quantity_borrow, 0);
 
       const result = await swalWithBootstrapButtons.fire({
         title: `ยืมอุปกรณ์ ${title}`,
@@ -210,7 +210,7 @@ function Home() {
         const existingIndex = items.findIndex((item) => Number(item.equipment_id) === equipmentId);
 
         if (existingIndex !== -1) {
-          const newTotal = items[existingIndex].quantity + quantityToBorrow;
+          const newTotal = items[existingIndex].quantity_borrow + quantityToBorrow;
           if (newTotal > quantity) {
             return swalWithBootstrapButtons.fire({
               title: "จำนวนเกิน!",
@@ -218,7 +218,7 @@ function Home() {
               icon: "error",
             });
           }
-          items[existingIndex].quantity = newTotal;
+          items[existingIndex].quantity_borrow = newTotal;
         } else {
           if (quantityToBorrow > quantity) {
             return swalWithBootstrapButtons.fire({
@@ -227,7 +227,7 @@ function Home() {
               icon: "error",
             });
           }
-          items.push({ equipment_id: equipmentId, quantity: quantityToBorrow });
+          items.push({ equipment_id: equipmentId, quantity_borrow: quantityToBorrow });
         }
 
         setBorrowItems(items);
@@ -244,7 +244,7 @@ function Home() {
 
         if (confirmBorrow.isConfirmed) {
           await axios.post(
-            `${apiUrl}/api/borrow/add`,
+            `${apiUrl}/api/borrowRecords/add`,
             { user_id: user.user_id, items },
             { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
           );
@@ -255,7 +255,7 @@ function Home() {
           });
           removeBorrowItems();
           await fetchEquipment();
-          await fetchBorrowItems();
+          await fetchBorrowRecords();
         }
       } else if (result.isDenied) {
         await confirmBorrowFromStorage();
@@ -344,18 +344,20 @@ function Home() {
                 <div key={item.equipment_id} className="relative bg-white border rounded-lg shadow-md transform transition duration-500 hover:scale-105">
                   <div className="aspect-w-16 aspect-h-9 p-2">
                     <img
-                      className="max-h-full max-w-full object-contain"
+                      className="rounded-md min-w-[100px] min-h-[100px] object-cover object-center"
                       src={item.image ? `${apiUrl}/uploads/${item.image.replace(/\\/g, "/")}` : null}
                       alt={item.equipment_id}
                       loading="lazy"
+                      width="200"
+                      height="200"
                     />
                   </div>
                   <div className="px-4 pb-3">
                     <h5 className="text-base sm:text-lg tracking-tight hover:text-sky-700 text-gray-900">
                       {item.equipment_name}
                     </h5>
-                    <p className="text-sm text-gray-600 truncate">จำนวนคงเหลือ {item.available_quantity}</p>
-                    <p className="text-xs text-gray-500 mt-2 truncate">อัพเดทเมื่อ: {new Date(item.updated_at).toLocaleString()}</p>
+                    <p className="text-sm text-gray-600 break-all">จำนวนคงเหลือ {item.quantity}</p>
+                    <p className="text-xs text-gray-500 mt-2">อัพเดทเมื่อ: {new Date(item.timeupdate).toLocaleString()}</p>
                     <hr className="w-full max-w-[12rem] h-1 mx-auto my-4 bg-gray-100 border-0 rounded" />
                     <div className="text-center pb-2">
                       {item.quantity === 0 ? (
@@ -364,7 +366,7 @@ function Home() {
                         </button>
                       ) : user?.user_id ? (
                         <button
-                          onClick={() => handleClick(item.equipment_id, item.equipment_name, item.image, item.available_quantity)}
+                          onClick={() => handleClick(item.equipment_id, item.equipment_name, item.image, item.quantity)}
                           className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-medium text-white rounded-md shadow-sm bg-[#1B262C] hover:bg-[#273A45] focus:ring-offset-2"
                         >
                           ยืมอุปกรณ์
