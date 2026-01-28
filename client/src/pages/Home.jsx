@@ -342,14 +342,12 @@ function Home() {
             ) : currentItems.length > 0 ? (
               currentItems.map((item) => (
                 <div key={item.equipment_id} className="relative bg-white border rounded-lg shadow-md transform transition duration-500 hover:scale-105 flex flex-col h-full">
-                  <div className="aspect-w-16 aspect-h-9 p-2">
+                  <div className="w-full h-48 bg-white rounded-t-lg overflow-hidden flex items-center justify-center p-4">
                     <img
-                      className="rounded-md min-w-[100px] min-h-[100px] object-cover object-center"
+                      className="max-h-full max-w-full object-contain"
                       src={item.image ? `${apiUrl}/uploads/${item.image.replace(/\\/g, "/")}` : null}
                       alt={item.equipment_id}
                       loading="lazy"
-                      width="200"
-                      height="200"
                     />
                   </div>
                   <div className="px-4 pb-3 flex flex-col flex-1">
