@@ -70,7 +70,7 @@ exports.login = async (req, res) => {
         }
 
         if (results.length === 0) {
-          return res.status(400).json({ msg: 'Invalid credentials' });
+          return res.status(400).json({ msg: 'ชื่อหรือรหัสผ่านไม่ถูกต้อง' });
         }
 
         const user = results[0];
@@ -78,7 +78,7 @@ exports.login = async (req, res) => {
         // ตรวจสอบรหัสผ่าน
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-          return res.status(400).json({ msg: 'Invalid credentials' });
+          return res.status(400).json({ msg: 'ชื่อหรือรหัสผ่านไม่ถูกต้อง' });
         }
 
         // สร้าง JWT payload

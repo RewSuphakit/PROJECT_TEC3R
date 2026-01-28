@@ -29,12 +29,12 @@ const Login = () => {
     e.preventDefault();
 
     if (!student_email || !password) {
-      toast.warn('กรุณากรอกข้อมูลให้ครบทุกช่อง', { position: 'top-center' });
+      toast.warn('กรุณากรอกข้อมูลให้ครบทุกช่อง', { position: 'top-right' });
       return;
     }
   
     if (!validateEmail(student_email)) {
-      toast.warn('กรุณาใช้อีเมล @rmuti.ac.th เท่านั้น', { position: 'top-center' });
+      toast.warn('กรุณาใช้อีเมล @rmuti.ac.th เท่านั้น', { position: 'top-right' });
       return;
     }
 
@@ -64,7 +64,7 @@ const Login = () => {
     <div>เข้าสู่ระบบสำเร็จ</div>
   </div>,
   {
-    position: "top-center",
+    position: "top-right",
     autoClose: 3000,
     type: "success",
   }
@@ -75,12 +75,33 @@ const Login = () => {
         throw new Error('Failed to log in. Please try again.');
       }
     } catch (error) {
-      // ปรับปรุง Error Handling - แสดงข้อความจาก Backend
-      const errorMessage = error.response?.data?.msg || 
-                           error.response?.data?.message || 
-                           error.response?.data?.error ||
-                           'ชื่อหรือรหัสผ่านไม่ถูกต้อง กรุณาลองอีกครั้ง';
-      toast.error(errorMessage, { position: 'top-center' });
+      // ดักจับ Error ตาม status code
+      if (error.response) {
+        const status = error.response.status;
+        const errorMessage = error.response.data?.msg || 
+                             error.response.data?.message || 
+                             error.response.data?.error;
+
+        if (status === 400) {
+          // Error 400: Bad Request - ข้อมูลไม่ถูกต้อง (เช่น อีเมลหรือรหัสผ่านผิด)
+          toast.error(errorMessage || 'ชื่อหรือรหัสผ่านไม่ถูกต้อง', { position: 'top-right' });
+        } else if (status === 401) {
+          // Error 401: Unauthorized
+          toast.error('ไม่ได้รับอนุญาต กรุณาเข้าสู่ระบบใหม่', { position: 'top-right' });
+        } else if (status === 500) {
+          // Error 500: Server Error
+          toast.error('เกิดข้อผิดพลาดจากเซิร์ฟเวอร์ กรุณาลองใหม่ภายหลัง', { position: 'top-right' });
+        } else {
+          // Other errors
+          toast.error(errorMessage || 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง', { position: 'top-right' });
+        }
+      } else if (error.request) {
+        // ไม่ได้รับ response จาก server (เช่น network error)
+        toast.error('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต', { position: 'top-right' });
+      } else {
+        // Error อื่นๆ
+        toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง', { position: 'top-right' });
+      }
     } finally {
       setIsLoading(false); // หยุด Loading
     }

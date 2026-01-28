@@ -1,12 +1,10 @@
 import logoTec from '../assets/LOGGG.png'
-
 import register from '../assets/register.png'
-import icon from '../assets/rmutikkc.png'
 import ContactAdminModal from './ContactAdminModal';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import useAuth from '../hooks/useAuth';
-import axios from 'axios';
+
 function Header() {
   const navigate = useNavigate();
   const { user, logout,borrowedCount} = useAuth();
@@ -29,14 +27,14 @@ function Header() {
       <p className='text-wrap'>ชื่อผู้ใช้: {user?.student_name}</p>
     </Link>
   </li>
-  <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2 text-wrap">
+  <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
     <Link to ="/RMUTI/EditEmail" className="flex items-center gap-3">
       <img
         className="w-6 h-6"
         src="https://img.icons8.com/?size=100&id=59835&format=png&color=374151"
         alt="email icon"
       />
-      อีเมล: {user?.student_email}
+     <p className='text-wrap'> อีเมล: {user?.student_email}</p>
     </Link>
   </li>
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
@@ -69,7 +67,7 @@ function Header() {
         src="https://img.icons8.com/?size=100&id=2817&format=png&color=374151"
         alt="contact admin icon"
       />
-      ติดต่อแอดมิน
+      ติดต่อผู้ดูแลระบบ
     </button>
   </li>
 
