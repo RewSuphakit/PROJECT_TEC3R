@@ -353,11 +353,11 @@ function Home() {
                     />
                   </div>
                   <div className="px-4 pb-3 flex flex-col flex-1">
-                    <h5 className="text-base sm:text-lg tracking-tight hover:text-sky-700 text-gray-900 line-clamp-2 min-h-[3.5em]">
+                    <h5 className="text-base sm:text-lg tracking-tight hover:text-sky-700 text-gray-900 line-clamp-2 h-[3.5rem] overflow-hidden" title={item.equipment_name}>
                       {item.equipment_name}
                     </h5>
-                    <p className="text-sm text-gray-600 break-all">จำนวนคงเหลือ {item.quantity}</p>
-                    <p className="text-xs text-gray-500 mt-2">อัพเดทเมื่อ: {new Date(item.timeupdate).toLocaleString()}</p>
+                    <p className="text-sm text-gray-600 truncate">จำนวนคงเหลือ {item.quantity}</p>
+                    <p className="text-xs text-gray-500 mt-2 truncate">อัพเดทเมื่อ: {new Date(item.timeupdate).toLocaleString()}</p>
                     <hr className="w-full max-w-[12rem] h-1 mx-auto my-4 bg-gray-100 border-0 rounded" />
                     <div className="text-center pb-2 mt-auto">
                       {item.quantity === 0 ? (
