@@ -302,7 +302,7 @@ function Home() {
             src={bg} 
             alt="Background" 
             className="w-full h-full object-cover"
-            fetchPriority="high"
+            fetchpriority="high"
           />
           <div className="absolute inset-0 bg-black/40" /> {/* Dim overlay */}
         </div>
