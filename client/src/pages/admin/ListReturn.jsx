@@ -13,6 +13,7 @@ function ListReturn() {
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const groupsPerPage = 5;
   const [openGroups, setOpenGroups] = useState([]);
   const [imageModalOpen, setImageModalOpen] = useState(false);
@@ -59,51 +60,57 @@ function ListReturn() {
     }
   };
 
-  useEffect(() => {
-    const fetchReturnRecords = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`${apiUrl}/api/borrow/all`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (response.data && Array.isArray(response.data.borrow_transactions)) {
-          const filteredTransactions = response.data.borrow_transactions.filter(
-            (transaction) =>
-              transaction.borrow_items.every(
-                (item) => item.status.toLowerCase() === "returned"
-              )
-          );
-
-          const flattenedRecords = [];
-          filteredTransactions.forEach((transaction) => {
-            transaction.borrow_items.forEach((item, index) => {
-              flattenedRecords.push({
-                groupId: transaction.transaction_id,
-                item_id: `${transaction.transaction_id}-${index}`,
-                student_name: transaction.student_name,
-                equipment_name: item.equipment_name,
-                quantity: item.quantity,
-                status: item.status,
-                image_return: item.image_return,
-                returned_at: item.returned_at,
-              });
+  // Fetch returned items with server-side pagination
+  const fetchReturnedItems = async (page = 1) => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: groupsPerPage.toString()
+      });
+      const response = await axios.get(`${apiUrl}/api/borrow/returned?${params}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.data && response.data.returned_items) {
+        // แปลงข้อมูลจาก API ให้ตรงกับ format ที่ใช้แสดงผล
+        const flattenedRecords = [];
+        response.data.returned_items.forEach((transaction) => {
+          transaction.items.forEach((item, index) => {
+            flattenedRecords.push({
+              groupId: transaction.transaction_id,
+              item_id: `${transaction.transaction_id}-${index}`,
+              student_name: transaction.student_name,
+              equipment_name: item.equipment_name,
+              quantity: item.quantity,
+              status: item.status,
+              image_return: item.image_return,
+              returned_at: item.returned_at,
             });
           });
-
-          setTools(flattenedRecords);
-        } else {
-          toast.error("ข้อมูลที่ได้รับไม่ถูกต้อง");
-        }
-      } catch (error) {
-        console.error("Error fetching returned records:", error);
-        toast.error("เกิดข้อผิดพลาดในการดึงข้อมูล");
-      } finally {
-        setLoading(false);
+        });
+        setTools(flattenedRecords);
+        
+        const pagination = response.data.pagination || { totalPages: 1 };
+        setTotalPages(pagination.totalPages || 1);
+      } else {
+        setTools([]);
+        setTotalPages(1);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching returned records:", error);
+      toast.error("เกิดข้อผิดพลาดในการดึงข้อมูล");
+      setTools([]);
+      setTotalPages(1);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchReturnRecords();
-  }, []);
+  useEffect(() => {
+    fetchReturnedItems(currentPage);
+  }, [currentPage]);
 
   // จัดกลุ่มข้อมูลตาม transaction_id
   const groupedRecords = useMemo(() => {
@@ -124,12 +131,8 @@ function ListReturn() {
     );
   }, [groupedRecords]);
 
-  // Pagination สำหรับกลุ่ม
-  const totalPages = Math.ceil(groupKeys.length / groupsPerPage);
-  const currentGroupKeys = groupKeys.slice(
-    (currentPage - 1) * groupsPerPage,
-    currentPage * groupsPerPage
-  );
+  // ใช้ groupKeys โดยตรง (ไม่ต้อง slice ที่ client)
+  const currentGroupKeys = groupKeys;
 
   // ฟังก์ชันเปิด/ปิด dropdown ของกลุ่ม
   const toggleGroup = (groupId) => {

@@ -7,11 +7,14 @@ import { toast } from 'react-toastify';
 import bg2 from '../assets/bg2.png';
 
 function Return() {
-  const { borrowedBooks, fetchBorrowItems } = useAuth();
+  const { user, fetchBorrowItems } = useAuth();
+  const [borrowedBooks, setBorrowedBooks] = useState([]);
   const [images, setImages] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const tableContainerRef = useRef(null);
+  const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
   // Dynamic calculation for perfect full-screen fit
   useEffect(() => {
@@ -50,13 +53,47 @@ function Return() {
     };
   }, []);
 
-  const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
+  // Fetch borrowed items with pagination
+  const fetchBorrowedItems = async (page = 1, limit = itemsPerPage) => {
+    if (!user?.user_id) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        status: 'Borrowed' // Only fetch non-returned items
+      });
+      
+      const response = await axios.get(
+        `${apiUrl}/api/borrow/all/${user.user_id}?${params}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const { data } = response.data;
+      const borrowedItems = (data.borrow_items || []).filter(
+        (item) => item.status !== 'Returned'
+      );
+      
+      setBorrowedBooks(borrowedItems);
+      
+      // For client-side pagination (งานเดิม), ไม่มี pagination จาก server
+      // ถ้าต้องการ implement server-side pagination ต้องแก้ backend getBorrowsByUserId
+      setTotalPages(Math.ceil(borrowedItems.length / limit));
+    } catch (error) {
+      console.error('Error fetching borrow items:', error.message);
+      setBorrowedBooks([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchBorrowedItems(currentPage, itemsPerPage);
+  }, [user, currentPage, itemsPerPage]);
   
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = borrowedBooks.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(borrowedBooks.length / itemsPerPage);
 
   const handleCaptureImage = (capturedImage, itemId) => {
     setImages((prevCapturedImages) => ({
@@ -88,7 +125,8 @@ function Return() {
         },
       });
       toast.success('คืนอุปกรณ์สำเร็จเรียบร้อย');
-      await fetchBorrowItems();
+      await fetchBorrowItems(); // Update AuthContext
+      await fetchBorrowedItems(currentPage, itemsPerPage); // Refresh local data
     } catch (error) {
       console.error('Error returned equipment:', error);
       toast.warn('เกิดข้อผิดพลาดในการคืนอุปกรณ์');

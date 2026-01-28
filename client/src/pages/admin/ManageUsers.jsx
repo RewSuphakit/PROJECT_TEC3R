@@ -12,6 +12,8 @@ function ManageUsers() {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const usersPerPage = 7;
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -33,25 +35,36 @@ function ManageUsers() {
     return null;
   };
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (page = 1) => {
+    setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: usersPerPage.toString()
+      });
       const response = await axios.get(
-        `${apiUrl}/api/users/users`,
+        `${apiUrl}/api/users/users?${params}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
       setUsers(Array.isArray(response.data.users) ? response.data.users : []);
+      const pagination = response.data.pagination || { totalPages: 1 };
+      setTotalPages(pagination.totalPages || 1);
     } catch (error) {
       console.error("Error fetching users:", error);
       toast.error("เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้");
       setUsers([]);
+      setTotalPages(1);
+    } finally {
+      setIsLoading(false);
     }
   };
+
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    fetchUsers(currentPage);
+  }, [currentPage]);
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -169,11 +182,8 @@ function ManageUsers() {
     setUserToEdit(null);
   };
 
-  const currentUsers = (users ?? []).slice(
-    (currentPage - 1) * usersPerPage,
-    currentPage * usersPerPage
-  );
-  const totalPages = Math.ceil(users.length / usersPerPage);
+  // ใช้ users จาก server โดยตรง (ไม่ต้อง slice ที่ client)
+  const currentUsers = users ?? [];
 
   return (
     <div style={{ 

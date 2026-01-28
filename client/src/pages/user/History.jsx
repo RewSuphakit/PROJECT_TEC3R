@@ -9,48 +9,53 @@ function History() {
   const [history, setHistory] = useState([]);
   const [apiLoading, setApiLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
   const [filter, setFilter] = useState("all");
+  const itemsPerPage = 10;
 
+  // Fetch history with pagination and filter
+  const fetchHistory = async (page = 1, filterValue = "all") => {
+    if (!user?.user_id) return;
+    setApiLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: itemsPerPage.toString(),
+        filter: filterValue
+      });
+      const response = await axios.get(
+        `${apiUrl}/api/borrow/history/${user.user_id}?${params}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setHistory(response.data.history || []);
+      const pagination = response.data.pagination || { totalPages: 1 };
+      setTotalPages(pagination.totalPages || 1);
+    } catch (err) {
+      console.error("Error fetching history:", err);
+      setHistory([]);
+      setTotalPages(1);
+    } finally {
+      setApiLoading(false);
+    }
+  };
+
+  // Fetch when page, filter, or user changes
   useEffect(() => {
-    const fetchHistory = async () => {
-      if (!user?.user_id) return;
-      setApiLoading(true);
-      try {
-        const token = localStorage.getItem("token");
-        const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
-        const response = await axios.get(
-          `${apiUrl}/api/borrow/history/${user.user_id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setHistory(response.data.history || []);
-      } catch (err) {
-        console.error("Error fetching history:", err);
-        setHistory([]);
-      } finally {
-        setApiLoading(false);
-      }
-    };
-    fetchHistory();
-  }, [user]);
+    fetchHistory(currentPage, filter);
+  }, [currentPage, filter, user]);
 
-  // กรองข้อมูลตามสถานะ
-  const filteredHistory =
-    filter === "all"
-      ? history
-      : history.filter((record) =>
-          filter === "borrowed"
-            ? record.status !== "Returned"
-            : record.status === "Returned"
-        );
+  // Reset to page 1 when filter changes
+  const handleFilterChange = (newFilter) => {
+    setFilter(newFilter);
+    setCurrentPage(1);
+  };
 
-  // การแบ่งหน้า
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredHistory.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredHistory.length / itemsPerPage);
+  // ใช้ history โดยตรง (ไม่ต้อง filter/slice ที่ client)
+  const currentItems = history;
 
   return (
     <div
@@ -79,7 +84,7 @@ function History() {
                 ? "bg-blue-500 text-white shadow-md"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
-            onClick={() => setFilter("all")}
+            onClick={() => handleFilterChange("all")}
           >
             ทั้งหมด
           </button>
@@ -89,7 +94,7 @@ function History() {
                 ? "bg-red-500 text-white shadow-md"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
-            onClick={() => setFilter("borrowed")}
+            onClick={() => handleFilterChange("borrowed")}
           >
             ยังไม่คืน
           </button>
@@ -99,7 +104,7 @@ function History() {
                 ? "bg-green-500 text-white shadow-md"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
-            onClick={() => setFilter("returned")}
+            onClick={() => handleFilterChange("returned")}
           >
             คืนแล้ว
           </button>

@@ -49,75 +49,79 @@ function Report() {
   const [tempYear, setTempYear] = useState(currentYear);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const itemsPerPage = 7;
 
-  useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`${apiUrl}/api/borrow/all`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (response.data && Array.isArray(response.data.borrow_transactions)) {
-          // แปลงข้อมูลจาก borrow_transactions เป็นรูปแบบที่ใช้แสดงผล
-          const allRecords = [];
-          response.data.borrow_transactions.forEach(transaction => {
-            transaction.borrow_items.forEach(item => {
-              allRecords.push({
-                item_id: item.item_id,
-                transaction_id: transaction.transaction_id,
-                student_name: transaction.student_name,
-                student_id: transaction.student_id || '',
-                equipment_name: item.equipment_name,
-                quantity: item.quantity,
-                borrow_date: transaction.borrow_date,
-                borrow_date_iso: transaction.borrow_date,
-                returned_at: item.returned_at,
-                status: item.status,
-                image_return: item.image_return
-              });
+  const fetchReports = async (page = 1) => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: itemsPerPage.toString()
+      });
+      
+      // เพิ่ม month/year ถ้ามีการ filter
+      if (selectedMonth !== null) {
+        params.append('month', selectedMonth.toString());
+        params.append('year', selectedYear.toString());
+      }
+      
+      const response = await axios.get(`${apiUrl}/api/borrow/all?${params}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.data && Array.isArray(response.data.borrow_transactions)) {
+        // แปลงข้อมูลจาก borrow_transactions เป็นรูปแบบที่ใช้แสดงผล
+        const allRecords = [];
+        response.data.borrow_transactions.forEach(transaction => {
+          transaction.borrow_items.forEach(item => {
+            allRecords.push({
+              item_id: item.item_id,
+              transaction_id: transaction.transaction_id,
+              student_name: transaction.student_name,
+              student_id: transaction.student_id || '',
+              equipment_name: item.equipment_name,
+              quantity: item.quantity,
+              borrow_date: transaction.borrow_date,
+              borrow_date_iso: transaction.borrow_date,
+              returned_at: item.returned_at,
+              status: item.status,
+              image_return: item.image_return
             });
           });
-          
-          // เรียงลำดับจากล่าสุดไปเก่าสุด
-          allRecords.sort((a, b) => new Date(b.borrow_date_iso) - new Date(a.borrow_date_iso));
-          
-          setReports(allRecords);
-        }
-      } catch (err) {
-        console.error("Error fetching report results:", err);
-        setError("ไม่สามารถโหลดข้อมูลรายงานได้ กรุณาลองใหม่อีกครั้ง");
-        toast.error("เกิดข้อผิดพลาดในการโหลดข้อมูล");
-      } finally {
-        setLoading(false);
+        });
+        
+        setReports(allRecords);
+        
+        const pagination = response.data.pagination || { totalPages: 1, totalCount: 0 };
+        setTotalPages(pagination.totalPages || 1);
+        setTotalCount(pagination.totalCount || 0);
       }
-    };
+    } catch (err) {
+      console.error("Error fetching report results:", err);
+      setError("ไม่สามารถโหลดข้อมูลรายงานได้ กรุณาลองใหม่อีกครั้ง");
+      toast.error("เกิดข้อผิดพลาดในการโหลดข้อมูล");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchReports();
-  }, []);
-
-  // กรองรายงานตามเดือนและปีที่เลือก
-  const filteredReports = selectedMonth !== null
-    ? reports.filter(report => {
-        const reportDate = new Date(report.borrow_date_iso || report.borrow_date);
-        return (
-          reportDate.getFullYear() === selectedYear &&
-          reportDate.getMonth() === selectedMonth
-        );
-      })
-    : reports;
+  useEffect(() => {
+    fetchReports(currentPage);
+  }, [currentPage, selectedMonth, selectedYear]);
 
   // Reset page when filter changes
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedMonth, selectedYear]);
 
-  // Pagination Logic
-  const totalPages = Math.ceil(filteredReports.length / itemsPerPage);
-  const currentItems = filteredReports.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  // ใช้ reports โดยตรง (ไม่ต้อง filter ที่ client)
+  const filteredReports = reports;
+
+  // Pagination Logic - ไม่ต้อง slice ที่ client
+  const currentItems = reports;
 
   const openModal = () => {
     setTempMonth(selectedMonth);
@@ -164,10 +168,46 @@ function Report() {
 
   const handleExportPDF = async () => {
     try {
-      if (!filteredReports || filteredReports.length === 0) {
+      // ดึงข้อมูลทั้งหมดสำหรับ export
+      const token = localStorage.getItem('token');
+      const params = new URLSearchParams({
+        exportAll: 'true'
+      });
+      
+      // เพิ่ม month/year ถ้ามีการ filter
+      if (selectedMonth !== null) {
+        params.append('month', selectedMonth.toString());
+        params.append('year', selectedYear.toString());
+      }
+      
+      const response = await axios.get(`${apiUrl}/api/borrow/all?${params}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (!response.data || !response.data.borrow_transactions || response.data.borrow_transactions.length === 0) {
         toast.warning("ไม่มีข้อมูลสำหรับออกรายงาน");
         return;
       }
+      
+      // แปลงข้อมูลสำหรับ PDF
+      const allRecordsForPDF = [];
+      response.data.borrow_transactions.forEach(transaction => {
+        transaction.borrow_items.forEach(item => {
+          allRecordsForPDF.push({
+            item_id: item.item_id,
+            transaction_id: transaction.transaction_id,
+            student_name: transaction.student_name,
+            student_id: transaction.student_id || '',
+            equipment_name: item.equipment_name,
+            quantity: item.quantity,
+            borrow_date: transaction.borrow_date,
+            borrow_date_iso: transaction.borrow_date,
+            returned_at: item.returned_at,
+            status: item.status,
+            image_return: item.image_return
+          });
+        });
+      });
 
       const doc = new jsPDF();
       
@@ -208,7 +248,7 @@ function Report() {
 
       // Data Rows
       doc.setFontSize(11);
-      filteredReports.forEach((item, index) => {
+      allRecordsForPDF.forEach((item, index) => {
         if (yPosition > 270) {
           doc.addPage();
           yPosition = 20;
@@ -241,7 +281,7 @@ function Report() {
       // Footer stats
       yPosition += 5;
       doc.setFontSize(12);
-      doc.text(`รวมทั้งหมด ${filteredReports.length} รายการ`, 105, yPosition, { align: 'center' });
+      doc.text(`รวมทั้งหมด ${allRecordsForPDF.length} รายการ`, 105, yPosition, { align: 'center' });
 
       doc.save(`report_${selectedMonth || 'all'}_${selectedYear}.pdf`);
       toast.success("บันทึกไฟล์ PDF สำเร็จ");
@@ -377,11 +417,11 @@ function Report() {
               <div className="mt-4 flex flex-wrap gap-4">
                 <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg shadow-sm border border-blue-100">
                   <span className="text-sm opacity-90">รายการทั้งหมด</span>
-                  <span className="ml-2 font-bold text-lg">{reports.length}</span>
+                  <span className="ml-2 font-bold text-lg">{totalCount}</span>
                 </div>
                 <div className="bg-red-50 text-red-700 px-4 py-2 rounded-lg shadow-sm border border-orange-100">
-                  <span className="text-sm opacity-90">รายการที่แสดง</span>
-                  <span className="ml-2 font-bold text-lg">{filteredReports.length}</span>
+                  <span className="text-sm opacity-90">กำลังแสดงหน้า</span>
+                  <span className="ml-2 font-bold text-lg">{currentPage}/{totalPages}</span>
                 </div>
               </div>
             </div>

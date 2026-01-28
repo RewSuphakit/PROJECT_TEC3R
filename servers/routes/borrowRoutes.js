@@ -28,4 +28,7 @@ router.get('/transaction/:transaction_id', authenticate, borrowItemsController.g
 // ดูรายละเอียด item
 router.get('/item/:item_id', authenticate, borrowItemsController.getBorrowByItemId);
 
+// ดูรายการที่คืนแล้ว (paginated)
+router.get('/returned', authenticate, borrowItemsController.getReturnedItems);
+
 module.exports = router;

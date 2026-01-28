@@ -116,13 +116,49 @@ exports.getUserProfile = async (req, res) => {
   }
 };
 
+// ดึงข้อมูลผู้ใช้ทั้งหมด - รองรับ pagination
 exports.getAllUsers = async (req, res) => {
   try {
-    const [results] = await promisePool.query('SELECT * FROM users');
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'ไม่พบข้อมูลผู้ใช้งาน' });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    const search = req.query.search || '';
+
+    // สร้าง WHERE clause สำหรับ search
+    let whereClause = '';
+    let queryParams = [];
+
+    if (search) {
+      whereClause = 'WHERE student_name LIKE ? OR student_email LIKE ? OR student_id LIKE ?';
+      const searchPattern = `%${search}%`;
+      queryParams = [searchPattern, searchPattern, searchPattern];
     }
-    res.status(200).json({ users: results });
+
+    // นับจำนวนทั้งหมด
+    const countQuery = `SELECT COUNT(*) as total FROM users ${whereClause}`;
+    const [countResult] = await promisePool.query(countQuery, queryParams);
+    const totalCount = countResult[0].total;
+    const totalPages = Math.ceil(totalCount / limit);
+
+    // ดึงข้อมูลตาม pagination
+    const dataQuery = `
+      SELECT user_id, student_id, student_name, year_of_study, student_email, phone, role, created_at
+      FROM users 
+      ${whereClause}
+      ORDER BY created_at DESC
+      LIMIT ? OFFSET ?
+    `;
+    const [results] = await promisePool.query(dataQuery, [...queryParams, limit, offset]);
+
+    res.status(200).json({
+      users: results,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        limit
+      }
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์' });
