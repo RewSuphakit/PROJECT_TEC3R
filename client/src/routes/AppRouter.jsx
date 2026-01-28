@@ -18,7 +18,11 @@ export default function AppRouter() {
         ? adminRoutes
         : userRoutes,
     },
-  ]);
+  ], {
+    future: {
+      v7_relativeSplatPath: true,
+    },
+  });
 
-  return <RouterProvider router={router} />;
+  return <RouterProvider router={router} future={{ v7_startTransition: true }} />;
 }
