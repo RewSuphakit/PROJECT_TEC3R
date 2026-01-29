@@ -172,7 +172,10 @@ exports.addBorrow = async (req, res) => {
             })),
         };
 
-        // 6. แปลงวันที่ให้เป็นรูปแบบไทย
+        // ยืนยัน Transaction
+        await connection.commit();
+
+        // 6. แปลงวันที่ให้เป็นรูปแบบไทย (สำหรับแจ้งเตือน)
         const { student_name, student_id, phone, borrow_date } = userResult[0];
         const thaiTimeCustom = new Date(borrow_date).toLocaleString("th-TH", {
             timeZone: "Asia/Bangkok",
@@ -194,11 +197,9 @@ exports.addBorrow = async (req, res) => {
             message += `- 🧰 อุปกรณ์: ${item.equipment_name} (${item.quantity} ชิ้น)\n`;
         });
 
-        // ส่งแจ้งเตือนผ่าน LINE
-        await lineNotify.sendMessage(message);
+        // ส่งแจ้งเตือนผ่าน LINE (นอก Transaction)
+        lineNotify.sendMessage(message).catch(err => console.error("Error sending LINE notification:", err));
 
-        // ยืนยัน Transaction
-        await connection.commit();
         res.status(201).json(responseData);
     } catch (error) {
         if (connection) await connection.rollback();
@@ -290,7 +291,11 @@ exports.updateReturnStatus = async (req, res) => {
 
         await connection.commit();
 
-        // ดึงข้อมูลสำหรับแจ้งเตือน LINE
+        // ปล่อย connection ทันทีหลัง commit เพื่อให้ผู้อื่นใช้งานได้
+        connection.release();
+        connection = null;
+
+        // ดึงข้อมูลสำหรับแจ้งเตือน LINE (ใช้ promisePool แทน connection เดิมที่ถูก release ไปแล้ว)
         const selectReturnQuery = `
       SELECT u.student_name, u.phone, e.equipment_name, bi.returned_at, bi.status, bi.quantity
       FROM borrow_items bi
@@ -299,34 +304,31 @@ exports.updateReturnStatus = async (req, res) => {
       JOIN equipment e ON bi.equipment_id = e.equipment_id
       WHERE bi.item_id = ?
     `;
-        const [userResult] = await connection.query(selectReturnQuery, [item_id]);
-        if (!userResult.length) throw new Error("Return record not found after update");
+        const [userResult] = await promisePool.query(selectReturnQuery, [item_id]);
+        if (userResult.length) {
+            const { student_name, phone, equipment_name, returned_at, status: borrow_status, quantity: returned_quantity } = userResult[0];
+            const thai_return_date = new Date(returned_at).toLocaleString("th-TH", {
+                timeZone: "Asia/Bangkok",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+            });
 
-        const { student_name, phone, equipment_name, returned_at, status: borrow_status } = userResult[0];
-        const thai_return_date = new Date(returned_at).toLocaleString("th-TH", {
-            timeZone: "Asia/Bangkok",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-        });
-
-        const message = `📌 มีการคืนอุปกรณ์:
+            const message = `📌 มีการคืนอุปกรณ์:
 - 👤 ชื่อผู้คืน: ${student_name}
 - 🎒 อุปกรณ์: ${equipment_name}
 - 📞 เบอร์โทร: ${phone}
 - 📅 วันที่คืน: ${thai_return_date}
-- 🔄 จำนวนที่คืน: ${quantity} ชิ้น
+- 🔄 จำนวนที่คืน: ${returned_quantity} ชิ้น
 - ✅ สถานะ: ${borrow_status}`;
 
-        // หากมีรูปภาพในการคืน ให้แนบ URL
-        const imageUrl = image_return ? `${process.env.API_URL}/image_return/${image_return}` : null;
-        try {
-            await lineNotify.sendMessage(message, imageUrl);
-        } catch (lineError) {
-            console.error("Error sending LINE notification:", lineError);
+            const imageUrl = image_return ? `${process.env.API_URL}/image_return/${image_return}` : null;
+            lineNotify.sendMessage(message, imageUrl).catch(lineError =>
+                console.error("Error sending LINE notification:", lineError)
+            );
         }
 
         res.status(200).json({ message: "Return status updated successfully" });
