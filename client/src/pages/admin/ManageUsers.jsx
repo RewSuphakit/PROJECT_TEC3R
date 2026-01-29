@@ -22,6 +22,7 @@ function ManageUsers() {
   const [userToDelete, setUserToDelete] = useState(null);
   const [userToEdit, setUserToEdit] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [filterRole, setFilterRole] = useState(""); // filter by role
 
   // ดึงข้อมูลแอดมินที่กำลัง login อยู่
   const getCurrentUser = () => {
@@ -37,7 +38,7 @@ function ManageUsers() {
     return null;
   };
 
-  const fetchUsers = async (page = 1) => {
+  const fetchUsers = async (page = 1, role = "") => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
@@ -45,6 +46,10 @@ function ManageUsers() {
         page: page.toString(),
         limit: usersPerPage.toString()
       });
+      // เพิ่ม role filter ถ้ามีการเลือก
+      if (role) {
+        params.append('role', role);
+      }
       const response = await axios.get(
         `${apiUrl}/api/users/users?${params}`,
         {
@@ -65,8 +70,14 @@ function ManageUsers() {
   };
 
   useEffect(() => {
-    fetchUsers(currentPage);
-  }, [currentPage]);
+    fetchUsers(currentPage, filterRole);
+  }, [currentPage, filterRole]);
+
+  // รีเซ็ตหน้าเมื่อเปลี่ยน filter
+  const handleFilterChange = (e) => {
+    setFilterRole(e.target.value);
+    setCurrentPage(1); // รีเซ็ตกลับหน้าแรก
+  };
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -164,6 +175,12 @@ function ManageUsers() {
   };
 
   const openDeleteModal = (user) => {
+    const currentUser = getCurrentUser();
+    // ป้องกันไม่ให้ Admin ลบตัวเอง
+    if (currentUser && currentUser.user_id === user.user_id) {
+      toast.error("ไม่สามารถลบบัญชีของตัวเองได้");
+      return;
+    }
     setUserToDelete(user);
     setDeleteModalOpen(true);
   };
@@ -214,6 +231,21 @@ function ManageUsers() {
                     <p className="text-gray-500 text-sm mt-1">จัดการรายชื่อผู้ใช้งานและกำหนดสิทธิ์</p>
                   </div>
                 </div>
+                
+                {/* Dropdown Filter by Role */}
+                <div className="flex items-center gap-3">
+                  <label className="text-sm font-medium text-gray-600">กรองตามระดับ:</label>
+                  <select
+                    value={filterRole}
+                    onChange={handleFilterChange}
+                    className="select select-bordered select-sm bg-white border-gray-200 text-gray-700 min-w-[140px] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                  >
+                    <option value="">ทั้งหมด</option>
+                    <option value="user">นักศึกษา</option>
+                    <option value="teacher">อาจารย์</option>
+                    <option value="admin">ผู้ดูแลระบบ</option>
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -236,11 +268,11 @@ function ManageUsers() {
                 {currentUsers.length ? (
                   currentUsers.map((user) => (
                     <tr key={user.user_id} className="table-row border-b hover:bg-blue-50/30 transition-colors">
-                      <td className="py-4 px-2 text-center">{user.student_id}</td>
-                      <td className="py-4 px-2 text-center">{user.student_name}</td>
-                      <td className="py-4 px-2 text-center">{user.year_of_study}</td>
-                      <td className="py-4 px-2 text-center">{user.student_email}</td>
-                      <td className="py-4 px-2 text-center">{user.phone}</td>
+                      <td className="py-4 px-2 text-center">{user.student_id || "-"}</td>
+                      <td className="py-4 px-2 text-center">{user.student_name || "-"}</td>
+                      <td className="py-4 px-2 text-center">{user.year_of_study || "-"}</td>
+                      <td className="py-4 px-2 text-center">{user.student_email || "-"}</td>
+                      <td className="py-4 px-2 text-center">{user.phone || "-"}</td>
                       <td className="py-4 px-2 text-center">
                         <span className={`badge text-white ${
                           user.role === "admin" ? "bg-blue-800" : 
@@ -259,12 +291,16 @@ function ManageUsers() {
                         </button>
                       </td>
                       <td className="py-4 px-2 text-center">
-                        <button
-                          onClick={() => openDeleteModal(user)}
-                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg shadow hover:shadow-lg transition-all hover:-translate-y-0.5 text-sm"
-                        >
-                          ลบ
-                        </button>
+                        {getCurrentUser()?.user_id === user.user_id ? (
+                          <span className="text-gray-400 text-sm" title="ไม่สามารถลบบัญชีตัวเองได้">-</span>
+                        ) : (
+                          <button
+                            onClick={() => openDeleteModal(user)}
+                            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg shadow hover:shadow-lg transition-all hover:-translate-y-0.5 text-sm"
+                          >
+                            ลบ
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))
@@ -324,12 +360,22 @@ function ManageUsers() {
                     >
                       แก้ไข
                     </button>
-                    <button
-                      onClick={() => openDeleteModal(user)}
-                      className="flex-1 btn btn-sm bg-red-500 hover:bg-red-600 text-white border-none"
-                    >
-                      ลบ
-                    </button>
+                    {getCurrentUser()?.user_id === user.user_id ? (
+                      <button
+                        disabled
+                        className="flex-1 btn btn-sm bg-gray-300 text-gray-500 border-none cursor-not-allowed"
+                        title="ไม่สามารถลบบัญชีตัวเองได้"
+                      >
+                        ลบ
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => openDeleteModal(user)}
+                        className="flex-1 btn btn-sm bg-red-500 hover:bg-red-600 text-white border-none"
+                      >
+                        ลบ
+                      </button>
+                    )}
                   </div>
                 </div>
               ))

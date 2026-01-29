@@ -120,23 +120,32 @@ exports.getUserProfile = async (req, res) => {
   }
 };
 
-// ดึงข้อมูลผู้ใช้ทั้งหมด - รองรับ pagination
+// ดึงข้อมูลผู้ใช้ทั้งหมด - รองรับ pagination และ filter by role
 exports.getAllUsers = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
     const search = req.query.search || '';
+    const role = req.query.role || ''; // เพิ่ม role filter
 
-    // สร้าง WHERE clause สำหรับ search
-    let whereClause = '';
+    // สร้าง WHERE clause สำหรับ search และ role filter
+    let whereConditions = [];
     let queryParams = [];
 
     if (search) {
-      whereClause = 'WHERE student_name LIKE ? OR student_email LIKE ? OR student_id LIKE ?';
+      whereConditions.push('(student_name LIKE ? OR student_email LIKE ? OR student_id LIKE ?)');
       const searchPattern = `%${search}%`;
-      queryParams = [searchPattern, searchPattern, searchPattern];
+      queryParams.push(searchPattern, searchPattern, searchPattern);
     }
+
+    // เพิ่มเงื่อนไข role filter
+    if (role) {
+      whereConditions.push('role = ?');
+      queryParams.push(role);
+    }
+
+    const whereClause = whereConditions.length > 0 ? 'WHERE ' + whereConditions.join(' AND ') : '';
 
     // นับจำนวนทั้งหมด
     const countQuery = `SELECT COUNT(*) as total FROM users ${whereClause}`;
@@ -149,7 +158,7 @@ exports.getAllUsers = async (req, res) => {
       SELECT user_id, student_id, student_name, year_of_study, student_email, phone, role, created_at
       FROM users 
       ${whereClause}
-      ORDER BY created_at DESC
+      ORDER BY role ASC
       LIMIT ? OFFSET ?
     `;
     const [results] = await promisePool.query(dataQuery, [...queryParams, limit, offset]);

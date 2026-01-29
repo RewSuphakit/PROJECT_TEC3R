@@ -12,6 +12,7 @@ function EditProfile() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [userToEdit, setUserToEdit] = useState(null);
   const [users, setUsers] = useState([]);
+  const [phoneError, setPhoneError] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -46,11 +47,22 @@ function EditProfile() {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
+    const phone = formData.get("phone");
+
+    // Validate phone number - must be exactly 10 digits
+    const phoneDigits = phone.replace(/\D/g, ""); // Remove non-digit characters
+    if (phoneDigits.length !== 10) {
+      setPhoneError("กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก");
+      toast.error("กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก");
+      return;
+    }
+    setPhoneError(""); // Clear error if valid
+
     const userData = {
       student_id: formData.get("student_id"),
       student_name: formData.get("student_name"),
       year_of_study: formData.get("year_of_study"),
-      phone: formData.get("phone"),
+      phone: phone,
     };
 
     await updateUser(userId, userData);
@@ -293,10 +305,27 @@ function EditProfile() {
                       type="tel"
                       name="phone"
                       defaultValue={userToEdit?.phone}
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all outline-none"
+                      pattern="[0-9]{10}"
+                      maxLength={10}
+                      placeholder="0XXXXXXXXX"
+                      onChange={(e) => {
+                        // Allow only digits
+                        e.target.value = e.target.value.replace(/\D/g, "");
+                        // Clear error when user starts typing
+                        if (phoneError) setPhoneError("");
+                      }}
+                      className={`w-full pl-10 pr-4 py-3 rounded-xl border-2 ${phoneError ? 'border-red-500 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 focus:border-orange-500 focus:ring-orange-100'} focus:ring-4 transition-all outline-none`}
                       required
                     />
                   </div>
+                  {phoneError && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {phoneError}
+                    </p>
+                  )}
                 </div>
               </div>
 
