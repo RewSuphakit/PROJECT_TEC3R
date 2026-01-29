@@ -19,6 +19,7 @@ function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
   const itemsPerPage = 10; // จำนวนต่อหน้า
 
   // ======= LocalStorage helper แยกตาม user_id =======
@@ -314,6 +315,33 @@ function Home() {
     }}>
       <ScrollToTopButton />
 
+      {/* Image Popup Modal */}
+      {selectedImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          onClick={() => setSelectedImage(null)}
+          style={{ animation: 'fadeIn 0.2s ease-out' }}
+        >
+          <div className="relative max-w-[90vw] max-h-[90vh]">
+            <button
+              className="absolute -top-10 right-0 text-white text-4xl hover:text-gray-300 transition-colors"
+              onClick={() => setSelectedImage(null)}
+            >
+              ×
+            </button>
+            <img
+              src={selectedImage.src}
+              alt={selectedImage.name}
+              className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <p className="text-center text-white mt-4 text-lg font-medium">
+              {selectedImage.name}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
       <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* LCP Optimization: Use img tag instead of background-image for priority loading */}
@@ -368,10 +396,14 @@ function Home() {
                 <div key={item.equipment_id} className="relative bg-white border rounded-lg shadow-md transform transition duration-500 hover:scale-105 flex flex-col h-full">
                   <div className="w-full h-40 p-2">
                     <img
-                      className="w-full h-full rounded-md object-cover object-center"
+                      className="w-full h-full rounded-md object-cover object-center cursor-pointer hover:opacity-80 transition-opacity"
                       src={item.image ? `${apiUrl}/uploads/${item.image.replace(/\\/g, "/")}` : null}
                       alt={item.equipment_id}
                       loading="lazy"
+                      onClick={() => setSelectedImage({
+                        src: item.image ? `${apiUrl}/uploads/${item.image.replace(/\\/g, "/")}` : null,
+                        name: item.equipment_name
+                      })}
                     />
                   </div>
                   <div className="px-4 pb-3 flex flex-col flex-grow">
