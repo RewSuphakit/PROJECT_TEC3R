@@ -23,16 +23,24 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
 
+    // ตรวจสอบข้อมูลพื้นฐาน
     if (
       !student_email ||
       !student_name ||
-      !year_of_study ||
-      !student_id ||
+      (role === "user" && !year_of_study) ||
       !phone ||
       !password ||
       !role
     ) {
       toast.warn("กรุณากรอกข้อมูลให้ครบทุกช่อง", {
+        position: "top-right"
+      });
+      return;
+    }
+
+    // ถ้าเป็นนักศึกษา ต้องกรอกรหัสนักศึกษา
+    if (role === "user" && !student_id) {
+      toast.warn("กรุณากรอกรหัสนักศึกษา", {
         position: "top-right"
       });
       return;
@@ -45,14 +53,16 @@ const Register = () => {
       return;
     }
 
-    // ตรวจสอบรหัสนักศึกษา 13 หลัก (รูปแบบ: 1xxxxxxxxxx-x)
-    const studentIdPattern = /^\d{11}-\d{1}$/;
-    if (!studentIdPattern.test(student_id)) {
-      setStudentIdValid(false);
-      toast.warn("กรุณากรอกรหัสนักศึกษาให้ถูกต้อง (รูปแบบ: 12345678901-2)", {
-        position: "top-center"
-      });
-      return;
+    // ตรวจสอบรหัสนักศึกษา 13 หลัก (รูปแบบ: 1xxxxxxxxxx-x) เฉพาะนักศึกษาเท่านั้น
+    if (role === "user") {
+      const studentIdPattern = /^\d{11}-\d{1}$/;
+      if (!studentIdPattern.test(student_id)) {
+        setStudentIdValid(false);
+        toast.warn("กรุณากรอกรหัสนักศึกษาให้ถูกต้อง (รูปแบบ: 12345678901-2)", {
+          position: "top-center"
+        });
+        return;
+      }
     }
 
     // ตรวจสอบเบอร์โทรให้ครบ 10 หลัก
@@ -146,64 +156,68 @@ const Register = () => {
                 </div>
               </div>
 
-              {/* ชั้นปี */}
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-gray-600">
-                  ชั้นปี
-                </label>
-                <div className="relative">
-                  <img
-                    src="https://img.icons8.com/?size=100&id=79387&format=png&color=CDCDCD"
-                    className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5"
-                    alt="year-icon"
-                  />
-                  <input
-                    type="text"
-                    id="year_of_study"
-                    name="year_of_study"
-                    value={year_of_study}
-                    onChange={(e) => setStudentYear(e.target.value)}
-                    className="w-full border rounded-lg pl-10 pr-4 py-2 text-sm bg-white focus:ring-2 focus:ring-[#0F4C75] focus:outline-none"
-                    placeholder="กรุณากรอกชั้นปี"
-                    aria-label="ชั้นปี"
-                  />
+              {/* ชั้นปี - แสดงเฉพาะเมื่อเลือกเป็นนักศึกษา */}
+              {role === "user" && (
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-medium text-gray-600">
+                    ชั้นปี
+                  </label>
+                  <div className="relative">
+                    <img
+                      src="https://img.icons8.com/?size=100&id=79387&format=png&color=CDCDCD"
+                      className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5"
+                      alt="year-icon"
+                    />
+                    <input
+                      type="text"
+                      id="year_of_study"
+                      name="year_of_study"
+                      value={year_of_study}
+                      onChange={(e) => setStudentYear(e.target.value)}
+                      className="w-full border rounded-lg pl-10 pr-4 py-2 text-sm bg-white focus:ring-2 focus:ring-[#0F4C75] focus:outline-none"
+                      placeholder="กรุณากรอกชั้นปี"
+                      aria-label="ชั้นปี"
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* รหัสนักศึกษา */}
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-gray-600">
-                  รหัสนักศึกษา
-                </label>
-                <div className="relative">
-                  <img
-                    src="https://img.icons8.com/?size=100&id=IU9d7JI9Ec9U&format=png&color=CDCDCD"
-                    className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5"
-                    alt="student-id-icon"
-                  />
-                  <input
-                    type="text"
-                    id="student_id"
-                    name="student_id"
-                    value={student_id}
-                    maxLength={13}
-                    onChange={(e) => {
-                      // อนุญาตให้กรอกตัวเลขและ - เท่านั้น
-                      const value = e.target.value.replace(/[^\d-]/g, '');
-                      setStudentId(value);
-                      setStudentIdValid(true);
-                    }}
-                    className={`w-full border rounded-lg pl-10 pr-4 py-2 text-sm bg-white focus:ring-2 focus:ring-[#0F4C75] focus:outline-none ${
-                      !studentIdValid ? "border-red-500 bg-red-50" : ""
-                    }`}
-                    placeholder="เช่น 12345678901-2"
-                    aria-label="รหัสนักศึกษา"
-                  />
+              {/* รหัสนักศึกษา - แสดงเฉพาะเมื่อเลือกเป็นนักศึกษา */}
+              {role === "user" && (
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-medium text-gray-600">
+                    รหัสนักศึกษา
+                  </label>
+                  <div className="relative">
+                    <img
+                      src="https://img.icons8.com/?size=100&id=IU9d7JI9Ec9U&format=png&color=CDCDCD"
+                      className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5"
+                      alt="student-id-icon"
+                    />
+                    <input
+                      type="text"
+                      id="student_id"
+                      name="student_id"
+                      value={student_id}
+                      maxLength={13}
+                      onChange={(e) => {
+                        // อนุญาตให้กรอกตัวเลขและ - เท่านั้น
+                        const value = e.target.value.replace(/[^\d-]/g, '');
+                        setStudentId(value);
+                        setStudentIdValid(true);
+                      }}
+                      className={`w-full border rounded-lg pl-10 pr-4 py-2 text-sm bg-white focus:ring-2 focus:ring-[#0F4C75] focus:outline-none ${
+                        !studentIdValid ? "border-red-500 bg-red-50" : ""
+                      }`}
+                      placeholder="เช่น 12345678901-2"
+                      aria-label="รหัสนักศึกษา"
+                    />
+                  </div>
+                  {!studentIdValid && (
+                    <p className="text-red-500 text-xs mt-1">รหัสนักศึกษาต้องเป็น 13 หลัก (รูปแบบ: 12345678901-2)</p>
+                  )}
                 </div>
-                {!studentIdValid && (
-                  <p className="text-red-500 text-xs mt-1">รหัสนักศึกษาต้องเป็น 13 หลัก (รูปแบบ: 12345678901-2)</p>
-                )}
-              </div>
+              )}
 
               {/* อีเมล */}
               <div className="flex flex-col gap-1">
@@ -311,7 +325,16 @@ const Register = () => {
                     id="role"
                     value={role}
                     required
-                    onChange={(e) => setRole(e.target.value)}
+                    onChange={(e) => {
+                      const newRole = e.target.value;
+                      setRole(newRole);
+                      // ถ้าเลือกเป็นอาจารย์ ให้ล้างรหัสนักศึกษา
+                      if (newRole === "teacher") {
+                        setStudentId("");
+                        setStudentYear("");
+                        setStudentIdValid(true);
+                      }
+                    }}
                     className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm text-gray-700 bg-white shadow-sm focus:ring-2 focus:ring-[#0F4C75] focus:border-[#0F4C75] focus:outline-none appearance-none"
                   >
                     <option className="text-gray-400" value="user">

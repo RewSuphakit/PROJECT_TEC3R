@@ -22,10 +22,14 @@ exports.register = async (req, res) => {
     // เข้ารหัสรหัสผ่าน
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // กำหนดค่า student_id และ year_of_study เป็น null หากไม่ใช่ user
+    const dbStudentId = role === 'user' ? student_id : null;
+    const dbYearOfStudy = role === 'user' ? year_of_study : null;
+
     // แทรกผู้ใช้งานใหม่
     await promisePool.query(
       'INSERT INTO users (student_id, student_name, year_of_study, student_email, password, phone, role) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [student_id, student_name, year_of_study, student_email, hashedPassword, phone, role]
+      [dbStudentId || null, student_name, dbYearOfStudy || null, student_email, hashedPassword, phone, role]
     );
 
     return res.status(201).json({ message: 'ลงทะเบียนผู้ใช้สำเร็จ' });
@@ -196,7 +200,7 @@ exports.updateUser = async (req, res) => {
       WHERE user_id = ?
     `;
 
-    const [results] = await promisePool.query(updateQuery, [student_id, student_name, year_of_study, phone, user_id]);
+    const [results] = await promisePool.query(updateQuery, [student_id || null, student_name, year_of_study || null, phone, user_id]);
 
     if (results.affectedRows === 0) {
       return res.status(404).json({ error: 'ไม่พบผู้ใช้นี้' });
@@ -270,7 +274,11 @@ exports.adminUpdateUser = async (req, res) => {
           phone = ?,
           role = ?
     `;
-    const values = [student_id, student_name, year_of_study, student_email, phone, role];
+    // ปรับค่าให้เป็น null กรณีที่ไม่ใช่ user
+    const dbStudentId = role === 'user' ? student_id : null;
+    const dbYearOfStudy = role === 'user' ? year_of_study : null;
+
+    const values = [dbStudentId || null, student_name, dbYearOfStudy || null, student_email, phone, role];
 
     if (password && password.trim() !== '') {
       const hashedPassword = await bcrypt.hash(password, 10);
