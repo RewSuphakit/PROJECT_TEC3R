@@ -14,28 +14,34 @@ function ManageTools() {
   const [popupImage, setPopupImage] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [currentPage, setCurrentPage] = useState(1);
-  const toolsPerPage = 5;
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const toolsPerPage = 10;
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [toolToDelete, setToolToDelete] = useState(null);
   const [toolToEdit, setToolToEdit] = useState(null);
 
-  const fetchTools = async () => {
+  const fetchTools = async (page = currentPage) => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        `${apiUrl}/api/equipment/equipment/`,
+        `${apiUrl}/api/equipment/equipment/?page=${page}&limit=${toolsPerPage}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setTools(response.data.equipment);
+      if (response.data.pagination) {
+        setTotalPages(response.data.pagination.totalPages);
+        setTotalCount(response.data.pagination.totalCount);
+      }
     } catch (error) {
       toast.error("เกิดข้อผิดพลาดในการดึงข้อมูลอุปกรณ์");
     }
   }; 
   
   useEffect(() => {
-    fetchTools();
-  }, []);
+    fetchTools(currentPage);
+  }, [currentPage]);
 
   const deleteTool = async (equipmentId) => {
     try {
@@ -147,12 +153,6 @@ function ManageTools() {
     setToolToEdit(null);
   };
 
-  const currentTools = tools.slice(
-    (currentPage - 1) * toolsPerPage,
-    currentPage * toolsPerPage
-  );
-  const totalPages = Math.ceil(tools.length / toolsPerPage);
-
   const handleImageMouseEnter = (e, imageUrl) => {
     const rect = e.target.getBoundingClientRect();
     setPopupImage(imageUrl);
@@ -211,8 +211,8 @@ function ManageTools() {
                 </tr>
               </thead>
               <tbody>
-                {currentTools.length ? (
-                  currentTools.map((tool) => (
+                {tools.length ? (
+                  tools.map((tool) => (
                     <tr
                       key={tool.equipment_id}
                       className="table-row border-b hover:bg-blue-50/30 transition-colors"
@@ -288,8 +288,8 @@ function ManageTools() {
 
           {/* Mobile Card View */}
           <div className="md:hidden space-y-3">
-            {currentTools.length ? (
-              currentTools.map((tool) => (
+            {tools.length ? (
+              tools.map((tool) => (
                 <div
                   key={tool.equipment_id}
                   className="bg-white rounded-lg shadow-md p-4"
