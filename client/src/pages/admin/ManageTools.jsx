@@ -80,28 +80,15 @@ function ManageTools() {
       }
   
       const token = localStorage.getItem('token');
-      const response = await axios.put(
+      await axios.put(
         `${apiUrl}/api/equipment/equipment/${currentTool.equipment_id}`,
         formData,
         { headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` } }
       );
   
-      let updatedTool = response.data.updatedTool;
-      if (!updatedTool || !updatedTool.equipment_id) {
-        updatedTool = {
-          ...currentTool,
-          equipment_name: e.target.equipment_name.value,
-          total_quantity: e.target.total_quantity.value,
-          image: e.target.image ? currentTool.image : currentTool.image,
-        };
-      }
-      fetchTools();
+      // ดึงข้อมูลใหม่จาก server เพื่อให้แน่ใจว่าได้ข้อมูลที่ถูกต้อง
+      await fetchTools(currentPage);
       
-      setTools((prevTools) =>
-        prevTools.map((tool) =>
-          tool && tool.equipment_id === currentTool.equipment_id ? updatedTool : tool
-        )
-      );
       toast.success("อัพเดตอุปกรณ์สำเร็จ");
       setEditModalOpen(false);
       setToolToEdit(null);
