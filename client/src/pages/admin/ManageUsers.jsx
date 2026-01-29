@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
 import bg2 from '../../assets/bg2.png';
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
@@ -10,6 +11,7 @@ import './AdminStyles.css';
 
 function ManageUsers() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -111,8 +113,7 @@ function ManageUsers() {
         
         // รอ 3 วินาทีแล้ว logout
         setTimeout(() => {
-          localStorage.removeItem("token");
-          navigate("/RMUTI/login");
+          logout(); // ใช้ logout จาก useAuth เพื่อ clear state และ redirect
         }, 3000);
         return;
       }
