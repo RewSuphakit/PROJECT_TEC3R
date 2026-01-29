@@ -215,9 +215,9 @@ function Home() {
         imageHeight: 150,
         imageAlt: `${title}`,
         showCancelButton: true,
-        showDenyButton: true,
+        showDenyButton: pendingCount > 0,
         confirmButtonText: "ยืมอุปกรณ์!",
-        denyButtonText: pendingCount > 0 ? `ที่ยืมค้างอยู่ (${pendingCount})` : "ที่ยืมค้างอยู่",
+        denyButtonText: `ยืนยันรายการที่เลือก (${pendingCount})`,
         cancelButtonText: "ยกเลิก!",
         reverseButtons: true,
         input: "number",
@@ -302,7 +302,7 @@ function Home() {
           // ผู้ใช้กด "ยืมเพิ่มเติม" - รายการจะถูกเก็บไว้ใน localStorage และ popup จะปิด
           await swalWithBootstrapButtons.fire({
             title: "เพิ่มอุปกรณ์สำเร็จ!",
-            html: `<p>คุณมี <strong>${items.length}</strong> รายการ (<strong>${pendingTotal}</strong> ชิ้น) รอยืม</p><p>กดปุ่ม "ที่ยืมค้างอยู่" เพื่อยืมทั้งหมด</p>`,
+            html: `<p>คุณมี <strong>${items.length}</strong> รายการ (<strong>${pendingTotal}</strong> ชิ้น) รอยืม</p><p>กดปุ่ม "ยืนยันรายการที่เลือก" เพื่อยืมทั้งหมด</p>`,
             icon: "info",
             timer: 2000,
             showConfirmButton: false,
