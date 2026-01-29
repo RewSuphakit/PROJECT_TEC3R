@@ -47,13 +47,13 @@ function Home() {
       setIsLoading(true);
       const token = localStorage.getItem('token');
       let response;
-      
+
       const params = new URLSearchParams({
         page: page.toString(),
         limit: itemsPerPage.toString(),
         ...(search && { search })
       });
-      
+
       if (token) {
         // ถ้า login แล้ว ใช้ protected endpoint
         response = await axios.get(`${apiUrl}/api/equipment/equipment?${params}`, {
@@ -63,10 +63,10 @@ function Home() {
         // ถ้ายังไม่ login ใช้ public endpoint
         response = await axios.get(`${apiUrl}/api/equipment/public?${params}`);
       }
-      
+
       const equipmentData = response.data.equipment || [];
       const pagination = response.data.pagination || { totalPages: 1, currentPage: 1 };
-      
+
       // กรอง status === 'Available' สำหรับ logged-in user
       if (token) {
         const availableEquipment = equipmentData.filter(record => record.status === 'Available');
@@ -74,7 +74,7 @@ function Home() {
       } else {
         setEquipment(equipmentData);
       }
-      
+
       setTotalPages(pagination.totalPages || 1);
     } catch (error) {
       console.error('Error fetching equipment:', error);
@@ -304,21 +304,23 @@ function Home() {
 
   const loadingData = isLoading || equipment.length === 0;
   return (
-    <div style={{ backgroundImage: `url(${bg2})`,
+    <div style={{
+      backgroundImage: `url(${bg2})`,
       backgroundSize: 'cover',
       backgroundRepeat: 'no-repeat',
       backgroundPosition: 'center',
       backgroundAttachment: 'fixed',
-      minHeight: '100vh'}}>
+      minHeight: '100vh'
+    }}>
       <ScrollToTopButton />
 
       {/* Hero Section */}
       <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* LCP Optimization: Use img tag instead of background-image for priority loading */}
         <div className="absolute inset-0 z-0">
-           <img 
-            src={bg} 
-            alt="Background" 
+          <img
+            src={bg}
+            alt="Background"
             className="w-full h-full object-cover"
             fetchpriority="high"
           />
@@ -364,14 +366,12 @@ function Home() {
             ) : equipment.length > 0 ? (
               equipment.map((item) => (
                 <div key={item.equipment_id} className="relative bg-white border rounded-lg shadow-md transform transition duration-500 hover:scale-105 flex flex-col h-full">
-                  <div className="aspect-w-16 aspect-h-9 p-2">
+                  <div className="w-full h-40 p-2">
                     <img
-                      className="rounded-md min-w-[100px] min-h-[100px] object-cover object-center"
+                      className="w-full h-full rounded-md object-cover object-center"
                       src={item.image ? `${apiUrl}/uploads/${item.image.replace(/\\/g, "/")}` : null}
                       alt={item.equipment_id}
                       loading="lazy"
-                      width="200"
-                      height="200"
                     />
                   </div>
                   <div className="px-4 pb-3 flex flex-col flex-grow">
@@ -416,18 +416,16 @@ function Home() {
       <div className="flex justify-center sm:justify-end px-4 sm:pr-[15%] md:pr-[20%] lg:pr-[23%] mb-5">
         <button
           disabled={currentPage === 1}
-          className={`flex items-center justify-center px-3 h-8 me-3 text-sm font-medium border rounded-lg ${
-            currentPage === 1 ? 'bg-gray-100 text-gray-400' : 'bg-white text-gray-600 hover:bg-gray-100'
-          }`}
+          className={`flex items-center justify-center px-3 h-8 me-3 text-sm font-medium border rounded-lg ${currentPage === 1 ? 'bg-gray-100 text-gray-400' : 'bg-white text-gray-600 hover:bg-gray-100'
+            }`}
           onClick={() => setCurrentPage(currentPage - 1)}
         >
           ย้อนกลับ
         </button>
         <button
           disabled={currentPage === totalPages}
-          className={`flex items-center justify-center px-3 h-8 text-sm font-medium border rounded-lg ${
-            currentPage === totalPages ? 'bg-gray-100 text-gray-400' : 'bg-white text-gray-600 hover:bg-gray-100'
-          }`}
+          className={`flex items-center justify-center px-3 h-8 text-sm font-medium border rounded-lg ${currentPage === totalPages ? 'bg-gray-100 text-gray-400' : 'bg-white text-gray-600 hover:bg-gray-100'
+            }`}
           onClick={() => setCurrentPage(currentPage + 1)}
         >
           หน้าต่อไป
