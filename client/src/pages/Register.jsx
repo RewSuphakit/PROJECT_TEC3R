@@ -222,7 +222,10 @@ const Register = () => {
               {/* อีเมล */}
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium text-gray-600">
-                  อีเมลนักศึกษา
+                  {role === "teacher" ? "อีเมล" : "อีเมลนักศึกษา"}
+                  <span className="text-[10px] text-red-500 ml-1 font-normal">
+                    *ใช้ @rmuti.ac.th
+                  </span>
                 </label>
                 <div className="relative">
                   <img
@@ -243,8 +246,8 @@ const Register = () => {
           focus:ring-[#0F4C75] focus:outline-none ${
             !emailValid || emailDuplicate ? "border-red-500 bg-red-50" : ""
           }`}
-                    placeholder="กรุณากรอกอีเมลนักศึกษา"
-                    aria-label="อีเมลนักศึกษา"
+                    placeholder={role === "teacher" ? "กรุณากรอกอีเมล" : "กรุณากรอกอีเมลนักศึกษา"}
+                    aria-label={role === "teacher" ? "อีเมล" : "อีเมลนักศึกษา"}
                   />
                 </div>
                 {emailDuplicate && (

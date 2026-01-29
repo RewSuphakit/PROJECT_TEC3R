@@ -110,43 +110,49 @@ function EditProfile() {
         {user && (
           <div className="space-y-3">
             {/* รหัสนักศึกษา */}
-            <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-100">
-            <img
-            src="https://img.icons8.com/?size=100&id=GhyhrWqfuHQ7&format=png&color=000000"
-            alt="user icon"
-            className="w-8 h-8"
-          />
-              <div className="flex-1">
-                <p className="text-sm text-gray-600 font-medium">รหัสนักศึกษา</p>
-                <p className="text-lg font-semibold text-gray-800">{user.student_id}</p>
-              </div>
-            </div>
-
-            {/* ชื่อนักศึกษา */}
-            <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-100">
+            {user.role !== "teacher" && (
+              <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-100">
                 <img
-            src="https://img.icons8.com/?size=100&id=3nWSKVe0pWxx&format=png&color=000000"
-            alt="user icon"
-            className="w-8 h-8"
-          />
+                  src="https://img.icons8.com/?size=100&id=GhyhrWqfuHQ7&format=png&color=000000"
+                  alt="user icon"
+                  className="w-8 h-8"
+                />
+                <div className="flex-1">
+                  <p className="text-sm text-gray-600 font-medium">รหัสนักศึกษา</p>
+                  <p className="text-lg font-semibold text-gray-800">{user.student_id}</p>
+                </div>
+              </div>
+            )}
+
+            {/* ชื่อจริง (เปลี่ยนจาก ชื่อนักศึกษา เป็น ชื่อผู้ใช้งาน ถ้าเป็นอาจารย์) */}
+            <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-100">
+              <img
+                src="https://img.icons8.com/?size=100&id=3nWSKVe0pWxx&format=png&color=000000"
+                alt="user icon"
+                className="w-8 h-8"
+              />
               <div className="flex-1">
-                <p className="text-sm text-gray-600 font-medium">ชื่อนักศึกษา</p>
+                <p className="text-sm text-gray-600 font-medium">
+                  {user.role === "teacher" ? "ชื่อผู้ใช้งาน" : "ชื่อนักศึกษา"}
+                </p>
                 <p className="text-lg font-semibold text-gray-800">{user.student_name}</p>
               </div>
             </div>
 
             {/* ระดับชั้น */}
-            <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-100">
-               <img
-            src="https://img.icons8.com/?size=100&id=xDDWfeoi2wrD&format=png&color=000000"
-            alt="user icon"
-            className="w-8 h-8"
-          />
-              <div className="flex-1">
-                <p className="text-sm text-gray-600 font-medium">ระดับชั้น</p>
-                <p className="text-lg font-semibold text-gray-800">{user.year_of_study}</p>
+            {user.role !== "teacher" && (
+              <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-100">
+                <img
+                  src="https://img.icons8.com/?size=100&id=xDDWfeoi2wrD&format=png&color=000000"
+                  alt="user icon"
+                  className="w-8 h-8"
+                />
+                <div className="flex-1">
+                  <p className="text-sm text-gray-600 font-medium">ระดับชั้น</p>
+                  <p className="text-lg font-semibold text-gray-800">{user.year_of_study}</p>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* เบอร์ติดต่อ */}
             <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-100">
@@ -192,37 +198,49 @@ function EditProfile() {
             <form onSubmit={handleEditSubmit} className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {/* รหัสนักศึกษา */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    รหัสนักศึกษา
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                       <img
-            src="https://img.icons8.com/?size=100&id=qEK2pqenBa22&format=png&color=CDCDCD"
-            alt="user icon"
-            className="w-5 h-5"
-          />
+                {userToEdit?.role !== "teacher" && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      รหัสนักศึกษา
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <img
+                          src="https://img.icons8.com/?size=100&id=qEK2pqenBa22&format=png&color=CDCDCD"
+                          alt="user icon"
+                          className="w-5 h-5"
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        name="student_id"
+                        defaultValue={userToEdit?.student_id}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all outline-none"
+                        required
+                      />
                     </div>
-                    <input
-                      type="text"
-                      name="student_id"
-                      defaultValue={userToEdit?.student_id}
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all outline-none"
-                      required
-                    />
                   </div>
-                </div>
+                )}
 
                 {/* ชื่อนักศึกษา */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    ชื่อนักศึกษา
+                    {userToEdit?.role === "teacher" ? "ชื่อผู้ใช้งาน" : "ชื่อนักศึกษา"}
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      <svg
+                        className="w-5 h-5 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        />
                       </svg>
                     </div>
                     <input
@@ -236,27 +254,29 @@ function EditProfile() {
                 </div>
 
                 {/* ระดับชั้น */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    ระดับชั้น
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                         <img
-            src="https://img.icons8.com/?size=100&id=3651&format=png&color=CDCDCD"
-            alt="user icon"
-            className="w-5 h-5"
-          />
+                {userToEdit?.role !== "teacher" && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      ระดับชั้น
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <img
+                          src="https://img.icons8.com/?size=100&id=3651&format=png&color=CDCDCD"
+                          alt="user icon"
+                          className="w-5 h-5"
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        name="year_of_study"
+                        defaultValue={userToEdit?.year_of_study}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all outline-none"
+                        required
+                      />
                     </div>
-                    <input
-                      type="text"
-                      name="year_of_study"
-                      defaultValue={userToEdit?.year_of_study}
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all outline-none"
-                      required
-                    />
                   </div>
-                </div>
+                )}
 
                 {/* เบอร์ติดต่อ */}
                 <div>
