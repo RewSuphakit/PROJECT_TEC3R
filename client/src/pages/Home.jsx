@@ -265,13 +265,17 @@ function Home() {
 
         setBorrowItems(items);
 
+        const pendingTotal = items.reduce((sum, item) => sum + item.quantity_borrow, 0);
+
         const confirmBorrow = await swalWithBootstrapButtons.fire({
           title: "ยืนยันการยืมอุปกรณ์",
-          text: "คลิกที่พื้นที่ว่างเพื่อ ยืมอุปกรณ์เพิ่มเติม ",
+          html: `<p>คุณมี <strong>${items.length}</strong> รายการ (<strong>${pendingTotal}</strong> ชิ้น) ในรายการยืม</p>`,
           icon: "warning",
-          showCancelButton: false,
+          showCancelButton: true,
+          showDenyButton: true,
           confirmButtonText: "ยืมทั้งหมด!",
-          cancelButtonText: "ยกเลิก!",
+          denyButtonText: "ยืมเพิ่มเติม",
+          cancelButtonText: "ยกเลิก",
           reverseButtons: true,
         });
 
@@ -294,6 +298,15 @@ function Home() {
           removeBorrowItems();
           await fetchEquipment(currentPage, debouncedSearch);
           await fetchBorrowItems();
+        } else if (confirmBorrow.isDenied) {
+          // ผู้ใช้กด "ยืมเพิ่มเติม" - รายการจะถูกเก็บไว้ใน localStorage และ popup จะปิด
+          await swalWithBootstrapButtons.fire({
+            title: "เพิ่มอุปกรณ์สำเร็จ!",
+            html: `<p>คุณมี <strong>${items.length}</strong> รายการ (<strong>${pendingTotal}</strong> ชิ้น) รอยืม</p><p>กดปุ่ม "ที่ยืมค้างอยู่" เพื่อยืมทั้งหมด</p>`,
+            icon: "info",
+            timer: 2000,
+            showConfirmButton: false,
+          });
         }
       } else if (result.isDenied) {
         await confirmBorrowFromStorage();
