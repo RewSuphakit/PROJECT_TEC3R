@@ -295,7 +295,7 @@ function ManageTools() {
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start mb-2">
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-800 text-sm sm:text-base truncate">
+                          <h3 className="font-semibold text-gray-800 text-sm sm:text-base truncate text-wrap">
                             {tool.equipment_name}
                           </h3>
                           <p className="text-xs text-gray-500">รหัส: {tool.equipment_id}</p>
