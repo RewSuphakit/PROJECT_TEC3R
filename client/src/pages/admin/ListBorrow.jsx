@@ -172,7 +172,7 @@ function ListBorrow() {
                   </thead>
                   <tbody>
                     {currentGroupKeys.length ? (
-                      currentGroupKeys.map((groupId) => {
+                      currentGroupKeys.map((groupId, index) => {
                         const groupItems = groupedRecords[groupId];
                         if (groupItems.length === 1) {
                           const item = groupItems[0];
