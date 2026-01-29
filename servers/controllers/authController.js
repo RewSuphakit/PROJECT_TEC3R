@@ -252,52 +252,72 @@ exports.updateEmailPassword = async (req, res) => {
 };
 
 exports.adminUpdateUser = async (req, res) => {
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY = 200; // milliseconds
+
+  const executeUpdate = async (retryCount = 0) => {
+    try {
+      const { user_id } = req.params;
+      const { student_id, student_name, year_of_study, student_email, password, phone, role } = req.body;
+
+      const [existingUsers] = await promisePool.query(
+        'SELECT user_id FROM users WHERE student_email = ? AND user_id != ?',
+        [student_email, user_id]
+      );
+
+      if (existingUsers.length > 0) {
+        return res.status(409).json({ error: 'อีเมลนี้มีผู้ใช้งานแล้ว กรุณาใช้อีเมลอื่น' });
+      }
+
+      let updateQuery = `
+        UPDATE users
+        SET student_id = ?,
+            student_name = ?,
+            year_of_study = ?,
+            student_email = ?,
+            phone = ?,
+            role = ?
+      `;
+      // ปรับค่าให้เป็น null กรณีที่ไม่ใช่ user
+      const dbStudentId = role === 'user' ? student_id : null;
+      const dbYearOfStudy = role === 'user' ? year_of_study : null;
+
+      const values = [dbStudentId || null, student_name, dbYearOfStudy || null, student_email, phone, role];
+
+      if (password && password.trim() !== '') {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        updateQuery += `, password = ? `;
+        values.push(hashedPassword);
+      }
+
+      updateQuery += `WHERE user_id = ?`;
+      values.push(user_id);
+
+      const [results] = await promisePool.query(updateQuery, values);
+
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ error: 'ไม่พบผู้ใช้นี้' });
+      }
+
+      res.status(200).json({ message: 'อัปเดตข้อมูลผู้ใช้โดยแอดมินสำเร็จ' });
+    } catch (error) {
+      // ถ้าเจอ Lock Timeout หรือ Connection Lost ให้ลองใหม่
+      if ((error.code === 'ER_LOCK_WAIT_TIMEOUT' || error.code === 'PROTOCOL_CONNECTION_LOST') && retryCount < MAX_RETRIES) {
+        console.log(`Lock timeout detected, retrying... (${retryCount + 1}/${MAX_RETRIES})`);
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (retryCount + 1)));
+        return executeUpdate(retryCount + 1);
+      }
+      throw error;
+    }
+  };
+
   try {
-    const { user_id } = req.params;
-    const { student_id, student_name, year_of_study, student_email, password, phone, role } = req.body;
-
-    const [existingUsers] = await promisePool.query(
-      'SELECT user_id FROM users WHERE student_email = ? AND user_id != ?',
-      [student_email, user_id]
-    );
-
-    if (existingUsers.length > 0) {
-      return res.status(409).json({ error: 'อีเมลนี้มีผู้ใช้งานแล้ว กรุณาใช้อีเมลอื่น' });
-    }
-
-    let updateQuery = `
-      UPDATE users
-      SET student_id = ?,
-          student_name = ?,
-          year_of_study = ?,
-          student_email = ?,
-          phone = ?,
-          role = ?
-    `;
-    // ปรับค่าให้เป็น null กรณีที่ไม่ใช่ user
-    const dbStudentId = role === 'user' ? student_id : null;
-    const dbYearOfStudy = role === 'user' ? year_of_study : null;
-
-    const values = [dbStudentId || null, student_name, dbYearOfStudy || null, student_email, phone, role];
-
-    if (password && password.trim() !== '') {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      updateQuery += `, password = ? `;
-      values.push(hashedPassword);
-    }
-
-    updateQuery += `WHERE user_id = ?`;
-    values.push(user_id);
-
-    const [results] = await promisePool.query(updateQuery, values);
-
-    if (results.affectedRows === 0) {
-      return res.status(404).json({ error: 'ไม่พบผู้ใช้นี้' });
-    }
-
-    res.status(200).json({ message: 'อัปเดตข้อมูลผู้ใช้โดยแอดมินสำเร็จ' });
+    await executeUpdate();
   } catch (error) {
     console.error('Error in adminUpdateUser:', error);
+    if (error.code === 'ER_LOCK_WAIT_TIMEOUT') {
+      return res.status(503).json({ error: 'ระบบกำลังประมวลผลข้อมูลอยู่ กรุณาลองใหม่อีกครั้ง' });
+    }
     res.status(500).json({ error: 'เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์' });
   }
 };
