@@ -38,6 +38,13 @@ function AuthContextProvider({ children }) {
       setUser(response.data);
     } catch (error) {
       console.error('Error fetching user profile:', error.message);
+      
+      // ถ้าได้ 401 error แสดงว่า token หมดอายุหรือไม่ถูกต้อง ให้ล้าง token ออก
+      if (error.response && error.response.status === 401) {
+        localStorage.removeItem('token');
+        console.log('Token expired or invalid, removed from localStorage');
+      }
+      
       setUser(null);
     } finally {
       setLoading(false);
@@ -74,6 +81,14 @@ function AuthContextProvider({ children }) {
       setBorrowedCount(borrowedItems.length);
     } catch (error) {
       console.error('Error fetching borrow items:', error.message);
+      
+      // ถ้าได้ 401 error แสดงว่า token หมดอายุหรือไม่ถูกต้อง ให้ล้าง token ออก
+      if (error.response && error.response.status === 401) {
+        localStorage.removeItem('token');
+        console.log('Token expired or invalid, removed from localStorage');
+        setUser(null);
+      }
+      
       setBorrowedCount(0);
       setReturnedCount(0);
       setBorrowedBooks([]);

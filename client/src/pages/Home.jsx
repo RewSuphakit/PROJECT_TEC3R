@@ -46,7 +46,6 @@ function Home() {
   const fetchEquipment = async (page = 1, search = '') => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('token');
       let response;
 
       const params = new URLSearchParams({
@@ -55,7 +54,9 @@ function Home() {
         ...(search && { search })
       });
 
-      if (token) {
+      // ใช้ user object แทนการตรวจสอบ token เพื่อป้องกันปัญหา token หมดอายุ
+      if (user?.user_id) {
+        const token = localStorage.getItem('token');
         // ถ้า login แล้ว ใช้ protected endpoint
         response = await axios.get(`${apiUrl}/api/equipment/equipment?${params}`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -69,7 +70,7 @@ function Home() {
       const pagination = response.data.pagination || { totalPages: 1, currentPage: 1 };
 
       // กรอง status === 'Available' สำหรับ logged-in user
-      if (token) {
+      if (user?.user_id) {
         const availableEquipment = equipmentData.filter(record => record.status === 'Available');
         setEquipment(availableEquipment);
       } else {
@@ -79,6 +80,28 @@ function Home() {
       setTotalPages(pagination.totalPages || 1);
     } catch (error) {
       console.error('Error fetching equipment:', error);
+      
+      // ถ้าได้ 401 error อาจเป็นเพราะ token หมดอายุ ให้ล้าง token และ reload
+      if (error.response && error.response.status === 401) {
+        localStorage.removeItem('token');
+        console.log('Token expired, cleared from localStorage');
+        // Retry with public endpoint
+        try {
+          const params = new URLSearchParams({
+            page: page.toString(),
+            limit: itemsPerPage.toString(),
+            ...(search && { search })
+          });
+          const response = await axios.get(`${apiUrl}/api/equipment/public?${params}`);
+          const equipmentData = response.data.equipment || [];
+          const pagination = response.data.pagination || { totalPages: 1, currentPage: 1 };
+          setEquipment(equipmentData);
+          setTotalPages(pagination.totalPages || 1);
+        } catch (retryError) {
+          console.error('Error fetching public equipment:', retryError);
+          setEquipment([]);
+        }
+      }
     } finally {
       setIsLoading(false);
     }
