@@ -350,10 +350,11 @@ exports.getAllBorrows = async (req, res) => {
             queryParams = [monthNum + 1, yearNum]; // MySQL MONTH() returns 1-12
         }
 
-        // นับจำนวน transactions ทั้งหมด
+        // นับจำนวน borrow_items ทั้งหมด (ไม่ใช่ transactions)
         const countQuery = `
-            SELECT COUNT(DISTINCT bt.transaction_id) as total
-            FROM borrow_transactions bt
+            SELECT COUNT(*) as total
+            FROM borrow_items bi
+            JOIN borrow_transactions bt ON bi.transaction_id = bt.transaction_id
             ${whereClause}
         `;
         const [countResult] = await promisePool.query(countQuery, queryParams);
@@ -380,58 +381,17 @@ exports.getAllBorrows = async (req, res) => {
             JOIN borrow_items bi ON bt.transaction_id = bi.transaction_id
             JOIN equipment e ON bi.equipment_id = e.equipment_id
             ${whereClause}
-            ORDER BY bt.borrow_date DESC
+            ORDER BY bt.borrow_date DESC, bi.item_id ASC
         `;
 
         let dataParams = [...queryParams];
 
         if (!exportAll) {
-            // ต้อง pagination ที่ระดับ transaction ไม่ใช่ row
-            // ดึง transaction_ids ก่อน แล้วค่อยดึง items
-            const transactionIdsQuery = `
-                SELECT DISTINCT bt.transaction_id, bt.borrow_date
-                FROM borrow_transactions bt
-                ${whereClause}
-                ORDER BY bt.borrow_date DESC
-                LIMIT ? OFFSET ?
+            // Pagination ที่ระดับ borrow_items
+            dataQuery += `
+            LIMIT ? OFFSET ?
             `;
-            const [transactionIds] = await promisePool.query(transactionIdsQuery, [...queryParams, limit, offset]);
-
-            if (transactionIds.length === 0) {
-                return res.json({
-                    borrow_transactions: [],
-                    pagination: {
-                        currentPage: page,
-                        totalPages,
-                        totalCount,
-                        limit
-                    }
-                });
-            }
-
-            const ids = transactionIds.map(t => t.transaction_id);
-            dataQuery = `
-                SELECT 
-                    bt.transaction_id, 
-                    bt.borrow_date, 
-                    bt.user_id, 
-                    bt.status AS transaction_status,
-                    u.student_name,
-                    u.student_id,
-                    bi.item_id, 
-                    bi.returned_at, 
-                    bi.quantity, 
-                    e.equipment_name, 
-                    bi.status, 
-                    bi.image_return
-                FROM borrow_transactions bt
-                JOIN users u ON bt.user_id = u.user_id
-                JOIN borrow_items bi ON bt.transaction_id = bi.transaction_id
-                JOIN equipment e ON bi.equipment_id = e.equipment_id
-                WHERE bt.transaction_id IN (${ids.map(() => '?').join(',')})
-                ORDER BY bt.borrow_date DESC
-            `;
-            dataParams = ids;
+            dataParams.push(limit, offset);
         }
 
         const [rows] = await promisePool.query(dataQuery, dataParams);
