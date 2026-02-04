@@ -108,7 +108,7 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
       yPosition += 10;
 
       // วาดตาราง
-      doc.setFontSize(10); // ลดขนาดฟอนต์ลงเล็กน้อยเพื่อความพอดี
+      doc.setFontSize(10);
       const tableHeaders = ['ลำดับ', 'ชื่ออุปกรณ์', 'จำนวน', 'สถานะ', 'วันที่ยืม', 'วันที่คืน'];
       const colWidths = [10, 50, 15, 20, 42, 42];
       let xPosition = 20;
@@ -125,13 +125,15 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
       // วาดข้อมูลในตาราง
       borrowItems.forEach((item, index) => {
+        const startYPosition = yPosition;
         xPosition = 20;
         
+        // แปลงวันที่ให้สั้นลง (ตัวเลขแทนชื่อเดือน)
         const borrowDate = item.borrow_date 
           ? new Date(item.borrow_date).toLocaleString('th-TH', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
+              year: '2-digit',
+              month: '2-digit',
+              day: '2-digit',
               hour: '2-digit',
               minute: '2-digit'
             })
@@ -139,9 +141,9 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
         const returnDate = item.returned_at
           ? new Date(item.returned_at).toLocaleString('th-TH', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
+              year: '2-digit',
+              month: '2-digit',
+              day: '2-digit',
               hour: '2-digit',
               minute: '2-digit'
             })
@@ -149,24 +151,39 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
         const status = item.status === 'Returned' ? 'คืนแล้ว' : 'ยังไม่คืน';
 
+        // ลำดับ
         doc.text((index + 1).toString(), xPosition, yPosition);
         xPosition += colWidths[0];
         
-        doc.text(item.equipment_name || '-', xPosition, yPosition);
+        // ชื่ออุปกรณ์ (ใช้ splitTextToSize สำหรับข้อความยาว)
+        const equipmentName = item.equipment_name || '-';
+        const splitEquipmentName = doc.splitTextToSize(equipmentName, colWidths[1] - 2);
+        doc.text(splitEquipmentName, xPosition, yPosition);
+        const equipmentNameHeight = splitEquipmentName.length * 4; // ความสูงของชื่ออุปกรณ์
         xPosition += colWidths[1];
         
+        // จำนวน
         doc.text((item.quantity || 0).toString(), xPosition, yPosition);
         xPosition += colWidths[2];
         
+        // สถานะ
         doc.text(status, xPosition, yPosition);
         xPosition += colWidths[3];
         
-        doc.text(borrowDate, xPosition, yPosition);
+        // วันที่ยืม (ใช้ splitTextToSize)
+        const splitBorrowDate = doc.splitTextToSize(borrowDate, colWidths[4] - 2);
+        doc.text(splitBorrowDate, xPosition, yPosition);
+        const borrowDateHeight = splitBorrowDate.length * 4;
         xPosition += colWidths[4];
 
-        doc.text(returnDate, xPosition, yPosition);
+        // วันที่คืน (ใช้ splitTextToSize)
+        const splitReturnDate = doc.splitTextToSize(returnDate, colWidths[5] - 2);
+        doc.text(splitReturnDate, xPosition, yPosition);
+        const returnDateHeight = splitReturnDate.length * 4;
         
-        yPosition += 8;
+        // หาความสูงสูงสุดของแถวนี้
+        const maxHeight = Math.max(equipmentNameHeight, borrowDateHeight, returnDateHeight, 4);
+        yPosition += maxHeight + 2;
 
         // ขึ้นหน้าใหม่ถ้าเกินพื้นที่
         if (yPosition > 270) {

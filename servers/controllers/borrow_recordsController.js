@@ -250,8 +250,7 @@ exports.updateReturnStatus = async (req, res) => {
 - 🎒 อุปกรณ์: ${equipment_name}
 - 📞 เบอร์โทร: ${phone}
 - 📅 วันที่คืน: ${thai_return_date}
-- 🔄 จำนวนที่คืน: ${quantity_borrow} ชิ้น
-- ✅ สถานะ: ${borrow_status}`;
+- 🔄 จำนวนที่คืน: ${quantity_borrow} ชิ้น`;
 
     // หากมีรูปภาพในการคืน ให้แนบ URL (ปรับ URL ให้ตรงกับโดเมนของคุณ)
     const imageUrl = image_return ? `${process.env.API_URL}/image_return/${image_return}` : null;

@@ -234,9 +234,9 @@ function Report() {
       yPosition += 15;
 
       // Table Header
-      doc.setFontSize(12);
-      const headers = ['ลำดับ', 'รหัส', 'ชื่อผู้ยืม', 'รหัสนักศึกษา', 'อุปกรณ์', 'จำนวน', 'วันที่ยืม'];
-      const xPositions = [15, 30, 50, 90, 120, 150, 170];
+      doc.setFontSize(10);
+      const headers = ['ลำดับ', 'ชื่อผู้ยืม', 'รหัสนักศึกษา', 'อุปกรณ์', 'จำนวน', 'วันที่ยืม', 'เวลาคืน'];
+      const xPositions = [12, 25, 60, 95, 125, 140, 170];
       
       doc.setFillColor(220, 220, 220);
       doc.rect(10, yPosition - 5, 190, 8, 'F');
@@ -247,29 +247,56 @@ function Report() {
       yPosition += 8;
 
       // Data Rows
-      doc.setFontSize(11);
+      doc.setFontSize(9);
       allRecordsForPDF.forEach((item, index) => {
         if (yPosition > 270) {
           doc.addPage();
           yPosition = 20;
-          // Re-draw header on new page (optional but good practice)
+          // Re-draw header on new page
+          doc.setFontSize(10);
           doc.setFillColor(220, 220, 220);
           doc.rect(10, yPosition - 5, 190, 8, 'F');
           headers.forEach((h, i) => {
             doc.text(h, xPositions[i], yPosition);
           });
           yPosition += 8;
+          doc.setFontSize(9);
         }
 
         doc.text((index + 1).toString(), xPositions[0], yPosition);
-        doc.text(item.item_id ? item.item_id.toString() : '-', xPositions[1], yPosition);
-        doc.text(item.student_name || '-', xPositions[2], yPosition);
-        doc.text(item.student_id || '-', xPositions[3], yPosition);
-        doc.text(item.equipment_name || '-', xPositions[4], yPosition);
-        doc.text(item.quantity ? item.quantity.toString() : '0', xPositions[5], yPosition);
+        doc.text(item.student_name || '-', xPositions[1], yPosition);
+        doc.text(item.student_id || '-', xPositions[2], yPosition);
         
-        const dateStr = formatThaiDateTime(item.borrow_date);
-        doc.text(dateStr, xPositions[6], yPosition, { maxWidth: 35 }); // Allow text wrapping with maxWidth
+        // ชื่ออุปกรณ์ (ใช้ splitTextToSize)
+        const equipmentName = item.equipment_name || '-';
+        const splitEquipmentName = doc.splitTextToSize(equipmentName, 28);
+        doc.text(splitEquipmentName, xPositions[3], yPosition);
+        
+        doc.text(item.quantity ? item.quantity.toString() : '0', xPositions[4], yPosition);
+        
+        // วันที่ยืม (ย่อ)
+        const borrowDateStr = item.borrow_date 
+          ? new Date(item.borrow_date).toLocaleString('th-TH', {
+              year: '2-digit',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit'
+            })
+          : '-';
+        doc.text(borrowDateStr, xPositions[5], yPosition);
+        
+        // เวลาคืน (ย่อ)
+        const returnDateStr = item.returned_at
+          ? new Date(item.returned_at).toLocaleString('th-TH', {
+              year: '2-digit',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit'
+            })
+          : '-';
+        doc.text(returnDateStr, xPositions[6], yPosition);
 
         yPosition += 7;
         
@@ -439,12 +466,12 @@ function Report() {
                   <table className="min-w-full bg-white">
                     <thead>
                       <tr className="bg-slate-100 text-slate-700 uppercase text-sm leading-normal">
-                        <th className="py-4 px-6 text-left font-semibold">รหัส</th>
                         <th className="py-4 px-6 text-left font-semibold">ชื่อผู้ยืม</th>
                         <th className="py-4 px-6 text-left font-semibold">รหัสนักศึกษา</th>
                         <th className="py-4 px-6 text-left font-semibold">อุปกรณ์</th>
                         <th className="py-4 px-6 text-center font-semibold">จำนวน</th>
                         <th className="py-4 px-6 text-center font-semibold">วันที่ยืม</th>
+                        <th className="py-4 px-6 text-center font-semibold">เวลาคืน</th>
                         <th className="py-4 px-6 text-center font-semibold">รายละเอียด</th>
                       </tr>
                     </thead>
@@ -454,11 +481,6 @@ function Report() {
                           key={report.item_id} 
                           className={`table-row border-b ${index % 2 === 0 ? 'bg-gray-50/50' : 'bg-white'} hover:bg-blue-50/30 transition-colors`}
                         >
-                          <td className="py-4 px-6">
-                            <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
-                              #{report.item_id}
-                            </span>
-                          </td>
                           <td className="py-4 px-6 font-medium text-gray-800">{report.student_name}</td>
                           <td className="py-4 px-6 text-gray-600">{report.student_id}</td>
                           <td className="py-4 px-6">
@@ -472,6 +494,13 @@ function Report() {
                             </span>
                           </td>
                           <td className="py-4 px-6 text-center text-gray-600">{formatThaiDateTime(report.borrow_date)}</td>
+                          <td className="py-4 px-6 text-center text-gray-600">
+                            {report.returned_at ? (
+                              <span className="text-green-600 font-medium">{formatThaiDateTime(report.returned_at)}</span>
+                            ) : (
+                              <span className="text-red-500 font-medium">ยังไม่คืน</span>
+                            )}
+                          </td>
                           <td className="py-4 px-6 text-center">
                             <Link
                               to={`/RMUTI/ReportDetails/${report.transaction_id}`}
@@ -651,7 +680,7 @@ function Report() {
             <div className="p-6 bg-gray-50 border-t flex flex-wrap gap-3 justify-end">
               <button
                 onClick={resetFilter}
-                className="px-6 py-3 rounded-xl font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors flex items-center gap-2"
+                className="px-6 py-3 rounded-xl font-medium text-white  bg-purple-500 hover:bg-purple-600 transition-colors flex items-center gap-2"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -660,7 +689,7 @@ function Report() {
               </button>
               <button
                 onClick={closeModal}
-                className="px-6 py-3 rounded-xl font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors"
+                className="px-6 py-3 rounded-xl font-medium text-white  bg-red-500 hover:bg-red-600"
               >
                 ยกเลิก
               </button>
