@@ -15,6 +15,8 @@ function Return() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [sortField, setSortField] = useState('borrow_date');
+  const [sortOrder, setSortOrder] = useState('desc');
   const tableContainerRef = useRef(null);
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
@@ -95,7 +97,54 @@ function Return() {
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = borrowedBooks.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Sorting logic
+  const sortedItems = React.useMemo(() => {
+    const items = [...borrowedBooks];
+    items.sort((a, b) => {
+      let comparison = 0;
+      switch (sortField) {
+        case 'equipment_name':
+          comparison = (a.equipment_name || '').localeCompare(b.equipment_name || '', 'th');
+          break;
+        case 'quantity':
+          comparison = (a.quantity || 0) - (b.quantity || 0);
+          break;
+        case 'borrow_date':
+        default:
+          comparison = new Date(b.borrow_date) - new Date(a.borrow_date);
+          break;
+      }
+      if (sortField === 'borrow_date') {
+        return sortOrder === 'desc' ? comparison : -comparison;
+      }
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+    return items;
+  }, [borrowedBooks, sortField, sortOrder]);
+
+  const currentItems = sortedItems.slice(indexOfFirstItem, indexOfLastItem);
+
+  // ฟังก์ชันจัดการการเรียงลำดับ
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+    setCurrentPage(1);
+  };
+
+  // Component แสดง icon การเรียงลำดับ
+  const SortIcon = ({ field }) => {
+    if (sortField !== field) {
+      return <span className="ml-1 text-gray-300 text-xs">⇅</span>;
+    }
+    return sortOrder === 'asc'
+      ? <span className="ml-1 text-blue-600 text-xs">▲</span>
+      : <span className="ml-1 text-blue-600 text-xs">▼</span>;
+  };
 
   const handleCaptureImage = (capturedImage, itemId) => {
     setImages((prevCapturedImages) => ({
@@ -172,11 +221,45 @@ function Return() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50/80 sticky top-0 z-10">
                   <tr>
-                    {['รหัส', 'รูปภาพ', 'ชื่ออุปกรณ์', 'จำนวน', 'วันที่ยืม', 'หลักฐานการคืน', 'ดำเนินการ'].map((header) => (
-                      <th key={header} className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/80 backdrop-blur-sm">
-                        {header}
-                      </th>
-                    ))}
+                    <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/80 backdrop-blur-sm">
+                      รหัส
+                    </th>
+                    <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/80 backdrop-blur-sm">
+                      รูปภาพ
+                    </th>
+                    <th
+                      className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/80 backdrop-blur-sm cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                      onClick={() => handleSort('equipment_name')}
+                    >
+                      <span className="flex items-center justify-center">
+                        ชื่ออุปกรณ์
+                        <SortIcon field="equipment_name" />
+                      </span>
+                    </th>
+                    <th
+                      className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/80 backdrop-blur-sm cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                      onClick={() => handleSort('quantity')}
+                    >
+                      <span className="flex items-center justify-center">
+                        จำนวน
+                        <SortIcon field="quantity" />
+                      </span>
+                    </th>
+                    <th
+                      className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/80 backdrop-blur-sm cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                      onClick={() => handleSort('borrow_date')}
+                    >
+                      <span className="flex items-center justify-center">
+                        วันที่ยืม
+                        <SortIcon field="borrow_date" />
+                      </span>
+                    </th>
+                    <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/80 backdrop-blur-sm">
+                      หลักฐานการคืน
+                    </th>
+                    <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/80 backdrop-blur-sm">
+                      ดำเนินการ
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-100">
