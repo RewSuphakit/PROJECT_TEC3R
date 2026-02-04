@@ -57,7 +57,8 @@ function Home() {
       // ใช้ user object แทนการตรวจสอบ token เพื่อป้องกันปัญหา token หมดอายุ
       if (user?.user_id) {
         const token = localStorage.getItem('token');
-        // ถ้า login แล้ว ใช้ protected endpoint
+        // ถ้า login แล้ว ใช้ protected endpoint และส่ง status=Available เพื่อกรองที่ server
+        params.append('status', 'Available');
         response = await axios.get(`${apiUrl}/api/equipment/equipment?${params}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -69,14 +70,8 @@ function Home() {
       const equipmentData = response.data.equipment || [];
       const pagination = response.data.pagination || { totalPages: 1, currentPage: 1 };
 
-      // กรอง status === 'Available' สำหรับ logged-in user
-      if (user?.user_id) {
-        const availableEquipment = equipmentData.filter(record => record.status === 'Available');
-        setEquipment(availableEquipment);
-      } else {
-        setEquipment(equipmentData);
-      }
-
+      // ไม่ต้องกรองที่ client อีกแล้ว เพราะ server กรองให้แล้ว
+      setEquipment(equipmentData);
       setTotalPages(pagination.totalPages || 1);
     } catch (error) {
       console.error('Error fetching equipment:', error);

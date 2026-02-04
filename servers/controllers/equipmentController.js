@@ -23,15 +23,34 @@ exports.addEquipment = async (req, res) => {
   }
 };
 
-// ดึงข้อมูลอุปกรณ์ทั้งหมด (ต้อง login) - รองรับ pagination
+// ดึงข้อมูลอุปกรณ์ทั้งหมด (ต้อง login) - รองรับ pagination และ filters
 exports.getAllEquipment = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    const search = req.query.search || '';
+    const status = req.query.status || '';
 
-    // นับจำนวนทั้งหมด
-    const [countResult] = await promisePool.query('SELECT COUNT(*) as total FROM equipment');
+    // สร้างเงื่อนไข WHERE
+    let whereClause = 'WHERE 1=1';
+    let queryParams = [];
+
+    if (status) {
+      whereClause += ' AND status = ?';
+      queryParams.push(status);
+    }
+
+    if (search) {
+      whereClause += ' AND equipment_name LIKE ?';
+      queryParams.push(`%${search}%`);
+    }
+
+    // นับจำนวนทั้งหมด (ตาม filter)
+    const [countResult] = await promisePool.query(
+      `SELECT COUNT(*) as total FROM equipment ${whereClause}`,
+      queryParams
+    );
     const totalCount = countResult[0].total;
     const totalPages = Math.ceil(totalCount / limit);
 
@@ -39,10 +58,11 @@ exports.getAllEquipment = async (req, res) => {
     const query = `
       SELECT equipment_id, equipment_name, total_quantity, available_quantity, status, image, created_at, updated_at 
       FROM equipment 
+      ${whereClause}
       ORDER BY updated_at DESC 
       LIMIT ? OFFSET ?
     `;
-    const [results] = await promisePool.query(query, [limit, offset]);
+    const [results] = await promisePool.query(query, [...queryParams, limit, offset]);
 
     res.status(200).json({
       equipment: results,
