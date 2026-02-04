@@ -16,7 +16,7 @@ function ManageUsers() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const usersPerPage = 7;
+  const usersPerPage = 10;
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
