@@ -4,7 +4,6 @@ const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function Activity() {
   const [transactions, setTransactions] = useState([]);
   const [error, setError] = useState(null);
-  const [now, setNow] = useState(Date.now());
 
   // ดึงข้อมูลกิจกรรมจาก API
   useEffect(() => {
@@ -14,6 +13,7 @@ function Activity() {
         const response = await axios.get(`${apiUrl}/api/borrow/all`, {
           headers: { Authorization: `Bearer ${token}` }
         });
+        const now = Date.now();
         const filtered = response.data.borrow_transactions?.filter(transaction => {
           const borrowDate = new Date(transaction.borrow_date);
           const diffInHours = (now - borrowDate.getTime()) / 3600000;
@@ -31,15 +31,6 @@ function Activity() {
     };
   
     fetchTransactions();
-  }, [now]);
-  
-
-  // อัปเดต "now" ทุก ๆ นาที เพื่อให้การคำนวณเวลาที่ผ่านไปเปลี่ยนแปลง
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setNow(Date.now());
-    }, 60000);
-    return () => clearInterval(timer);
   }, []);
 
   return (
@@ -51,7 +42,7 @@ function Activity() {
       ) : (
         <div className="space-y-4">
           {transactions.map((transaction) => (
-            <TransactionItem key={transaction.transaction_id} transaction={transaction} now={now} />
+            <TransactionItem key={transaction.transaction_id} transaction={transaction} />
           ))}
         </div>
       )}
@@ -59,26 +50,26 @@ function Activity() {
   );
 }
 
-const TransactionItem = ({ transaction, now }) => {
+const TransactionItem = ({ transaction }) => {
   // ใช้ student_name หรือหากไม่มี ให้แสดง User ID
   const userName = transaction.student_name || `User ID: ${transaction.user_id}`;
 
   // กำหนดสถานะโดยดูจากว่า return_date มีค่าหรือไม่ (ถ้ามี ให้ถือว่า Returned)
   const status = transaction.return_date ? "Returned" : "Borrowed";
 
-  // ฟังก์ชันคำนวณเวลาที่ผ่านไปจากวันที่ที่กำหนด
-  const getTimeDifference = (date) => {
-    const diff = now - new Date(date).getTime();
-    const diffInMinutes = Math.floor(diff / 60000);
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours > 0) {
-      return `${diffInHours} ชั่วโมงที่แล้ว`;
-    }
-    return `${diffInMinutes} นาทีที่แล้ว`;
+  // ฟังก์ชันแปลงวันที่เป็นรูปแบบไทย DD/MM/YYYY HH:mm
+  const formatDateTime = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear() + 543; // แปลงเป็นพ.ศ.
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
 
-  const borrowTime = getTimeDifference(transaction.borrow_date);
-  const returnTime = transaction.return_date ? getTimeDifference(transaction.return_date) : null;
+  const borrowTime = formatDateTime(transaction.borrow_date);
+  const returnTime = transaction.return_date ? formatDateTime(transaction.return_date) : null;
 
   // กำหนดไอคอนและพื้นหลังตามสถานะ
   const getIconClass = () => status === "Borrowed" ? "fa-box text-blue-500" : "fa-check text-green-500";
