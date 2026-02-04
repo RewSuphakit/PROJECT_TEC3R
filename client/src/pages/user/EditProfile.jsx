@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -7,6 +8,7 @@ import bg2 from '../../assets/bg2.png';
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function EditProfile() {
   const { user, fetchUserProfile, logout } = useAuth();
+  const navigate = useNavigate();
   const userId = user?.user_id;
 
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -101,7 +103,7 @@ function EditProfile() {
   return (
     <div className="flex-grow flex flex-col items-center justify-center p-2 relative w-full"
       style={{ backgroundImage: `url(${bg2})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-      >
+    >
       {/* Overlay */}
       {/* <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-0 "></div> */}
       {/* Profile Display Section */}
@@ -168,11 +170,11 @@ function EditProfile() {
 
             {/* เบอร์ติดต่อ */}
             <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-100">
-               <img
-            src="https://img.icons8.com/?size=100&id=I24lanX6Nq71&format=png&color=000000"
-            alt="user icon"
-            className="w-8 h-8"
-          />
+              <img
+                src="https://img.icons8.com/?size=100&id=I24lanX6Nq71&format=png&color=000000"
+                alt="user icon"
+                className="w-8 h-8"
+              />
               <div className="flex-1">
                 <p className="text-sm text-gray-600 font-medium">เบอร์ติดต่อ</p>
                 <p className="text-lg font-semibold text-gray-800">{user.phone}</p>
@@ -181,14 +183,25 @@ function EditProfile() {
           </div>
         )}
 
-        <button 
-          onClick={openEditModal} 
+        <button
+          onClick={openEditModal}
           className="w-full mt-4 py-2 bg-gradient-to-r from-blue-900 to-blue-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
           </svg>
           แก้ไขข้อมูลส่วนตัว
+        </button>
+
+        {/* Back to Home Button */}
+        <button
+          onClick={() => navigate('/RMUTI')}
+          className="w-full mt-3 py-2 bg-white text-gray-600 border-2 border-gray-200 rounded-xl font-semibold hover:bg-gray-50 hover:text-blue-600 hover:border-blue-300 transition-all duration-200 flex items-center justify-center gap-2"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          กลับหน้าหลักยืมอุปกรณ์
         </button>
       </div>
 
@@ -198,11 +211,11 @@ function EditProfile() {
           <div className="bg-white p-8 rounded-2xl max-w-2xl w-full shadow-2xl max-h-[85vh] overflow-y-auto">
             <div className="text-center mb-6">
               <div className="inline-flex items-center justify-center w-20 h-20   mb-3">
-                  <img
-            src="https://img.icons8.com/?size=100&id=DXj6ILt461oM&format=png&color=000000"
-            alt="user icon"
-            className="w-20 h-20"
-          />
+                <img
+                  src="https://img.icons8.com/?size=100&id=DXj6ILt461oM&format=png&color=000000"
+                  alt="user icon"
+                  className="w-20 h-20"
+                />
               </div>
               <h2 className="text-2xl font-bold text-gray-800">แก้ไขข้อมูลส่วนตัว</h2>
             </div>
@@ -338,8 +351,8 @@ function EditProfile() {
                 >
                   ยกเลิก
                 </button>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="flex-1 py-3 px-4 bg-gradient-to-r from-green-600 to-green-400 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
                 >
                   บันทึก
