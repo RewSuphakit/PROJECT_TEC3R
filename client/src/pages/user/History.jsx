@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "daisyui/dist/full.css";
 import useAuth from "../../hooks/useAuth";
 import axios from "axios";
@@ -6,6 +7,7 @@ import bg2 from "../../assets/bg2.png";
 
 function History() {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
   const [history, setHistory] = useState([]);
   const [apiLoading, setApiLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -330,6 +332,19 @@ function History() {
             )}
           </>
         )}
+
+        {/* Back to Home Button - Bottom */}
+        <div className="flex justify-start mt-6 pt-4 border-t border-gray-200">
+          <button
+            onClick={() => navigate('/RMUTI')}
+            className="px-4 py-2 bg-white text-gray-600 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 hover:text-blue-600 hover:border-blue-300 transition-all duration-200 flex items-center gap-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            กลับหน้าหลักยืมอุปกรณ์
+          </button>
+        </div>
       </div>
     </div>
   );
