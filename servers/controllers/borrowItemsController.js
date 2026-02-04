@@ -46,22 +46,8 @@ exports.getHistoryByUserId = async (req, res) => {
         `;
         const [results] = await promisePool.query(query, [user_id, limit, offset]);
 
-        // Format date to Thai locale
-        const formattedResults = results.map(record => ({
-            ...record,
-            borrow_date: record.borrow_date ? new Date(record.borrow_date).toLocaleString("th-TH", {
-                timeZone: "Asia/Bangkok",
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit"
-            }) : null,
-            returned_at: record.returned_at ? new Date(record.returned_at).toLocaleString("th-TH", {
-                timeZone: "Asia/Bangkok",
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit"
-            }) : null,
-        }));
+        // Send raw dates to frontend so it can format including time
+        const formattedResults = results;
 
         res.status(200).json({
             history: formattedResults,

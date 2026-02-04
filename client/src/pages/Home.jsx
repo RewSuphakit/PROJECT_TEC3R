@@ -80,7 +80,7 @@ function Home() {
       setTotalPages(pagination.totalPages || 1);
     } catch (error) {
       console.error('Error fetching equipment:', error);
-      
+
       // ถ้าได้ 401 error อาจเป็นเพราะ token หมดอายุ ให้ล้าง token และ reload
       if (error.response && error.response.status === 401) {
         localStorage.removeItem('token');
@@ -177,7 +177,7 @@ function Home() {
         icon: "warning",
         showCancelButton: true,
         showDenyButton: true,
-        confirmButtonText: "ยืมทั้งหมด!",
+        confirmButtonText: "ยืนยันการยืม",
         denyButtonText: "ลบรายการค้าง",
         cancelButtonText: "ยกเลิก",
         reverseButtons: true,
@@ -239,8 +239,8 @@ function Home() {
         imageAlt: `${title}`,
         showCancelButton: true,
         showDenyButton: pendingCount > 0,
-        confirmButtonText: "ยืมอุปกรณ์!",
-        denyButtonText: `ยืนยันรายการที่เลือก (${pendingCount})`,
+        confirmButtonText: pendingCount > 0 ? `ยืนยันรายการที่เลือก (${pendingCount})` : "ยืนยันรายการที่เลือก",
+        denyButtonText: "ลบรายการที่เลือก",
         cancelButtonText: "ยกเลิก!",
         reverseButtons: true,
         input: "number",
@@ -296,7 +296,7 @@ function Home() {
           icon: "warning",
           showCancelButton: true,
           showDenyButton: true,
-          confirmButtonText: "ยืมทั้งหมด!",
+          confirmButtonText: "ยืนยันการยืม",
           denyButtonText: "ยืมเพิ่มเติม",
           cancelButtonText: "ยกเลิก",
           reverseButtons: true,
@@ -332,7 +332,15 @@ function Home() {
           });
         }
       } else if (result.isDenied) {
-        await confirmBorrowFromStorage();
+        removeBorrowItems();
+        await swalWithBootstrapButtons.fire({
+          title: "ลบรายการที่เลือกเรียบร้อย",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false
+        });
+        // You might want to update the UI or badge here if necessary
+        // setBorrowItems([]); // already done by removeBorrowItems
       }
     } catch (error) {
       console.error("Error borrowing equipment:", error);
@@ -484,7 +492,7 @@ function Home() {
       <div className="flex justify-center sm:justify-end px-4 sm:pr-[15%] md:pr-[20%] lg:pr-[23%] mb-5">
         <button
           disabled={currentPage === 1}
-          className={`flex items-center justify-center px-3 h-8 me-3 text-sm font-medium border rounded-lg ${currentPage === 1 ? 'bg-gray-100 text-gray-400' : 'bg-white text-gray-600 hover:bg-gray-100'
+          className={`flex items-center justify-center px-6 py-3 me-3 text-lg font-bold border-2 rounded-xl shadow-md transition-all duration-200 ${currentPage === 1 ? 'bg-gray-100 text-gray-400 border-gray-200' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-400 hover:scale-105'
             }`}
           onClick={() => setCurrentPage(currentPage - 1)}
         >
@@ -492,7 +500,7 @@ function Home() {
         </button>
         <button
           disabled={currentPage === totalPages}
-          className={`flex items-center justify-center px-3 h-8 text-sm font-medium border rounded-lg ${currentPage === totalPages ? 'bg-gray-100 text-gray-400' : 'bg-white text-gray-600 hover:bg-gray-100'
+          className={`flex items-center justify-center px-6 py-3 text-lg font-bold border-2 rounded-xl shadow-md transition-all duration-200 ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 border-gray-200' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-400 hover:scale-105'
             }`}
           onClick={() => setCurrentPage(currentPage + 1)}
         >

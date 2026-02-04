@@ -13,6 +13,21 @@ function History() {
   const [filter, setFilter] = useState("all");
   const itemsPerPage = 10;
 
+  // ฟังก์ชันจัดรูปแบบวันที่: DD/MM/YYYY HH:mm (พ.ศ.)
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString; // Fallback
+
+    const year = date.getFullYear() + 543;
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  };
+
   // Fetch history with pagination and filter
   const fetchHistory = async (page = 1, filterValue = "all") => {
     if (!user?.user_id) return;
@@ -79,31 +94,28 @@ function History() {
         {/* ปุ่มกรองแบบเรียบๆ */}
         <div className="flex justify-center gap-2 mb-8 flex-wrap">
           <button
-            className={`px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-              filter === "all"
-                ? "bg-blue-500 text-white shadow-md"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${filter === "all"
+              ? "bg-blue-500 text-white shadow-md"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
             onClick={() => handleFilterChange("all")}
           >
             ทั้งหมด
           </button>
           <button
-            className={`px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-              filter === "borrowed"
-                ? "bg-red-500 text-white shadow-md"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${filter === "borrowed"
+              ? "bg-red-500 text-white shadow-md"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
             onClick={() => handleFilterChange("borrowed")}
           >
             ยังไม่คืน
           </button>
           <button
-            className={`px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-              filter === "returned"
-                ? "bg-green-500 text-white shadow-md"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${filter === "returned"
+              ? "bg-green-500 text-white shadow-md"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
             onClick={() => handleFilterChange("returned")}
           >
             คืนแล้ว
@@ -156,7 +168,7 @@ function History() {
                         </td>
                       </tr>
                     ) : (
-                        currentItems.map((record) => (
+                      currentItems.map((record) => (
                         <tr
                           key={record.item_id}
                           className="hover:bg-gray-50 transition-colors"
@@ -168,18 +180,17 @@ function History() {
                             {record.quantity}
                           </td>
                           <td className="px-4 lg:px-6 py-4 text-sm text-center text-gray-600">
-                            {record.borrow_date || "-"}
+                            {formatDate(record.borrow_date)}
                           </td>
                           <td className="px-4 lg:px-6 py-4 text-sm text-center text-gray-600">
-                            {record.returned_at || "-"}
+                            {formatDate(record.returned_at)}
                           </td>
                           <td className="px-4 lg:px-6 py-4 text-center">
                             <span
-                              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                                record.status === "Returned"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-200 text-red-800"
-                              }`}
+                              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${record.status === "Returned"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-200 text-red-800"
+                                }`}
                             >
                               {record.status === "Returned"
                                 ? "คืนแล้ว"
@@ -197,11 +208,10 @@ function History() {
               {totalPages > 1 && (
                 <div className="flex justify-center gap-1 py-4 bg-gray-50 border-t border-gray-200">
                   <button
-                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                      currentPage === 1
-                        ? "text-gray-400 cursor-not-allowed"
-                        : "text-gray-700 hover:bg-gray-200"
-                    }`}
+                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${currentPage === 1
+                      ? "text-gray-400 cursor-not-allowed"
+                      : "text-gray-700 hover:bg-gray-200"
+                      }`}
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(prev - 1, 1))
                     }
@@ -212,22 +222,20 @@ function History() {
                   {[...Array(totalPages)].map((_, idx) => (
                     <button
                       key={idx}
-                      className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                        currentPage === idx + 1
-                          ? "bg-blue-500 text-white"
-                          : "text-gray-700 hover:bg-gray-200"
-                      }`}
+                      className={`px-3 py-1 rounded text-sm font-medium transition-colors ${currentPage === idx + 1
+                        ? "bg-blue-500 text-white"
+                        : "text-gray-700 hover:bg-gray-200"
+                        }`}
                       onClick={() => setCurrentPage(idx + 1)}
                     >
                       {idx + 1}
                     </button>
                   ))}
                   <button
-                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                      currentPage === totalPages
-                        ? "text-gray-400 cursor-not-allowed"
-                        : "text-gray-700 hover:bg-gray-200"
-                    }`}
+                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${currentPage === totalPages
+                      ? "text-gray-400 cursor-not-allowed"
+                      : "text-gray-700 hover:bg-gray-200"
+                      }`}
                     onClick={() =>
                       setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                     }
@@ -256,11 +264,10 @@ function History() {
                         {record.equipment_name}
                       </h3>
                       <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ml-2 ${
-                          record.status === "Returned"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ml-2 ${record.status === "Returned"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                          }`}
                       >
                         {record.status === "Returned" ? "คืนแล้ว" : "ยังไม่คืน"}
                       </span>
@@ -273,15 +280,14 @@ function History() {
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">วันที่ยืม:</span>
                         <span className="text-gray-800">
-                          {record.borrow_date || "-"}
+                          {formatDate(record.borrow_date)}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">วันที่คืน:</span>
                         <span className="text-gray-800">
-                          {record.returned_at || "-"}
+                          {formatDate(record.returned_at)}
                         </span>
                       </div>
                     </div>
@@ -294,11 +300,10 @@ function History() {
             {totalPages > 1 && (
               <div className="md:hidden flex justify-center gap-1 pt-4">
                 <button
-                  className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                    currentPage === 1
-                      ? "text-gray-400 cursor-not-allowed"
-                      : "text-gray-700 hover:bg-gray-200 bg-white border border-gray-300"
-                  }`}
+                  className={`px-3 py-1 rounded text-sm font-medium transition-colors ${currentPage === 1
+                    ? "text-gray-400 cursor-not-allowed"
+                    : "text-gray-700 hover:bg-gray-200 bg-white border border-gray-300"
+                    }`}
                   onClick={() =>
                     setCurrentPage((prev) => Math.max(prev - 1, 1))
                   }
@@ -310,11 +315,10 @@ function History() {
                   {currentPage} / {totalPages}
                 </div>
                 <button
-                  className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                    currentPage === totalPages
-                      ? "text-gray-400 cursor-not-allowed"
-                      : "text-gray-700 hover:bg-gray-200 bg-white border border-gray-300"
-                  }`}
+                  className={`px-3 py-1 rounded text-sm font-medium transition-colors ${currentPage === totalPages
+                    ? "text-gray-400 cursor-not-allowed"
+                    : "text-gray-700 hover:bg-gray-200 bg-white border border-gray-300"
+                    }`}
                   onClick={() =>
                     setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                   }
