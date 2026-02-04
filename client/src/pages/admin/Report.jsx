@@ -51,7 +51,7 @@ function Report() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const itemsPerPage = 7;
+  const itemsPerPage = 10;
 
   const fetchReports = async (page = 1) => {
     try {
