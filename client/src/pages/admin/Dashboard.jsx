@@ -89,11 +89,11 @@ function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-3xl font-bold text-gray-800 mt-2">
-                    {statsData.total_borrowed || 0}
+                    {statsData.total_borrow_items || 0}
                   </h3>
                   <p className="text-gray-500 text-sm font-medium mt-2 flex items-center gap-1">
                     <i className="fas fa-exchange-alt text-xs" />
-                    <span>รายการอุปกรณ์ที่ถูกยืม</span>
+                    <span>จำนวนการยืมทั้งหมด</span>
                   </p>
                 </div>
                 <div className="bg-orange-50 p-4 rounded-xl">

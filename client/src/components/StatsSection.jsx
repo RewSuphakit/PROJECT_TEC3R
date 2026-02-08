@@ -14,8 +14,8 @@ const StatsSection = () => {
         const fetchedStats = [
           { id: 1, label: 'อุปกรณ์ที่มีทั้งหมด', count: response.data.total_equipment, icon: 'https://img.icons8.com/?size=100&id=Wwrq6dySBLGL&format=png&color=000000' },
           { id: 2, label: 'ผู้ใช้งานทั้งหมด', count: response.data.total_users, icon: 'https://img.icons8.com/?size=100&id=13042&format=png&color=000000' },
-          { id: 3, label: 'การยืมอุปกรณ์ทั้งหมด', count: response.data.total_borrowed, icon: 'https://img.icons8.com/?size=100&id=tbXXLF54CFmX&format=png&color=000000' },
-          { id: 4, label: 'การคืนอุปกรณ์ทั้งหมด', count: response.data.total_returned, icon: 'https://img.icons8.com/?size=100&id=sLAKrHTYvco6&format=png&color=000000' }
+          { id: 3, label: 'จำนวนการยืมทั้งหมด', count: response.data.total_borrow_items, icon: 'https://img.icons8.com/?size=100&id=tbXXLF54CFmX&format=png&color=000000' },
+          { id: 4, label: 'จำนวนการคืนทั้งหมด', count: response.data.total_returned, icon: 'https://img.icons8.com/?size=100&id=sLAKrHTYvco6&format=png&color=000000' }
         ];
 
         setStatsData(fetchedStats);
