@@ -42,6 +42,31 @@ function Home() {
     localStorage.setItem('borrowItems', JSON.stringify(allItems));
   };
 
+  // ลบอุปกรณ์ทีละชิ้นจาก localStorage
+  const removeOneBorrowItem = (equipmentId) => {
+    if (!user?.user_id) return;
+    const items = getBorrowItems();
+    const filteredItems = items.filter(item => Number(item.equipment_id) !== Number(equipmentId));
+    setBorrowItems(filteredItems);
+  };
+
+  // อัพเดทจำนวนอุปกรณ์ใน localStorage
+  const updateBorrowItemQuantity = (equipmentId, newQuantity) => {
+    if (!user?.user_id) return;
+    const items = getBorrowItems();
+    const itemIndex = items.findIndex(item => Number(item.equipment_id) === Number(equipmentId));
+    
+    if (itemIndex !== -1) {
+      if (newQuantity <= 0) {
+        // ถ้าจำนวนเป็น 0 หรือน้อยกว่า ให้ลบรายการออก
+        items.splice(itemIndex, 1);
+      } else {
+        items[itemIndex].quantity_borrow = newQuantity;
+      }
+      setBorrowItems(items);
+    }
+  };
+
   // ======= ดึงข้อมูลอุปกรณ์ (Server-side Pagination) =======
   const fetchEquipment = async (page = 1, search = '') => {
     try {
@@ -327,15 +352,206 @@ function Home() {
           });
         }
       } else if (result.isDenied) {
-        removeBorrowItems();
-        await swalWithBootstrapButtons.fire({
-          title: "ลบรายการที่เลือกเรียบร้อย",
-          icon: "success",
-          timer: 1500,
-          showConfirmButton: false
-        });
-        // You might want to update the UI or badge here if necessary
-        // setBorrowItems([]); // already done by removeBorrowItems
+        // แสดง popup รายการอุปกรณ์ที่เลือกไว้พร้อมปุ่มลบทีละชิ้น
+        const showDeleteItemsPopup = async () => {
+          const pendingItems = getBorrowItems();
+          
+          if (pendingItems.length === 0) {
+            return swalWithBootstrapButtons.fire({
+              title: "ไม่มีรายการ",
+              text: "ไม่มีอุปกรณ์ในรายการที่เลือก",
+              icon: "info",
+            });
+          }
+
+          // ดึงชื่ออุปกรณ์จากรายการ equipment ปัจจุบัน
+          const getEquipmentName = (equipmentId) => {
+            const found = equipment.find(e => Number(e.equipment_id) === Number(equipmentId));
+            return found ? found.equipment_name : `อุปกรณ์ #${equipmentId}`;
+          };
+
+          // ดึงจำนวนอุปกรณ์คงเหลือ
+          const getEquipmentMaxQty = (equipmentId) => {
+            const found = equipment.find(e => Number(e.equipment_id) === Number(equipmentId));
+            return found ? found.available_quantity : 999;
+          };
+
+          const buildItemsHtml = () => {
+            const items = getBorrowItems();
+            if (items.length === 0) {
+              return '<p style="color: #6b7280; text-align: center;">ไม่มีรายการอุปกรณ์</p>';
+            }
+            return `
+              <div style="max-height: 300px; overflow-y: auto; text-align: left;">
+                ${items.map((item, index) => {
+                  const maxQty = getEquipmentMaxQty(item.equipment_id);
+                  return `
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; margin: 8px 0; background: #f3f4f6; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <div style="flex: 1; min-width: 0;">
+                      <strong style="display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${index + 1}. ${getEquipmentName(item.equipment_id)}</strong>
+                      <span style="color: #6b7280; font-size: 12px;">คงเหลือ: ${maxQty}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-left: 12px;">
+                      <button 
+                        type="button"
+                        class="swal-minus-btn" 
+                        data-equipment-id="${item.equipment_id}"
+                        data-current-qty="${item.quantity_borrow}"
+                        style="background: ${item.quantity_borrow <= 1 ? '#d1d5db' : '#3b82f6'}; color: white; border: none; width: 32px; height: 32px; border-radius: 6px; cursor: ${item.quantity_borrow <= 1 ? 'not-allowed' : 'pointer'}; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center;"
+                      >
+                        −
+                      </button>
+                      <span style="min-width: 40px; text-align: center; font-weight: bold; font-size: 16px;">${item.quantity_borrow}</span>
+                      <button 
+                        type="button"
+                        class="swal-plus-btn" 
+                        data-equipment-id="${item.equipment_id}"
+                        data-current-qty="${item.quantity_borrow}"
+                        data-max-qty="${maxQty}"
+                        style="background: ${item.quantity_borrow >= maxQty ? '#d1d5db' : '#3b82f6'}; color: white; border: none; width: 32px; height: 32px; border-radius: 6px; cursor: ${item.quantity_borrow >= maxQty ? 'not-allowed' : 'pointer'}; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center;"
+                      >
+                        +
+                      </button>
+                      <button 
+                        type="button"
+                        class="swal-delete-btn" 
+                        data-equipment-id="${item.equipment_id}"
+                        style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-left: 8px;"
+                      >
+                        ลบ
+                      </button>
+                    </div>
+                  </div>
+                `}).join('')}
+              </div>
+            `;
+          };
+
+          // ฟังก์ชันสำหรับ attach event listeners ให้ปุ่มทั้งหมด
+          const attachEventListeners = (popup) => {
+            const htmlContainer = popup.querySelector('.swal2-html-container');
+            
+            // ปุ่มลบ
+            htmlContainer.querySelectorAll('.swal-delete-btn').forEach(btn => {
+              btn.addEventListener('click', (e) => {
+                const equipmentId = e.target.getAttribute('data-equipment-id');
+                removeOneBorrowItem(equipmentId);
+                htmlContainer.innerHTML = buildItemsHtml();
+                attachEventListeners(popup);
+                checkAndCloseIfEmpty();
+              });
+            });
+
+            // ปุ่มลด
+            htmlContainer.querySelectorAll('.swal-minus-btn').forEach(btn => {
+              btn.addEventListener('click', (e) => {
+                const equipmentId = e.target.getAttribute('data-equipment-id');
+                const currentQty = parseInt(e.target.getAttribute('data-current-qty'), 10);
+                // ไม่ให้ลดต่ำกว่า 1
+                if (currentQty <= 1) return;
+                const newQty = currentQty - 1;
+                updateBorrowItemQuantity(equipmentId, newQty);
+                htmlContainer.innerHTML = buildItemsHtml();
+                attachEventListeners(popup);
+              });
+            });
+
+            // ปุ่มเพิ่ม
+            htmlContainer.querySelectorAll('.swal-plus-btn').forEach(btn => {
+              btn.addEventListener('click', (e) => {
+                const equipmentId = e.target.getAttribute('data-equipment-id');
+                const currentQty = parseInt(e.target.getAttribute('data-current-qty'), 10);
+                const maxQty = parseInt(e.target.getAttribute('data-max-qty'), 10);
+                // ไม่ให้เพิ่มเกินจำนวนคงเหลือ
+                if (currentQty >= maxQty) return;
+                const newQty = currentQty + 1;
+                updateBorrowItemQuantity(equipmentId, newQty);
+                htmlContainer.innerHTML = buildItemsHtml();
+                attachEventListeners(popup);
+              });
+            });
+          };
+
+          // ตรวจสอบว่ารายการหมดหรือยัง และปิด popup
+          const checkAndCloseIfEmpty = () => {
+            if (getBorrowItems().length === 0) {
+              Swal.close();
+              swalWithBootstrapButtons.fire({
+                title: "ลบรายการทั้งหมดเรียบร้อย",
+                icon: "success",
+                timer: 1500,
+                showConfirmButton: false
+              });
+            }
+          };
+
+          const deleteResult = await swalWithBootstrapButtons.fire({
+            title: "รายการอุปกรณ์ที่เลือก",
+            html: buildItemsHtml(),
+            showCancelButton: true,
+            showConfirmButton: true,
+            showDenyButton: true,
+            cancelButtonText: "กลับ",
+            denyButtonText: "ลบทั้งหมด",
+            confirmButtonText: "ยืนยันการยืม",
+            reverseButtons: true,
+            width: '500px',
+            customClass: {
+              cancelButton: "bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded",
+              denyButton: "bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded",
+              confirmButton: "bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded",
+            },
+            didOpen: () => {
+              const popup = Swal.getPopup();
+              attachEventListeners(popup);
+            }
+          });
+
+          if (deleteResult.isDenied) {
+            // ลบทั้งหมด
+            removeBorrowItems();
+            await swalWithBootstrapButtons.fire({
+              title: "ลบรายการทั้งหมดเรียบร้อย",
+              icon: "success",
+              timer: 1500,
+              showConfirmButton: false
+            });
+          } else if (deleteResult.isConfirmed) {
+            // ยืนยันการยืม
+            const items = getBorrowItems();
+            if (items.length === 0) {
+              return swalWithBootstrapButtons.fire({
+                title: "ไม่มีรายการ",
+                text: "ไม่มีอุปกรณ์ในรายการยืม",
+                icon: "info",
+              });
+            }
+
+            const payloadItems = items.map(item => ({
+              equipment_id: item.equipment_id,
+              quantity: item.quantity_borrow
+            }));
+
+            await axios.post(
+              `${apiUrl}/api/borrow/add`,
+              { user_id: user.user_id, items: payloadItems },
+              { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+            );
+
+            await swalWithBootstrapButtons.fire({
+              title: "สำเร็จ!",
+              text: "คุณได้ยืมอุปกรณ์เรียบร้อยแล้ว",
+              icon: "success",
+            });
+
+            removeBorrowItems();
+            await fetchEquipment(currentPage, debouncedSearch);
+            await fetchBorrowItems();
+          }
+          // กลับ (dismiss === cancel) - ไม่ต้องทำอะไร
+        };
+
+        await showDeleteItemsPopup();
       }
     } catch (error) {
       console.error("Error borrowing equipment:", error);

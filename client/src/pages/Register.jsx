@@ -16,6 +16,7 @@ const Register = () => {
   const [message, setMessage] = useState("");
   const [emailValid, setEmailValid] = useState(true);
   const [emailDuplicate, setEmailDuplicate] = useState(false);
+  const [studentIdDuplicate, setStudentIdDuplicate] = useState(false);
   const [phoneValid, setPhoneValid] = useState(true);
   const [studentIdValid, setStudentIdValid] = useState(true);
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
@@ -76,6 +77,7 @@ const Register = () => {
 
     setEmailValid(true);
     setEmailDuplicate(false);
+    setStudentIdDuplicate(false);
     setPhoneValid(true);
     setStudentIdValid(true);
 
@@ -95,14 +97,22 @@ const Register = () => {
       });
       navigate("/RMUTI/Login");
     } catch (error) {
-      if (error.response?.data?.message === 'User with this email already exists') {
+      const errorMessage = error.response?.data?.message || '';
+      
+      // ตรวจสอบ error จาก backend
+      if (errorMessage.includes('อีเมล') || errorMessage.includes('email')) {
         setEmailDuplicate(true);
         toast.error("อีเมลนี้ถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น", {
           position: "top-right"
         });
+      } else if (errorMessage.includes('รหัสนักศึกษา') || errorMessage.includes('student_id')) {
+        setStudentIdDuplicate(true);
+        toast.error("รหัสนักศึกษานี้มีอยู่ในระบบแล้ว กรุณาตรวจสอบอีกครั้ง", {
+          position: "top-right"
+        });
       } else {
         setMessage("การสมัครสมาชิกไม่สำเร็จ กรุณาลองอีกครั้ง");
-        toast.error("การสมัครสมาชิกไม่สำเร็จ กรุณาลองอีกครั้ง", {
+        toast.error(errorMessage || "การสมัครสมาชิกไม่สำเร็จ กรุณาลองอีกครั้ง", {
           position: "top-right"
         });
       }
@@ -205,9 +215,10 @@ const Register = () => {
                         const value = e.target.value.replace(/[^\d-]/g, '');
                         setStudentId(value);
                         setStudentIdValid(true);
+                        setStudentIdDuplicate(false);
                       }}
                       className={`w-full border rounded-lg pl-10 pr-4 py-2 text-sm bg-white focus:ring-2 focus:ring-[#0F4C75] focus:outline-none ${
-                        !studentIdValid ? "border-red-500 bg-red-50" : ""
+                        !studentIdValid || studentIdDuplicate ? "border-red-500 bg-red-50" : ""
                       }`}
                       placeholder="เช่น 12345678901-2"
                       aria-label="รหัสนักศึกษา"
@@ -215,6 +226,9 @@ const Register = () => {
                   </div>
                   {!studentIdValid && (
                     <p className="text-red-500 text-xs mt-1">รหัสนักศึกษาต้องเป็น 13 หลัก (รูปแบบ: 12345678901-2)</p>
+                  )}
+                  {studentIdDuplicate && (
+                    <p className="text-red-500 text-xs mt-1">รหัสนักศึกษานี้มีอยู่ในระบบแล้ว</p>
                   )}
                 </div>
               )}

@@ -13,6 +13,13 @@ const EditModal = ({ tool, onSubmit, onCancel }) => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // ตรวจสอบประเภทไฟล์
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('รองรับเฉพาะไฟล์รูปภาพประเภท .jpg, .jpeg, .png เท่านั้น');
+        e.target.value = ''; // ล้างค่าไฟล์ที่เลือก
+        return;
+      }
       setPreview(URL.createObjectURL(file));
     } else if (tool && tool.image) {
       setPreview(`${apiUrl}/uploads/${tool.image}`);
@@ -51,11 +58,11 @@ const EditModal = ({ tool, onSubmit, onCancel }) => {
          
           <div className="form-control mb-4">
             <label className="form-control flex flex-col gap-2 mt-4">
-                  <span className="label-text font-medium">อัปโหลดรูปภาพ (JPG, PNG, สูงสุด 10MB)</span>
+                  <span className="label-text font-medium">อัปโหลดรูปภาพ <span className="text-red-500 text-xs">(รองรับเฉพาะ .jpg, .jpeg, .png)</span></span>
                   <div className="flex items-center gap-2">
                     <input
                       type="file"
-                      accept="image/*"
+                      accept=".jpg,.jpeg,.png"
                       className="file-input file-input-bordered w-full"
                       name="image"
                       onChange={handleFileChange}

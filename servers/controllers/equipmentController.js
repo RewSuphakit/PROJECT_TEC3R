@@ -10,6 +10,12 @@ exports.addEquipment = async (req, res) => {
     const image = req.file ? req.file.filename : '';
     const available_quantity = total_quantity || 0;
 
+    // ตรวจสอบว่าชื่ออุปกรณ์ซ้ำหรือไม่
+    const [existingEquipment] = await promisePool.query('SELECT equipment_id FROM equipment WHERE equipment_name = ?', [equipment_name]);
+    if (existingEquipment.length > 0) {
+      return res.status(400).json({ message: 'ชื่ออุปกรณ์นี้มีอยู่ในระบบแล้ว' });
+    }
+
     const query = 'INSERT INTO equipment (equipment_name, total_quantity, available_quantity, image) VALUES (?, ?, ?, ?)';
     const [result] = await promisePool.query(query, [equipment_name, total_quantity, available_quantity, image]);
 
@@ -54,12 +60,15 @@ exports.getAllEquipment = async (req, res) => {
     const totalCount = countResult[0].total;
     const totalPages = Math.ceil(totalCount / limit);
 
-    // ดึงข้อมูลตาม pagination
+    // ดึงข้อมูลตาม pagination - เรียงตามจำนวนการยืมจากมากไปน้อย
     const query = `
-      SELECT equipment_id, equipment_name, total_quantity, available_quantity, status, image, created_at, updated_at 
-      FROM equipment 
-      ${whereClause}
-      ORDER BY updated_at DESC 
+      SELECT e.equipment_id, e.equipment_name, e.total_quantity, e.available_quantity, e.status, e.image, e.created_at, e.updated_at,
+             COALESCE(SUM(bi.quantity), 0) AS total_borrowed
+      FROM equipment e
+      LEFT JOIN borrow_items bi ON e.equipment_id = bi.equipment_id
+      ${whereClause.replace(/status/g, 'e.status').replace(/equipment_name/g, 'e.equipment_name')}
+      GROUP BY e.equipment_id, e.equipment_name, e.total_quantity, e.available_quantity, e.status, e.image, e.created_at, e.updated_at
+      ORDER BY total_borrowed DESC, e.updated_at DESC
       LIMIT ? OFFSET ?
     `;
     const [results] = await promisePool.query(query, [...queryParams, limit, offset]);
@@ -104,12 +113,15 @@ exports.getPublicEquipment = async (req, res) => {
     const totalCount = countResult[0].total;
     const totalPages = Math.ceil(totalCount / limit);
 
-    // ดึงข้อมูลตาม pagination
+    // ดึงข้อมูลตาม pagination - เรียงตามจำนวนการยืมจากมากไปน้อย
     const query = `
-      SELECT equipment_id, equipment_name, total_quantity, available_quantity, image, status, updated_at 
-      FROM equipment 
-      ${whereClause}
-      ORDER BY updated_at DESC 
+      SELECT e.equipment_id, e.equipment_name, e.total_quantity, e.available_quantity, e.image, e.status, e.updated_at,
+             COALESCE(SUM(bi.quantity), 0) AS total_borrowed
+      FROM equipment e
+      LEFT JOIN borrow_items bi ON e.equipment_id = bi.equipment_id
+      ${whereClause.replace(/status/g, 'e.status').replace(/equipment_name/g, 'e.equipment_name').replace(/available_quantity/g, 'e.available_quantity')}
+      GROUP BY e.equipment_id, e.equipment_name, e.total_quantity, e.available_quantity, e.image, e.status, e.updated_at
+      ORDER BY total_borrowed DESC, e.updated_at DESC
       LIMIT ? OFFSET ?
     `;
     const [results] = await promisePool.query(query, [...queryParams, limit, offset]);
@@ -182,6 +194,15 @@ exports.updateEquipment = async (req, res) => {
     const [results] = await promisePool.query('SELECT * FROM equipment WHERE equipment_id = ?', [id]);
     if (results.length === 0) {
       return res.status(404).json({ message: 'Equipment not found' });
+    }
+
+    // ตรวจสอบว่าชื่ออุปกรณ์ซ้ำหรือไม่ (ยกเว้นตัวเอง)
+    const [existingEquipment] = await promisePool.query(
+      'SELECT equipment_id FROM equipment WHERE equipment_name = ? AND equipment_id != ?',
+      [equipment_name, id]
+    );
+    if (existingEquipment.length > 0) {
+      return res.status(400).json({ message: 'ชื่ออุปกรณ์นี้มีอยู่ในระบบแล้ว' });
     }
 
     const oldEquipment = results[0];

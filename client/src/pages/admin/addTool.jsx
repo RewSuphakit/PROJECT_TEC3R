@@ -36,13 +36,29 @@ function AddTool({ onAddSuccess }) {
       }
       closeModal();
     } catch (error) {
-      toast.error("เกิดข้อผิดพลาดในการเพิ่มอุปกรณ์");
+      const errorMessage = error.response?.data?.message || "";
+      if (errorMessage.includes("Only .jpg") || errorMessage.includes("allowed")) {
+        toast.error("รองรับเฉพาะไฟล์รูปภาพประเภท .jpg, .jpeg, .png เท่านั้น");
+      } else if (errorMessage.includes("ชื่ออุปกรณ์")) {
+        toast.error(errorMessage);
+      } else {
+        toast.error("เกิดข้อผิดพลาดในการเพิ่มอุปกรณ์");
+      }
     }
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // ตรวจสอบประเภทไฟล์
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error('รองรับเฉพาะไฟล์รูปภาพประเภท .jpg, .jpeg, .png เท่านั้น');
+        e.target.value = ''; // ล้างค่าไฟล์ที่เลือก
+        setImage(null);
+        setPreviewImage(null);
+        return;
+      }
       setImage(file);
       setPreviewImage(URL.createObjectURL(file));
     }
@@ -132,11 +148,11 @@ function AddTool({ onAddSuccess }) {
 
                 <div className="form-control mb-4">
                   <label className="label">
-                    <span className="label-text font-medium">อัปโหลดรูปภาพ (JPG, PNG, สูงสุด 10MB)</span>
+                    <span className="label-text font-medium">อัปโหลดรูปภาพ <span className="text-red-500 text-xs">(รองรับเฉพาะ .jpg, .jpeg, .png)</span></span>
                   </label>
                   <input
                     type="file"
-                    accept="image/*"
+                    accept=".jpg,.jpeg,.png"
                     className="file-input file-input-bordered w-full"
                     required
                     onChange={handleImageChange}

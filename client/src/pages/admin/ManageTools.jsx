@@ -69,14 +69,24 @@ function ManageTools() {
       toast.error("ไม่พบข้อมูลอุปกรณ์ที่ต้องการอัพเดต");
       return;
     }
+
+    // ตรวจสอบประเภทไฟล์ก่อนส่ง
+    const file = e.target.image.files[0];
+    if (file) {
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error("รองรับเฉพาะไฟล์รูปภาพประเภท .jpg, .jpeg, .png เท่านั้น");
+        return;
+      }
+    }
   
     try {
       const formData = new FormData();
       formData.append("equipment_name", e.target.equipment_name.value);
       formData.append("total_quantity", e.target.total_quantity.value);
   
-      if (e.target.image.files[0]) {
-        formData.append("image", e.target.image.files[0]);
+      if (file) {
+        formData.append("image", file);
       }
   
       const token = localStorage.getItem('token');
@@ -93,7 +103,14 @@ function ManageTools() {
       setEditModalOpen(false);
       setToolToEdit(null);
     } catch (error) {
-      toast.error("เกิดข้อผิดพลาดในการอัพเดตอุปกรณ์");
+      const errorMessage = error.response?.data?.message || "";
+      if (errorMessage.includes("Only .jpg") || errorMessage.includes("allowed")) {
+        toast.error("รองรับเฉพาะไฟล์รูปภาพประเภท .jpg, .jpeg, .png เท่านั้น");
+      } else if (errorMessage.includes("ชื่ออุปกรณ์")) {
+        toast.error(errorMessage);
+      } else {
+        toast.error("เกิดข้อผิดพลาดในการอัพเดตอุปกรณ์");
+      }
     }
   };
   

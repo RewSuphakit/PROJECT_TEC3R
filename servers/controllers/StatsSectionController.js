@@ -111,3 +111,28 @@ exports.getReportDetails = async (req, res) => {
     res.status(500).json({ message: "Error fetching borrow items details", error: error.message });
   }
 }
+
+// =========================
+// ดึงข้อมูลอุปกรณ์ที่ถูกยืมเยอะที่สุด (Top 5)
+// =========================
+exports.getTopBorrowedEquipment = async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        e.equipment_id,
+        e.equipment_name,
+        e.image,
+        SUM(bi.quantity) AS total_borrowed
+      FROM borrow_items bi
+      JOIN equipment e ON bi.equipment_id = e.equipment_id
+      GROUP BY e.equipment_id, e.equipment_name, e.image
+      ORDER BY total_borrowed DESC
+      LIMIT 5
+    `;
+    const [rows] = await promisePool.query(query);
+    res.json(rows);
+  } catch (error) {
+    console.error("Error fetching top borrowed equipment:", error);
+    res.status(500).json({ message: "Error fetching top borrowed equipment", error: error.message });
+  }
+}

@@ -19,6 +19,14 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'มีผู้ใช้งานที่ใช้อีเมลนี้แล้ว' });
     }
 
+    // ตรวจสอบว่า student_id ซ้ำหรือไม่ (เฉพาะ role = user)
+    if (role === 'user' && student_id) {
+      const [existingStudentId] = await promisePool.query('SELECT user_id FROM users WHERE student_id = ?', [student_id]);
+      if (existingStudentId.length > 0) {
+        return res.status(400).json({ message: 'รหัสนักศึกษานี้มีอยู่ในระบบแล้ว' });
+      }
+    }
+
     // เข้ารหัสรหัสผ่าน
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -200,6 +208,17 @@ exports.updateUser = async (req, res) => {
     const { user_id } = req.params;
     const { student_id, student_name, year_of_study, phone } = req.body;
 
+    // ตรวจสอบว่า student_id ซ้ำหรือไม่ (ยกเว้นตัวเอง)
+    if (student_id) {
+      const [existingStudentId] = await promisePool.query(
+        'SELECT user_id FROM users WHERE student_id = ? AND user_id != ?',
+        [student_id, user_id]
+      );
+      if (existingStudentId.length > 0) {
+        return res.status(400).json({ error: 'รหัสนักศึกษานี้มีอยู่ในระบบแล้ว' });
+      }
+    }
+
     const updateQuery = `
       UPDATE users
       SET student_id = ?,
@@ -276,6 +295,17 @@ exports.adminUpdateUser = async (req, res) => {
 
       if (existingUsers.length > 0) {
         return res.status(409).json({ error: 'อีเมลนี้มีผู้ใช้งานแล้ว กรุณาใช้อีเมลอื่น' });
+      }
+
+      // ตรวจสอบว่า student_id ซ้ำหรือไม่ (ยกเว้นตัวเอง และเฉพาะ role = user)
+      if (role === 'user' && student_id) {
+        const [existingStudentId] = await promisePool.query(
+          'SELECT user_id FROM users WHERE student_id = ? AND user_id != ?',
+          [student_id, user_id]
+        );
+        if (existingStudentId.length > 0) {
+          return res.status(409).json({ error: 'รหัสนักศึกษานี้มีอยู่ในระบบแล้ว' });
+        }
       }
 
       let updateQuery = `
