@@ -11,7 +11,15 @@ function App() {
       <span className="loading loading-bars loading-lg"></span>
     ) : (
       <>
-        <ToastContainer />
+        <ToastContainer 
+          position="top-center"
+          autoClose={3000}
+          limit={1}
+          newestOnTop
+          closeOnClick
+          pauseOnHover={false}
+          style={{ zIndex: 999999 }}
+        />
         <AppRouter />
       </>
     )}

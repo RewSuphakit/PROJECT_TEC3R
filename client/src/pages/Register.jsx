@@ -102,7 +102,7 @@ const Register = () => {
       // ตรวจสอบ error จาก backend
       if (errorMessage.includes('อีเมล') || errorMessage.includes('email')) {
         setEmailDuplicate(true);
-        toast.error("อีเมลนี้ถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น", {
+        toast.error("อีเมลนี้ถูกลงทะเบียนแล้ว กรุณาตรวจสอบอีกครั้ง", {
           position: "top-right"
         });
       } else if (errorMessage.includes('รหัสนักศึกษา') || errorMessage.includes('student_id')) {

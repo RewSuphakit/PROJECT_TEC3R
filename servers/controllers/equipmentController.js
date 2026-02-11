@@ -7,17 +7,18 @@ const sharp = require('sharp');
 exports.addEquipment = async (req, res) => {
   try {
     const { equipment_name, total_quantity } = req.body;
+    const trimmedName = equipment_name ? equipment_name.trim() : '';
     const image = req.file ? req.file.filename : '';
     const available_quantity = total_quantity || 0;
 
-    // ตรวจสอบว่าชื่ออุปกรณ์ซ้ำหรือไม่
-    const [existingEquipment] = await promisePool.query('SELECT equipment_id FROM equipment WHERE equipment_name = ?', [equipment_name]);
+    // ตรวจสอบว่าชื่ออุปกรณ์ซ้ำหรือไม่ (ลบ space ก่อนเปรียบเทียบ)
+    const [existingEquipment] = await promisePool.query('SELECT equipment_id FROM equipment WHERE REPLACE(equipment_name, \' \', \'\') = REPLACE(?, \' \', \'\') ', [trimmedName]);
     if (existingEquipment.length > 0) {
       return res.status(400).json({ message: 'ชื่ออุปกรณ์นี้มีอยู่ในระบบแล้ว' });
     }
 
     const query = 'INSERT INTO equipment (equipment_name, total_quantity, available_quantity, image) VALUES (?, ?, ?, ?)';
-    const [result] = await promisePool.query(query, [equipment_name, total_quantity, available_quantity, image]);
+    const [result] = await promisePool.query(query, [trimmedName, total_quantity, available_quantity, image]);
 
     res.status(201).json({
       message: 'Equipment added successfully',
@@ -189,6 +190,7 @@ exports.updateEquipment = async (req, res) => {
   try {
     const { id } = req.params;
     const { equipment_name, total_quantity } = req.body;
+    const trimmedName = equipment_name ? equipment_name.trim() : '';
     const newImage = req.file ? req.file.filename : null;
 
     const [results] = await promisePool.query('SELECT * FROM equipment WHERE equipment_id = ?', [id]);
@@ -196,10 +198,10 @@ exports.updateEquipment = async (req, res) => {
       return res.status(404).json({ message: 'Equipment not found' });
     }
 
-    // ตรวจสอบว่าชื่ออุปกรณ์ซ้ำหรือไม่ (ยกเว้นตัวเอง)
+    // ตรวจสอบว่าชื่ออุปกรณ์ซ้ำหรือไม่ (ลบ space ก่อนเปรียบเทียบ, ยกเว้นตัวเอง)
     const [existingEquipment] = await promisePool.query(
-      'SELECT equipment_id FROM equipment WHERE equipment_name = ? AND equipment_id != ?',
-      [equipment_name, id]
+      'SELECT equipment_id FROM equipment WHERE REPLACE(equipment_name, \' \', \'\') = REPLACE(?, \' \', \'\') AND equipment_id != ?',
+      [trimmedName, id]
     );
     if (existingEquipment.length > 0) {
       return res.status(400).json({ message: 'ชื่ออุปกรณ์นี้มีอยู่ในระบบแล้ว' });
@@ -235,7 +237,7 @@ exports.updateEquipment = async (req, res) => {
       SET equipment_name = ?, total_quantity = ?, available_quantity = ?, image = ?
       WHERE equipment_id = ?
     `;
-    await promisePool.query(updateQuery, [equipment_name, newTotalQuantity, newAvailableQuantity, updatedImage, id]);
+    await promisePool.query(updateQuery, [trimmedName, newTotalQuantity, newAvailableQuantity, updatedImage, id]);
 
     // ดึงข้อมูลล่าสุดกลับไปให้ frontend
     const [updatedResults] = await promisePool.query('SELECT * FROM equipment WHERE equipment_id = ?', [id]);

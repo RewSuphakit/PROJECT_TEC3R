@@ -40,7 +40,7 @@ function AddTool({ onAddSuccess }) {
       if (errorMessage.includes("Only .jpg") || errorMessage.includes("allowed")) {
         toast.error("รองรับเฉพาะไฟล์รูปภาพประเภท .jpg, .jpeg, .png เท่านั้น");
       } else if (errorMessage.includes("ชื่ออุปกรณ์")) {
-        toast.error(errorMessage);
+        toast.error(errorMessage, { toastId: 'duplicate-equipment' });
       } else {
         toast.error("เกิดข้อผิดพลาดในการเพิ่มอุปกรณ์");
       }
