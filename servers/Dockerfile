@@ -11,7 +11,7 @@ RUN mkdir uploads/ && mkdir image_return/
 COPY . .
 
 
-EXPOSE 8000
+EXPOSE 4001
 
 # CMD ["node", "index.js"]
 CMD ["npm", "start"]

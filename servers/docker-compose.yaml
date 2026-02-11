@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "4001:4001"
     volumes:
       - /data/rew/uploads:/app/uploads
       - /data/rew/image_return:/app/image_return
