@@ -10,6 +10,8 @@ services:
     environment:
       - NODE_ENV=production
       - VITE_REACT_APP_API_URL=${API_URL}
+    networks:
+      - coolify
 
   server:
     build:
@@ -31,3 +33,9 @@ services:
       - channelAccessToken=${channelAccessToken}
       - channelSecret=${channelSecret}
       - recipientId=${recipientId}
+    networks:
+      - coolify
+
+networks:
+  coolify:
+    external: true

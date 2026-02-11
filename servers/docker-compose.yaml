@@ -21,3 +21,9 @@ services:
       - channelAccessToken=${channelAccessToken}
       - channelSecret=${channelSecret}
       - recipientId=${recipientId}
+    networks:
+      - coolify
+
+networks:
+  coolify:
+    external: true
