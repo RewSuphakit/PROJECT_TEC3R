@@ -82,8 +82,7 @@ function Home() {
       // ใช้ user object แทนการตรวจสอบ token เพื่อป้องกันปัญหา token หมดอายุ
       if (user?.user_id) {
         const token = localStorage.getItem('token');
-        // ถ้า login แล้ว ใช้ protected endpoint และส่ง status=Available เพื่อกรองที่ server
-        params.append('status', 'Available');
+        // ถ้า login แล้ว ใช้ protected endpoint โดยไม่กรอง status เพื่อแสดงอุปกรณ์ทั้งหมด
         response = await axios.get(`${apiUrl}/api/equipment/equipment?${params}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -669,10 +668,21 @@ function Home() {
                     <p className="text-xs text-gray-500 mt-2">อัพเดทเมื่อ: {new Date(item.updated_at).toLocaleString()}</p>
                     <hr className="w-full max-w-[12rem] h-1 mx-auto my-4 bg-gray-100 border-0 rounded" />
                     <div className="text-center pb-2 pb-2 mt-auto">
-                      {item.available_quantity === 0 ? (
-                        <button className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-medium text-white rounded-md shadow-sm bg-red-300 cursor-not-allowed">
-                          หมด
+                      {item.status !== 'Available' ? (
+                        <button className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-medium text-white rounded-md shadow-sm bg-yellow-400 cursor-not-allowed">
+                          ไม่พร้อมใช้งาน
                         </button>
+                      ) : item.available_quantity === 0 ? (
+                        <div>
+                          <button className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base font-medium text-white rounded-md shadow-sm bg-red-300 cursor-not-allowed">
+                            หมด
+                          </button>
+                          {item.borrowers && (
+                            <p className="text-xs text-gray-500 mt-1 break-all">
+                              กำลังยืม: {item.borrowers} 
+                            </p>
+                          )}
+                        </div>
                       ) : user?.user_id ? (
                         <button
                           onClick={() => handleClick(item.equipment_id, item.equipment_name, item.image, item.available_quantity)}

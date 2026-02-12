@@ -131,7 +131,7 @@ const Register = () => {
       }}
     >
       <div className="relative w-full max-w-lg mx-auto">
-        <div className="w-full px-8 py-8 bg-white rounded-xl shadow-lg mb-10">
+        <div className="w-full px-8 py-8 bg-white rounded-xl shadow-lg mb-5">
           <div className="flex flex-col justify-center items-center">
             <div className="flex flex-col items-center gap-3 mb-8">
               <p className="text-2xl font-semibold text-[#0F4C75] text-center">
@@ -385,8 +385,11 @@ const Register = () => {
                 </button>
               </div>
             </form>
+          
           </div>
+        
         </div>
+        <p className="text-red-500 text-sm mt-2 text-left bg-white rounded-lg p-2">* หมายเหตุ: กรุณากรอกข้อมูลให้ครบทุกช่อง</p>
       </div>
     </div>
   );

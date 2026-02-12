@@ -64,7 +64,13 @@ exports.getAllEquipment = async (req, res) => {
     // ดึงข้อมูลตาม pagination - เรียงตามจำนวนการยืมจากมากไปน้อย
     const query = `
       SELECT e.equipment_id, e.equipment_name, e.total_quantity, e.available_quantity, e.status, e.image, e.created_at, e.updated_at,
-             COALESCE(SUM(bi.quantity), 0) AS total_borrowed
+             COALESCE(SUM(bi.quantity), 0) AS total_borrowed,
+             (SELECT GROUP_CONCAT(DISTINCT CONCAT(u.student_name, ' (', COALESCE(u.year_of_study, '-'), ')') SEPARATOR ', ')
+              FROM borrow_items bi2
+              JOIN borrow_transactions bt ON bi2.transaction_id = bt.transaction_id
+              JOIN users u ON bt.user_id = u.user_id
+              WHERE bi2.equipment_id = e.equipment_id AND bi2.status = 'Borrowed'
+             ) AS borrowers
       FROM equipment e
       LEFT JOIN borrow_items bi ON e.equipment_id = bi.equipment_id
       ${whereClause.replace(/status/g, 'e.status').replace(/equipment_name/g, 'e.equipment_name')}
@@ -98,7 +104,7 @@ exports.getPublicEquipment = async (req, res) => {
     const search = req.query.search || '';
 
     // สร้างเงื่อนไข search
-    let whereClause = 'WHERE status = ? AND available_quantity > 0';
+    let whereClause = 'WHERE status = ?';
     let queryParams = ['Available'];
 
     if (search) {
