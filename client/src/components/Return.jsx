@@ -5,7 +5,7 @@ import axios from 'axios';
 import CameraCapture from '../components/CameraCapture';
 import ImageUpload from '../components/ImageUpload';
 import { toast } from 'react-toastify';
-import bg2 from '../assets/bg2.png';
+import bg2 from '../assets/bg2.webp';
 
 function Return() {
   const { user, fetchBorrowItems } = useAuth();

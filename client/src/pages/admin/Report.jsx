@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
-import bg2 from '../../assets/bg2.png';
+import bg2 from '../../assets/bg2.webp';
 import jsPDF from 'jspdf';
 
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;

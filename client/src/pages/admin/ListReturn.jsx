@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import bg2 from '../../assets/bg2.png';
+import bg2 from '../../assets/bg2.webp';
 
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 

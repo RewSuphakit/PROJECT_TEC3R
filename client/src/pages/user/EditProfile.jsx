@@ -4,7 +4,7 @@ import useAuth from "../../hooks/useAuth";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import bg2 from '../../assets/bg2.png';
+import bg2 from '../../assets/bg2.webp';
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function EditProfile() {
   const { user, fetchUserProfile, logout } = useAuth();

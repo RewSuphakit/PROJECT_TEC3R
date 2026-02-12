@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
-import bg2 from '../../assets/bg2.png';
+import bg2 from '../../assets/bg2.webp';
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
 import './AdminStyles.css';

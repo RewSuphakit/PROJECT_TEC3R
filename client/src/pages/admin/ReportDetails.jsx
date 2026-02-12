@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, Link } from 'react-router-dom';
 import jsPDF from 'jspdf';
-import bg2 from '../../assets/bg2.png';
+import bg2 from '../../assets/bg2.webp';
 
 
 

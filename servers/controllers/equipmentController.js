@@ -39,41 +39,39 @@ exports.getAllEquipment = async (req, res) => {
     const search = req.query.search || '';
     const status = req.query.status || '';
 
-    // สร้างเงื่อนไข WHERE
+    // สร้างเงื่อนไข WHERE (prefix ด้วย e. ตั้งแต่แรก)
     let whereClause = 'WHERE 1=1';
     let queryParams = [];
 
     if (status) {
-      whereClause += ' AND status = ?';
+      whereClause += ' AND e.status = ?';
       queryParams.push(status);
     }
 
     if (search) {
-      whereClause += ' AND equipment_name LIKE ?';
+      whereClause += ' AND e.equipment_name LIKE ?';
       queryParams.push(`%${search}%`);
     }
 
     // นับจำนวนทั้งหมด (ตาม filter)
     const [countResult] = await promisePool.query(
-      `SELECT COUNT(*) as total FROM equipment ${whereClause}`,
+      `SELECT COUNT(*) as total FROM equipment e ${whereClause}`,
       queryParams
     );
     const totalCount = countResult[0].total;
     const totalPages = Math.ceil(totalCount / limit);
 
-    // ดึงข้อมูลตาม pagination - เรียงตามจำนวนการยืมจากมากไปน้อย
+    // ดึงข้อมูลตาม pagination - ใช้ LEFT JOIN แทน correlated subquery เพื่อประสิทธิภาพ
     const query = `
       SELECT e.equipment_id, e.equipment_name, e.total_quantity, e.available_quantity, e.status, e.image, e.created_at, e.updated_at,
              COALESCE(SUM(bi.quantity), 0) AS total_borrowed,
-             (SELECT GROUP_CONCAT(DISTINCT CONCAT(u.student_name, ' (', COALESCE(u.year_of_study, '-'), ')') SEPARATOR ', ')
-              FROM borrow_items bi2
-              JOIN borrow_transactions bt ON bi2.transaction_id = bt.transaction_id
-              JOIN users u ON bt.user_id = u.user_id
-              WHERE bi2.equipment_id = e.equipment_id AND bi2.status = 'Borrowed'
-             ) AS borrowers
+             GROUP_CONCAT(DISTINCT CASE WHEN bi2.status = 'Borrowed' THEN CONCAT(u.student_name, ' (', COALESCE(u.year_of_study, '-'), ')') END SEPARATOR ', ') AS borrowers
       FROM equipment e
       LEFT JOIN borrow_items bi ON e.equipment_id = bi.equipment_id
-      ${whereClause.replace(/status/g, 'e.status').replace(/equipment_name/g, 'e.equipment_name')}
+      LEFT JOIN borrow_items bi2 ON e.equipment_id = bi2.equipment_id AND bi2.status = 'Borrowed'
+      LEFT JOIN borrow_transactions bt ON bi2.transaction_id = bt.transaction_id
+      LEFT JOIN users u ON bt.user_id = u.user_id
+      ${whereClause}
       GROUP BY e.equipment_id, e.equipment_name, e.total_quantity, e.available_quantity, e.status, e.image, e.created_at, e.updated_at
       ORDER BY total_borrowed DESC, e.updated_at DESC
       LIMIT ? OFFSET ?
@@ -103,18 +101,18 @@ exports.getPublicEquipment = async (req, res) => {
     const offset = (page - 1) * limit;
     const search = req.query.search || '';
 
-    // สร้างเงื่อนไข search
-    let whereClause = 'WHERE status = ?';
+    // สร้างเงื่อนไข search (prefix ด้วย e. ตั้งแต่แรก)
+    let whereClause = 'WHERE e.status = ?';
     let queryParams = ['Available'];
 
     if (search) {
-      whereClause += ' AND equipment_name LIKE ?';
+      whereClause += ' AND e.equipment_name LIKE ?';
       queryParams.push(`%${search}%`);
     }
 
     // นับจำนวนทั้งหมด (ตาม filter)
     const [countResult] = await promisePool.query(
-      `SELECT COUNT(*) as total FROM equipment ${whereClause}`,
+      `SELECT COUNT(*) as total FROM equipment e ${whereClause}`,
       queryParams
     );
     const totalCount = countResult[0].total;
@@ -126,7 +124,7 @@ exports.getPublicEquipment = async (req, res) => {
              COALESCE(SUM(bi.quantity), 0) AS total_borrowed
       FROM equipment e
       LEFT JOIN borrow_items bi ON e.equipment_id = bi.equipment_id
-      ${whereClause.replace(/status/g, 'e.status').replace(/equipment_name/g, 'e.equipment_name').replace(/available_quantity/g, 'e.available_quantity')}
+      ${whereClause}
       GROUP BY e.equipment_id, e.equipment_name, e.total_quantity, e.available_quantity, e.image, e.status, e.updated_at
       ORDER BY total_borrowed DESC, e.updated_at DESC
       LIMIT ? OFFSET ?

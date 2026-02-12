@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "daisyui/dist/full.css";
 import useAuth from "../../hooks/useAuth";
 import axios from "axios";
-import bg2 from "../../assets/bg2.png";
+import bg2 from "../../assets/bg2.webp";
 
 function History() {
   const { user, loading } = useAuth();

@@ -1,15 +1,15 @@
-import React, { useEffect, useState, useRef } from 'react';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-import Typed from 'typed.js';
-import bg from '../assets/bbb.png';
-import bg2 from '../assets/bg2.png';
+import React, { useEffect, useState, useRef, lazy, Suspense } from 'react';
 import axios from 'axios';
 import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-import StatsSection from '../components/StatsSection';
-import Swal from 'sweetalert2';
 import ScrollToTopButton from '../components/ScrollToTopButton';
+
+// Lazy load heavy components
+const StatsSection = lazy(() => import('../components/StatsSection'));
+
+// Images: WebP format — bbb.webp (154KB vs 7.8MB), bg2.webp (68KB vs 2MB)
+import bg from '../assets/bbb.webp';
+import bg2 from '../assets/bg2.webp';
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function Home() {
   const { user, fetchBorrowItems } = useAuth();
@@ -140,28 +140,42 @@ function Home() {
     fetchEquipment(currentPage, debouncedSearch);
   }, [currentPage, debouncedSearch, user]);
 
+  // Lazy load AOS — only after initial render
   useEffect(() => {
-    AOS.init({ duration: 1000 });
+    let mounted = true;
+    import('aos/dist/aos.css').then(() => {
+      import('aos').then((AOS) => {
+        if (mounted) AOS.default.init({ duration: 1000 });
+      });
+    });
+    return () => { mounted = false; };
   }, []);
 
+  // Lazy load Typed.js — only after initial render
   const el = useRef(null);
   useEffect(() => {
-    const typed = new Typed(el.current, {
-      strings: [
-        'ยินดีต้อนรับเข้าสู่',
-        'ระบบการยืม-คืนอุปกรณ์ '
-      ],
-      typeSpeed: 50,
-      loop: true,
-      backSpeed: 1,
-      smartBackspace: true,
-      backDelay: 4000,
+    let typed;
+    import('typed.js').then(({ default: Typed }) => {
+      if (el.current) {
+        typed = new Typed(el.current, {
+          strings: [
+            'ยินดีต้อนรับเข้าสู่',
+            'ระบบการยืม-คืนอุปกรณ์ '
+          ],
+          typeSpeed: 50,
+          loop: true,
+          backSpeed: 1,
+          smartBackspace: true,
+          backDelay: 4000,
+        });
+      }
     });
-    return () => typed.destroy();
+    return () => { if (typed) typed.destroy(); };
   }, []);
 
   // ======= ฟังก์ชันยืนยันการยืมรายการค้าง =======
   const confirmBorrowFromStorage = async () => {
+    const Swal = (await import('sweetalert2')).default;
     try {
       const items = getBorrowItems();
       const pendingCount = items.reduce((sum, item) => sum + item.quantity_borrow, 0);
@@ -235,6 +249,7 @@ function Home() {
 
   // ======= ฟังก์ชันยืมอุปกรณ์แต่ละชิ้น =======
   const handleClick = async (equipmentId, title, image, quantity) => {
+    const Swal = (await import('sweetalert2')).default;
     try {
       equipmentId = Number(equipmentId);
       const swalWithBootstrapButtons = Swal.mixin({
@@ -605,6 +620,10 @@ function Home() {
             alt="Background"
             className="w-full h-full object-cover"
             fetchpriority="high"
+            decoding="sync"
+            loading="eager"
+            width={1920}
+            height={1080}
           />
           <div className="absolute inset-0 bg-black/40" /> {/* Dim overlay */}
         </div>
@@ -729,7 +748,9 @@ function Home() {
         </button>
       </div>
 
-      <StatsSection />
+      <Suspense fallback={<div className="text-center py-10 text-gray-400">กำลังโหลด...</div>}>
+        <StatsSection />
+      </Suspense>
     </div>
   );
 }

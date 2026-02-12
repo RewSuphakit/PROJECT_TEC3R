@@ -22,9 +22,9 @@ module.exports = async (req, res, next) => {
       return res.status(401).json({ error: 'Unauthorized: Invalid token payload' });
     }
 
-    // ดึงข้อมูลผู้ใช้จาก DB
+    // ดึงข้อมูลผู้ใช้จาก DB (เฉพาะ column ที่จำเป็น ไม่ดึง password)
     const [rows] = await promisePool.query(
-      'SELECT * FROM users WHERE student_email = ? LIMIT 1',
+      'SELECT user_id, student_id, student_name, year_of_study, student_email, phone, role FROM users WHERE student_email = ? LIMIT 1',
       [payload.user.student_email]
     );
 
@@ -33,10 +33,10 @@ module.exports = async (req, res, next) => {
     }
 
     // เพิ่ม user_id ลง req.user
-      req.user = {
-        ...rows[0],
-        user_id: rows[0].user_id, // ใช้ชื่อ field ที่ถูกต้อง
-      };
+    req.user = {
+      ...rows[0],
+      user_id: rows[0].user_id, // ใช้ชื่อ field ที่ถูกต้อง
+    };
 
     next();
   } catch (err) {

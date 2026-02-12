@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import bg2 from '../assets/bg2.png';
+import bg2 from '../assets/bg2.webp';
 
 const Register = () => {
   const navigate = useNavigate();

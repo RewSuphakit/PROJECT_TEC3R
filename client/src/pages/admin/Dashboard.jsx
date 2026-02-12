@@ -3,7 +3,7 @@ import axios from "axios";
 import Activity from "../admin/Activity";
 import AddTool from '../admin/addTool';
 import TopBorrowedEquipment from '../../components/TopBorrowedEquipment';
-import bg2 from '../../assets/bg2.png';
+import bg2 from '../../assets/bg2.webp';
 import { Link } from "react-router-dom";
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 

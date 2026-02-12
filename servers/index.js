@@ -13,8 +13,9 @@ const StatsSection = require('./routes/StatsSection');
 app.use(cors());
 app.use(express.json());
 
-app.use('/image_return', express.static('image_return'));
-app.use('/uploads', express.static('uploads'));
+// Static files with cache headers (1 day cache for uploaded images)
+app.use('/image_return', express.static('image_return', { maxAge: '1d' }));
+app.use('/uploads', express.static('uploads', { maxAge: '1d' }));
 app.use('/api/equipment', equipmentRoutes);
 app.use('/api/borrow', borrowRoutes);
 app.use('/api/users', userRoutes);

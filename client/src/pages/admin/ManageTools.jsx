@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import DeleteModal from "./DeleteModal";
 import EditModal from "./EditModal";
-import bg2 from '../../assets/bg2.png';
+import bg2 from '../../assets/bg2.webp';
 
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
