@@ -482,7 +482,7 @@ function Report() {
                           className={`table-row border-b ${index % 2 === 0 ? 'bg-gray-50/50' : 'bg-white'} hover:bg-blue-50/30 transition-colors`}
                         >
                           <td className="py-4 px-6 font-medium text-gray-800">{report.student_name}</td>
-                          <td className="py-4 px-6 text-gray-600">{report.student_id}</td>
+                          <td className="py-4 px-6 text-gray-600">{report.student_id || '-'}</td>
                           <td className="py-4 px-6">
                             <span className="bg-cyan-100 text-cyan-700 px-3 py-1 rounded-lg text-sm">
                               {report.equipment_name}
