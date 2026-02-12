@@ -4,7 +4,7 @@ const cors = require('cors');
 const app = express();
 app.set('trust proxy', 1); // Enable trust proxy for rate limiter
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 4001;
 const equipmentRoutes = require('./routes/equipmentRoutes');
 const userRoutes = require('./routes/userRoutes');
 const borrowRoutes = require('./routes/borrowRoutes');

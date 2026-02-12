@@ -10,13 +10,15 @@ services:
     environment:
       - NODE_ENV=production
       - VITE_REACT_APP_API_URL=${API_URL}
+    networks:
+      - coolify
 
   server:
     build:
       context: ./servers
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "4001:4001"
     volumes:
       - /data/rew/uploads:/app/uploads
       - /data/rew/image_return:/app/image_return
@@ -27,7 +29,14 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASS=${DB_PASS}
       - DB_NAME=${DB_NAME}
+      - DB_PORT=${DB_PORT}
       - JWT_SECRET=${JWT_SECRET}
       - channelAccessToken=${channelAccessToken}
       - channelSecret=${channelSecret}
       - recipientId=${recipientId}
+    networks:
+      - coolify
+
+networks:
+  coolify:
+    external: true

@@ -10,3 +10,9 @@ services:
     environment:
       - NODE_ENV=production
       - VITE_REACT_APP_API_URL=${API_URL}
+    networks:
+      - coolify
+
+networks:
+  coolify:
+    external: true
