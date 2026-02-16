@@ -17,11 +17,6 @@ exports.sendMessage = async (message, imageUrl) => {
       return { success: false, reason: 'Missing credentials' };
     }
 
-    if (!process.env.recipientId) {
-      console.warn('LINE Bot SDK: Missing recipientId - skipping notification');
-      return { success: false, reason: 'Missing recipientId' };
-    }
-
     // Define the payload for text and image messages
     const messages = [
       {
@@ -44,14 +39,12 @@ exports.sendMessage = async (message, imageUrl) => {
       });
     }
 
-    const recipientId = process.env.recipientId;
-
     // Log the payload before sending
-    console.log('LINE API Payload:', { recipientId, messages });
+    console.log('LINE Broadcast Payload:', { messages });
 
-    // Send the message using LINE's pushMessage method
-    await client.pushMessage(recipientId, messages);
-    console.log('✓ LINE notification sent successfully');
+    // Send broadcast to all friends of the bot
+    await client.broadcast(messages);
+    console.log('✓ LINE broadcast sent to all friends');
     return { success: true };
   } catch (error) {
     // Handle different types of errors gracefully
