@@ -62,7 +62,7 @@ function Header() {
     </Link>
   </li>
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-    <a href="/RMUTI/Return" onClick={closeMenu} className="flex justify-start  gap-3">
+    <Link to="/RMUTI/Return" onClick={closeMenu} className="flex justify-start  gap-3">
       <img
         className="w-6 h-6"
         src="https://img.icons8.com/?size=100&id=1846&format=png&color=374151"
@@ -72,17 +72,17 @@ function Header() {
       {borrowedCount <= 0  ? null : (
       <div className="badge badge-error">{borrowedCount}</div>
       )}
-    </a>
+    </Link>
    </li>
     <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-    <a href="/RMUTI/History" onClick={closeMenu} className="flex justify-start  gap-3">
+    <Link to="/RMUTI/History" onClick={closeMenu} className="flex justify-start  gap-3">
       <img
         className="w-6 h-6"
         src="https://img.icons8.com/?size=100&id=6904&format=png&color=000000"
         alt="history icon"
       />
       <div >ประวัติการยืม/คืน</div>
-    </a>
+    </Link>
      </li>
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
     <button className="flex items-center gap-3 w-full text-left" onClick={() => { setShowContactModal(true); closeMenu(); }}>

@@ -215,7 +215,21 @@ exports.updateEquipment = async (req, res) => {
     const oldImage = oldEquipment.image;
     const oldTotalQuantity = oldEquipment.total_quantity;
 
-    // ถ้ามีการอัปโหลดไฟล์ใหม่ ให้ลบรูปเก่า
+
+
+    const updatedImage = newImage || oldImage;
+    const newTotalQuantity = parseInt(total_quantity) || oldTotalQuantity;
+    const quantityDiff = newTotalQuantity - oldTotalQuantity;
+    const newAvailableQuantity = Math.max(0, oldEquipment.available_quantity + quantityDiff);
+
+    const updateQuery = `
+      UPDATE equipment
+      SET equipment_name = ?, total_quantity = ?, available_quantity = ?, image = ?
+      WHERE equipment_id = ?
+    `;
+    await promisePool.query(updateQuery, [trimmedName, newTotalQuantity, newAvailableQuantity, updatedImage, id]);
+
+    // ถ้ามีการอัปโหลดไฟล์ใหม่ และอัปเดตสำเร็จ -> ให้ลบรูปเก่า
     if (newImage && oldImage) {
       const filePath = path.join(__dirname, '..', 'uploads', oldImage);
       try {
@@ -230,18 +244,6 @@ exports.updateEquipment = async (req, res) => {
         }
       }
     }
-
-    const updatedImage = newImage || oldImage;
-    const newTotalQuantity = parseInt(total_quantity) || oldTotalQuantity;
-    const quantityDiff = newTotalQuantity - oldTotalQuantity;
-    const newAvailableQuantity = Math.max(0, oldEquipment.available_quantity + quantityDiff);
-
-    const updateQuery = `
-      UPDATE equipment
-      SET equipment_name = ?, total_quantity = ?, available_quantity = ?, image = ?
-      WHERE equipment_id = ?
-    `;
-    await promisePool.query(updateQuery, [trimmedName, newTotalQuantity, newAvailableQuantity, updatedImage, id]);
 
     // ดึงข้อมูลล่าสุดกลับไปให้ frontend
     const [updatedResults] = await promisePool.query('SELECT * FROM equipment WHERE equipment_id = ?', [id]);

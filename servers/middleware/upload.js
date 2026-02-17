@@ -29,13 +29,13 @@ const upload = multer({
 const compressImage = (req, res, next) => {
   if (!req.file) return next(); // ถ้าไม่มีไฟล์ก็ไม่ต้องทำอะไร
 
-  const filename = `RMUTI-${Date.now()}.jpg`;  // ตั้งชื่อไฟล์ใหม่หลังจากบีบอัด
-  const outputPath = path.join(__dirname, '..', 'uploads', filename);  // เส้นทางการเก็บไฟล์ที่บีบอัด
+  const filename = `RMUTI-${Date.now()}.webp`;  // ตั้งชื่อไฟล์ใหม่เป็น .webp
+  const outputPath = path.join(__dirname, '..', 'uploads', filename);  // เส้นทางการเก็บไฟล์
 
   // บีบอัดไฟล์
   sharp(req.file.buffer)  // ใช้ไฟล์ที่เก็บในหน่วยความจำ
     .resize(800, 800, { fit: 'inside', withoutEnlargement: true })  // ปรับขนาดภาพให้ไม่เกิน 800x800 โดยรักษาสัดส่วน
-    .jpeg({ quality: 80 })  // บีบอัดไฟล์ภาพเป็น .jpg พร้อมลดคุณภาพ (80%)
+    .webp({ quality: 80 })  // บีบอัดไฟล์ภาพเป็น .webp และลดคุณภาพ (80%)
     .toFile(outputPath, (err, info) => {
       if (err) {
         console.error('Error during image compression:', err);

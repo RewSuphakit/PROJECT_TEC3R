@@ -120,7 +120,7 @@ function AuthContextProvider({ children }) {
     if (user?.user_id) {
       fetchBorrowItems();
     }
-  }, [user]);
+  }, [user?.user_id]);
 
   return (
     <AuthContext.Provider

@@ -190,6 +190,20 @@ exports.deleteUser = async (req, res) => {
   try {
     const { user_id } = req.params;
 
+    // ตรวจสอบว่า user มีการยืมอุปกรณ์ที่ยังไม่คืนอยู่หรือไม่
+    const [pendingBorrows] = await promisePool.query(
+      `SELECT COUNT(*) as count FROM borrow_items bi
+       JOIN borrow_transactions bt ON bi.transaction_id = bt.transaction_id
+       WHERE bt.user_id = ? AND bi.status = 'Borrowed'`,
+      [user_id]
+    );
+
+    if (pendingBorrows[0].count > 0) {
+      return res.status(400).json({
+        error: `ไม่สามารถลบผู้ใช้ได้ เนื่องจากยังมีการยืมอุปกรณ์ค้างอยู่ ${pendingBorrows[0].count} รายการ`
+      });
+    }
+
     const [results] = await promisePool.query('DELETE FROM users WHERE user_id = ?', [user_id]);
 
     if (results.affectedRows === 0) {
@@ -207,6 +221,11 @@ exports.updateUser = async (req, res) => {
   try {
     const { user_id } = req.params;
     const { student_id, student_name, year_of_study, phone } = req.body;
+
+    // ตรวจสอบว่า user แก้ไขข้อมูลตัวเองเท่านั้น (ยกเว้น admin)
+    if (req.user.role !== 'admin' && String(req.user.user_id) !== String(user_id)) {
+      return res.status(403).json({ error: 'ไม่ได้รับอนุญาต: คุณสามารถแก้ไขข้อมูลของตัวเองเท่านั้น' });
+    }
 
     // ตรวจสอบว่า student_id ซ้ำหรือไม่ (ยกเว้นตัวเอง)
     if (student_id) {
@@ -246,15 +265,38 @@ exports.updateEmailPassword = async (req, res) => {
     const { user_id } = req.params;
     const { student_email, password } = req.body;
 
+    // ตรวจสอบว่ามีข้อมูลที่จะอัปเดตหรือไม่
+    const hasEmail = student_email && student_email.trim() !== "";
+    const hasPassword = password && password.trim() !== "";
+
+    if (!hasEmail && !hasPassword) {
+      return res.status(400).json({ error: "กรุณาระบุอีเมลหรือรหัสผ่านที่ต้องการเปลี่ยน" });
+    }
+
     let updateQuery = `UPDATE users SET `;
     const values = [];
 
-    if (student_email && student_email.trim() !== "") {
+    if (hasEmail) {
+      // ตรวจสอบว่า email ซ้ำหรือไม่ (ยกเว้นตัวเอง)
+      const [existingEmail] = await promisePool.query(
+        'SELECT user_id FROM users WHERE student_email = ? AND user_id != ?',
+        [student_email, user_id]
+      );
+      if (existingEmail.length > 0) {
+        return res.status(400).json({ error: 'อีเมลนี้มีผู้ใช้งานแล้ว กรุณาใช้อีเมลอื่น' });
+      }
+
+      // ตรวจสอบว่าอีเมลมีโดเมน @rmuti.ac.th หรือไม่
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@rmuti\.ac\.th$/;
+      if (!emailRegex.test(student_email)) {
+        return res.status(400).json({ error: 'อีเมลต้องอยู่ในรูปแบบ @rmuti.ac.th' });
+      }
+
       updateQuery += `student_email = ? `;
       values.push(student_email);
     }
 
-    if (password && password.trim() !== "") {
+    if (hasPassword) {
       const hashedPassword = await bcrypt.hash(password, 10);
       if (values.length > 0) updateQuery += `, `;
       updateQuery += `password = ? `;

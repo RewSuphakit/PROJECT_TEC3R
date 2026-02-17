@@ -1,6 +1,4 @@
 const { promisePool } = require('../config/db');
-const sharp = require('sharp');
-
 
 exports.getStats = async (req, res) => {
   try {
