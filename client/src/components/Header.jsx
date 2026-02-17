@@ -2,7 +2,7 @@ import logoTec from '../assets/LOGGG.png'
 import register from '../assets/register.png'
 import ContactAdminModal from './ContactAdminModal';
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import useAuth from '../hooks/useAuth';
 
 function Header() {
@@ -13,12 +13,36 @@ function Header() {
     navigate('/RMUTI/');
   }
   const [showContactModal, setShowContactModal] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [guestMenuOpen, setGuestMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+  const guestMenuRef = useRef(null);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+      if (guestMenuRef.current && !guestMenuRef.current.contains(e.target)) {
+        setGuestMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, []);
+
+  const closeMenu = () => setMenuOpen(false);
 
   
   const userMenu = user?.user_id && (
     <>
      <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2 ">
-    <Link to="/RMUTI/EditProfile" className="flex items-center gap-3  ">
+    <Link to="/RMUTI/EditProfile" onClick={closeMenu} className="flex items-center gap-3  ">
       <img
         className="w-6 h-6"
         src="https://img.icons8.com/?size=100&id=98957&format=png&color=374151"
@@ -28,7 +52,7 @@ function Header() {
     </Link>
   </li>
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-    <Link to ="/RMUTI/EditEmail" className="flex items-center gap-3">
+    <Link to ="/RMUTI/EditEmail" onClick={closeMenu} className="flex items-center gap-3">
       <img
         className="w-6 h-6"
         src="https://img.icons8.com/?size=100&id=59835&format=png&color=374151"
@@ -38,7 +62,7 @@ function Header() {
     </Link>
   </li>
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-    <a href="/RMUTI/Return" className="flex justify-start  gap-3">
+    <a href="/RMUTI/Return" onClick={closeMenu} className="flex justify-start  gap-3">
       <img
         className="w-6 h-6"
         src="https://img.icons8.com/?size=100&id=1846&format=png&color=374151"
@@ -51,7 +75,7 @@ function Header() {
     </a>
    </li>
     <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-    <a href="/RMUTI/History" className="flex justify-start  gap-3">
+    <a href="/RMUTI/History" onClick={closeMenu} className="flex justify-start  gap-3">
       <img
         className="w-6 h-6"
         src="https://img.icons8.com/?size=100&id=6904&format=png&color=000000"
@@ -61,7 +85,7 @@ function Header() {
     </a>
      </li>
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-    <button className="flex items-center gap-3 w-full text-left" onClick={() => setShowContactModal(true)}>
+    <button className="flex items-center gap-3 w-full text-left" onClick={() => { setShowContactModal(true); closeMenu(); }}>
       <img
         className="w-6 h-6"
         src="https://img.icons8.com/?size=100&id=2817&format=png&color=374151"
@@ -75,8 +99,9 @@ function Header() {
 
 
 
+
   <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-    <button   onClick={handleLogout}  className="flex items-center gap-3">
+    <button   onClick={() => { handleLogout(); closeMenu(); }}  className="flex items-center gap-3">
       <img
         className="w-6 h-6"
         src="https://img.icons8.com/?size=100&id=2445&format=png&color=374151"
@@ -133,9 +158,9 @@ function Header() {
         <div className="flex-1"></div>
         
         {/* Menu Section */}
-        <div className="dropdown dropdown-end">
+        <div className="relative">
           {user?.user_id && (
-            <>
+            <div ref={menuRef} className="relative">
               <div className="flex items-center gap-2 sm:gap-4">
                 {/* User role badge */}
                 <div className="hidden sm:flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full">
@@ -150,8 +175,8 @@ function Header() {
                 </div>
 
                 <div className="relative">
-                  <label
-                    tabIndex={0}
+                  <button
+                    onClick={() => setMenuOpen(!menuOpen)}
                     className="btn btn-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200 gap-1 sm:gap-2"
                   >
                     <svg
@@ -169,7 +194,7 @@ function Header() {
                       />
                     </svg>
                     <span className="hidden sm:inline">เมนู</span>
-                  </label>
+                  </button>
                   {borrowedCount <= 0 ? null : (
                     <span className="absolute -top-1 -right-1 flex h-4 w-4 sm:h-5 sm:w-5">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -181,18 +206,20 @@ function Header() {
                 </div>
               </div>
 
-              <ul className="menu menu-sm dropdown-content mt-3 p-3 shadow-xl bg-white rounded-2xl w-60 z-10 border border-gray-100">
-                {userMenu}
-              </ul>
-            </>
+              {menuOpen && (
+                <ul className="menu menu-sm absolute right-0 mt-3 p-3 shadow-xl bg-white rounded-2xl w-60 z-10 border border-gray-100">
+                  {userMenu}
+                </ul>
+              )}
+            </div>
           )}
           
           {!user?.user_id && (
             <>
               {/* Mobile Menu - Modern Design */}
-              <div className="dropdown dropdown-end sm:hidden">
-                <label
-                  tabIndex={0}
+              <div ref={guestMenuRef} className="relative sm:hidden">
+                <button
+                  onClick={() => setGuestMenuOpen(!guestMenuOpen)}
                   className="btn btn-sm bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 gap-2 px-4"
                 >
                   <svg
@@ -210,9 +237,10 @@ function Header() {
                     />
                   </svg>
                   <span className="text-xs font-semibold">เมนู</span>
-                </label>
+                </button>
                 
-                <div className="dropdown-content mt-3 p-4 shadow-2xl bg-white/95 backdrop-blur-lg rounded-3xl w-64 z-10 border border-orange-100">
+                {guestMenuOpen && (
+                <div className="absolute right-0 mt-3 p-4 shadow-2xl bg-white/95 backdrop-blur-lg rounded-3xl w-64 z-10 border border-orange-100">
                   {/* Header */}
                   <div className="text-center mb-4 pb-3 border-b border-orange-100">
                     <p className="text-sm font-bold text-gray-800">ยินดีต้อนรับ</p>
@@ -222,7 +250,7 @@ function Header() {
                   {/* Login Card */}
                   <Link 
                     to="/RMUTI/Login" 
-                    onClick={() => document.activeElement.blur()}
+                    onClick={() => setGuestMenuOpen(false)}
                     className="block mb-3 p-4 bg-gradient-to-r from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100 rounded-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-md group"
                   >
                     <div className="flex items-center gap-4">
@@ -240,7 +268,7 @@ function Header() {
                   {/* Register Card */}
                   <Link 
                     to="/RMUTI/Register" 
-                    onClick={() => document.activeElement.blur()}
+                    onClick={() => setGuestMenuOpen(false)}
                     className="block p-4 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-md group"
                   >
                     <div className="flex items-center gap-4">
@@ -255,6 +283,7 @@ function Header() {
                     </div>
                   </Link>
                 </div>
+                )}
               </div>
 
               {/* Desktop Buttons */}

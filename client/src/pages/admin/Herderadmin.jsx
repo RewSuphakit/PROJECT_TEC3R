@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 
@@ -7,15 +7,20 @@ function Herderadmin() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isReportsDropdownOpen, setIsReportsDropdownOpen] = useState(false);
   const { user, logout } = useAuth();
-  const navigate = useNavigate(); // ใช้ useNavigate ที่นี่
+  const navigate = useNavigate();
+  const sidebarRef = useRef(null);
 
   const handleLogout = () => {
-    logout(); // ออกจากระบบ
-    navigate('/RMUTI/'); // หลังจาก logout ให้เปลี่ยนเส้นทางไปที่หน้า /RMUTI/
+    logout();
+    navigate('/RMUTI/');
   };
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
   };
 
   const toggleReportsDropdown = () => {
@@ -25,18 +30,37 @@ function Herderadmin() {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
+  // Close sidebar when clicking outside on mobile
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(e.target)) {
+        setIsSidebarOpen(false);
+      }
+    };
+    if (isSidebarOpen) {
+      document.addEventListener('touchstart', handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isSidebarOpen]);
+
   return (
     <div className="bg-gray-50 font-[Kanit]">
       {/* Overlay */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-10 lg:hidden"
-          onClick={toggleSidebar}
+          onClick={closeSidebar}
+          onTouchEnd={closeSidebar}
+          style={{ cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
         />
       )}
 
       {/* Sidebar */}
-      <aside className={`w-72 bg-white shadow-xl fixed h-full transition-all duration-300 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 z-10`}>
+      <aside ref={sidebarRef} className={`w-72 bg-white shadow-xl fixed h-full transition-all duration-300 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 z-10`}>
         <div className="p-6 border-b ">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
@@ -50,12 +74,12 @@ function Herderadmin() {
             <p className="px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">เมนูหลัก</p>
           </div>
 
-          <Link to="/RMUTI/Dashboard" className="flex items-center gap-3 px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group">
+          <Link to="/RMUTI/Dashboard" onClick={closeSidebar} className="flex items-center gap-3 px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group">
             <i className="fas fa-home w-5 transition-transform group-hover:scale-110" />
             <span className="font-medium">แดชบอร์ด</span>
           </Link>
 
-          <Link to="/RMUTI/ManageTools" className="flex items-center gap-3 px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group">
+          <Link to="/RMUTI/ManageTools" onClick={closeSidebar} className="flex items-center gap-3 px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group">
             <i className="fas fa-box w-5 transition-transform group-hover:scale-110" />
             <span>จัดการอุปกรณ์</span>
           </Link>
@@ -64,6 +88,7 @@ function Herderadmin() {
             <button
               onClick={toggleDropdown}
               className="w-full flex items-center justify-between px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               <div className="flex items-center gap-3">
                 <i className="fas fa-exchange-alt w-5 transition-transform group-hover:scale-110" />
@@ -73,18 +98,18 @@ function Herderadmin() {
             </button>
 
             <div className={`${isDropdownOpen ? 'block' : 'hidden'} pl-11 mt-1 space-y-1`}>
-              <Link to="/RMUTI/ListBorrow" className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200">
+              <Link to="/RMUTI/ListBorrow" onClick={closeSidebar} className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200">
                 <i className="fas fa-users w-5" />
                 <span>รายการยืมอุปกรณ์</span>
               </Link>
-              <Link to="/RMUTI/ListReturn" className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200">
+              <Link to="/RMUTI/ListReturn" onClick={closeSidebar} className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200">
                 <i className="fas fa-undo w-5" />
                 <span>รายการคืนอุปกรณ์</span>
               </Link>
             </div>
           </div>
 
-          <Link to="/RMUTI/ManageUsers" className="flex items-center gap-3 px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group">
+          <Link to="/RMUTI/ManageUsers" onClick={closeSidebar} className="flex items-center gap-3 px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group">
             <i className="fas fa-users w-5 transition-transform group-hover:scale-110" />
             <span>จัดการผู้ใช้</span>
           </Link>
@@ -92,6 +117,7 @@ function Herderadmin() {
             <button
               onClick={toggleReportsDropdown}
               className="w-full flex items-center justify-between px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               <div className="flex items-center gap-3">
                <i className="fas fa-chart-bar w-5 transition-transform group-hover:scale-110" />
@@ -101,7 +127,7 @@ function Herderadmin() {
             </button>
 
             <div className={`${isReportsDropdownOpen ? 'block' : 'hidden'} pl-11 mt-1 space-y-1`}>
-              <Link to="/RMUTI/Report" className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200">
+              <Link to="/RMUTI/Report" onClick={closeSidebar} className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200">
                 <i className="fas fa-file w-5" />
                 <span>รายงานการยืม-คืน</span>
               </Link>
@@ -113,10 +139,10 @@ function Herderadmin() {
             <p className="px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">บัญชี</p>
           </div>
 
-          <a href="#" onClick={handleLogout} className="flex items-center gap-3 px-4 py-3 text-red-600 rounded-lg hover:bg-red-50 transition-all duration-200 group">
+          <button onClick={() => { handleLogout(); closeSidebar(); }} className="w-full flex items-center gap-3 px-4 py-3 text-red-600 rounded-lg hover:bg-red-50 transition-all duration-200 group" style={{ WebkitTapHighlightColor: 'transparent' }}>
             <i className="fas fa-sign-out-alt w-5 transition-transform group-hover:scale-110" />
             <span>ออกจากระบบ</span>
-          </a>
+          </button>
         </nav>
       </aside>
 
@@ -129,6 +155,7 @@ function Herderadmin() {
                 <button
                   onClick={toggleSidebar}
                   className="text-gray-500 hover:text-gray-600 lg:hidden focus:outline-none"
+                  style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
                 >
                   <i className="fas fa-bars text-xl" />
                 </button>
@@ -155,3 +182,4 @@ function Herderadmin() {
 }
 
 export default Herderadmin;
+
