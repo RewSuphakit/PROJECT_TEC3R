@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { FaPlus, FaTimes, FaTools, FaSortNumericUp } from 'react-icons/fa';
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
 function AddTool({ onAddSuccess }) {
@@ -10,6 +11,7 @@ function AddTool({ onAddSuccess }) {
   const [totalQuantity, setTotalQuantity] = useState("");
   const [image, setImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -19,6 +21,7 @@ function AddTool({ onAddSuccess }) {
     formData.append("total_quantity", totalQuantity);
     formData.append("image", image);
 
+    setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
       await axios.post(`${apiUrl}/api/equipment/equipment`, formData, {
@@ -44,6 +47,8 @@ function AddTool({ onAddSuccess }) {
       } else {
         toast.error("เกิดข้อผิดพลาดในการเพิ่มอุปกรณ์");
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -80,7 +85,7 @@ function AddTool({ onAddSuccess }) {
         style={{ backgroundColor: "#0F4C75" }}
         onClick={() => setShowModal(true)}
       >
-        <i className="fas fa-plus transition-transform group-hover:rotate-90" />
+        <FaPlus className="transition-transform group-hover:rotate-90" />
         <span>เพิ่มอุปกรณ์ใหม่</span>
       </button>
 
@@ -106,7 +111,7 @@ function AddTool({ onAddSuccess }) {
                   className="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"
                   onClick={closeModal}
                 >
-                  <i className="fas fa-times" />
+                  <FaTimes />
                 </button>
 
                 <h3 className="font-bold text-lg mb-4">เพิ่มชุดอุปกรณ์</h3>
@@ -116,7 +121,7 @@ function AddTool({ onAddSuccess }) {
                     <span className="label-text font-medium">ชื่ออุปกรณ์</span>
                   </label>
                   <div className="input input-bordered flex items-center gap-2">
-                    <i className="fas fa-tools text-gray-400" />
+                    <FaTools className="text-gray-400" />
                     <input
                       type="text"
                       placeholder="ชื่ออุปกรณ์"
@@ -133,7 +138,7 @@ function AddTool({ onAddSuccess }) {
                     <span className="label-text font-medium">จำนวน</span>
                   </label>
                   <div className="input input-bordered flex items-center gap-2">
-                    <i className="fas fa-sort-numeric-up text-gray-400" />
+                    <FaSortNumericUp className="text-gray-400" />
                     <input
                       type="number"
                       placeholder="จำนวน"
@@ -170,8 +175,22 @@ function AddTool({ onAddSuccess }) {
                   >
                     ยกเลิก
                   </button>
-                  <button type="submit" className="btn bg-blue-600 hover:bg-blue-700 text-white">
-                    ตกลง
+                  <button 
+                    type="submit" 
+                    className={`btn text-white flex items-center gap-2 ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        กำลังบันทึก...
+                      </>
+                    ) : (
+                      'ตกลง'
+                    )}
                   </button>
                 </div>
               </form>

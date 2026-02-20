@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
+import { FaBoxes, FaHome, FaBox, FaExchangeAlt, FaChevronDown, FaUsers, FaUndo, FaChartBar, FaFile, FaSignOutAlt, FaBars } from 'react-icons/fa';
 
 function Herderadmin() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -64,7 +65,7 @@ function Herderadmin() {
         <div className="p-6 border-b ">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-              <i className="fas fa-boxes text-lg" style={{ color: '#0F4C75' }} />
+              <FaBoxes className="text-lg" style={{ color: '#0F4C75' }} />
             </div>
             <span className="text-xl font-semibold text-gray-800">จัดการหลังบ้าน</span>
           </div>
@@ -75,12 +76,12 @@ function Herderadmin() {
           </div>
 
           <Link to="/RMUTI/Dashboard" onClick={closeSidebar} className="flex items-center gap-3 px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group">
-            <i className="fas fa-home w-5 transition-transform group-hover:scale-110" />
+            <FaHome className="w-5 transition-transform group-hover:scale-110" />
             <span className="font-medium">แดชบอร์ด</span>
           </Link>
 
           <Link to="/RMUTI/ManageTools" onClick={closeSidebar} className="flex items-center gap-3 px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group">
-            <i className="fas fa-box w-5 transition-transform group-hover:scale-110" />
+            <FaBox className="w-5 transition-transform group-hover:scale-110" />
             <span>จัดการอุปกรณ์</span>
           </Link>
 
@@ -91,26 +92,26 @@ function Herderadmin() {
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               <div className="flex items-center gap-3">
-                <i className="fas fa-exchange-alt w-5 transition-transform group-hover:scale-110" />
+                <FaExchangeAlt className="w-5 transition-transform group-hover:scale-110" />
                 <span>รายการยืม-คืน</span>
               </div>
-              <i className={`fas fa-chevron-down transform transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              <FaChevronDown className={`transform transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
             <div className={`${isDropdownOpen ? 'block' : 'hidden'} pl-11 mt-1 space-y-1`}>
               <Link to="/RMUTI/ListBorrow" onClick={closeSidebar} className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200">
-                <i className="fas fa-users w-5" />
+                <FaUsers className="w-5" />
                 <span>รายการยืมอุปกรณ์</span>
               </Link>
               <Link to="/RMUTI/ListReturn" onClick={closeSidebar} className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200">
-                <i className="fas fa-undo w-5" />
+                <FaUndo className="w-5" />
                 <span>รายการคืนอุปกรณ์</span>
               </Link>
             </div>
           </div>
 
           <Link to="/RMUTI/ManageUsers" onClick={closeSidebar} className="flex items-center gap-3 px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200 group">
-            <i className="fas fa-users w-5 transition-transform group-hover:scale-110" />
+            <FaUsers className="w-5 transition-transform group-hover:scale-110" />
             <span>จัดการผู้ใช้</span>
           </Link>
  <div className="relative">
@@ -120,15 +121,15 @@ function Herderadmin() {
               style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               <div className="flex items-center gap-3">
-               <i className="fas fa-chart-bar w-5 transition-transform group-hover:scale-110" />
+               <FaChartBar className="w-5 transition-transform group-hover:scale-110" />
                 <span>รายงานการยืม-คืน</span>
               </div>
-              <i className={`fas fa-chevron-down transform transition-transform duration-200 ${isReportsDropdownOpen ? 'rotate-180' : ''}`} />
+              <FaChevronDown className={`transform transition-transform duration-200 ${isReportsDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
             <div className={`${isReportsDropdownOpen ? 'block' : 'hidden'} pl-11 mt-1 space-y-1`}>
               <Link to="/RMUTI/Report" onClick={closeSidebar} className="flex items-center gap-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-all duration-200">
-                <i className="fas fa-file w-5" />
+                <FaFile className="w-5" />
                 <span>รายงานการยืม-คืน</span>
               </Link>
             </div>
@@ -140,7 +141,7 @@ function Herderadmin() {
           </div>
 
           <button onClick={() => { handleLogout(); closeSidebar(); }} className="w-full flex items-center gap-3 px-4 py-3 text-red-600 rounded-lg hover:bg-red-50 transition-all duration-200 group" style={{ WebkitTapHighlightColor: 'transparent' }}>
-            <i className="fas fa-sign-out-alt w-5 transition-transform group-hover:scale-110" />
+            <FaSignOutAlt className="w-5 transition-transform group-hover:scale-110" />
             <span>ออกจากระบบ</span>
           </button>
         </nav>
@@ -157,7 +158,7 @@ function Herderadmin() {
                   className="text-gray-500 hover:text-gray-600 lg:hidden focus:outline-none"
                   style={{ WebkitTapHighlightColor: 'transparent', touchAction: 'manipulation' }}
                 >
-                  <i className="fas fa-bars text-xl" />
+                  <FaBars className="text-xl" />
                 </button>
                 <p className="text-gray-500">ระบบการยืม-คืนอุปกรณ์ชุดฝึกการเรียนการสอน</p>
               </div>

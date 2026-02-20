@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { FaBox, FaCheck } from 'react-icons/fa';
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function Activity() {
   const [transactions, setTransactions] = useState([]);
@@ -72,13 +73,13 @@ const TransactionItem = ({ transaction }) => {
   const returnTime = transaction.return_date ? formatDateTime(transaction.return_date) : null;
 
   // กำหนดไอคอนและพื้นหลังตามสถานะ
-  const getIconClass = () => status === "Borrowed" ? "fa-box text-blue-500" : "fa-check text-green-500";
+  const getIcon = () => status === "Borrowed" ? <FaBox className="text-blue-500" /> : <FaCheck className="text-green-500" />;
   const getBgClass = () => status === "Borrowed" ? "bg-blue-100" : "bg-green-100";
 
   return (
     <div className="bg-white flex items-center gap-4 p-4 rounded-lg hover:bg-gray-50 transition-colors duration-200 shadow-sm">
       <div className={`w-10 h-10 rounded-full ${getBgClass()} flex items-center justify-center flex-shrink-0`}>
-        <i className={`fas ${getIconClass()}`}></i>
+        {getIcon()}
       </div>
       <div className="flex-1">
         <p className="text-sm font-medium text-gray-800">{userName}</p>

@@ -12,7 +12,7 @@ import bg from '../assets/bbb.webp';
 import bg2 from '../assets/bg2.webp';
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function Home() {
-  const { user, fetchBorrowItems } = useAuth();
+  const { user, loading: authLoading, fetchBorrowItems } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [equipment, setEquipment] = useState([]);
@@ -135,10 +135,11 @@ function Home() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Fetch data when page, search, or user changes
+  // Fetch data when page, search, or user changes (wait for auth to resolve first)
   useEffect(() => {
+    if (authLoading) return; // Don't fetch until we know if user is logged in or not
     fetchEquipment(currentPage, debouncedSearch);
-  }, [currentPage, debouncedSearch, user]);
+  }, [currentPage, debouncedSearch, user, authLoading]);
 
   // Lazy load AOS — only after initial render
   useEffect(() => {

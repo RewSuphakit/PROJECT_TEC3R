@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import 'daisyui/dist/full.css';
+
 
 const CameraCapture = ({ onCapture, recordId }) => {
   const videoRef = useRef(null);

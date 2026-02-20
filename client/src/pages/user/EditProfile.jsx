@@ -5,6 +5,7 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import bg2 from '../../assets/bg2.webp';
+import { HiUserCircle, HiIdentification, HiUser, HiAcademicCap, HiPhone, HiPencilAlt } from 'react-icons/hi';
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 function EditProfile() {
   const { user, fetchUserProfile, logout } = useAuth();
@@ -109,11 +110,7 @@ function EditProfile() {
       {/* Profile Display Section */}
       <div className="bg-white rounded-xl p-5 z-10 max-w-3xl w-full">
         <div className="flex items-center gap-2 mb-2">
-          <img
-            src="https://img.icons8.com/?size=100&id=23tLBxDnXI8K&format=png&color=000000"
-            alt="user icon"
-            className="w-16 h-16"
-          />
+          <HiUserCircle className="w-16 h-16 text-blue-900" />
           <div>
             <h1 className="text-2xl font-bold text-blue-900">
               โปรไฟล์ของฉัน
@@ -126,11 +123,7 @@ function EditProfile() {
             {/* รหัสนักศึกษา */}
             {user.role !== "teacher" && (
               <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-100">
-                <img
-                  src="https://img.icons8.com/?size=100&id=GhyhrWqfuHQ7&format=png&color=000000"
-                  alt="user icon"
-                  className="w-8 h-8"
-                />
+                <HiIdentification className="w-8 h-8 text-blue-700" />
                 <div className="flex-1">
                   <p className="text-sm text-gray-600 font-medium">รหัสนักศึกษา</p>
                   <p className="text-lg font-semibold text-gray-800">{user.student_id}</p>
@@ -140,11 +133,7 @@ function EditProfile() {
 
             {/* ชื่อจริง (เปลี่ยนจาก ชื่อนักศึกษา เป็น ชื่อผู้ใช้งาน ถ้าเป็นอาจารย์) */}
             <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-100">
-              <img
-                src="https://img.icons8.com/?size=100&id=3nWSKVe0pWxx&format=png&color=000000"
-                alt="user icon"
-                className="w-8 h-8"
-              />
+              <HiUser className="w-8 h-8 text-blue-700" />
               <div className="flex-1">
                 <p className="text-sm text-gray-600 font-medium">
                   {user.role === "teacher" ? "ชื่อผู้ใช้งาน" : "ชื่อนักศึกษา"}
@@ -156,11 +145,7 @@ function EditProfile() {
             {/* ระดับชั้น */}
             {user.role !== "teacher" && (
               <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-100">
-                <img
-                  src="https://img.icons8.com/?size=100&id=xDDWfeoi2wrD&format=png&color=000000"
-                  alt="user icon"
-                  className="w-8 h-8"
-                />
+                <HiAcademicCap className="w-8 h-8 text-blue-700" />
                 <div className="flex-1">
                   <p className="text-sm text-gray-600 font-medium">ระดับชั้น</p>
                   <p className="text-lg font-semibold text-gray-800">{user.year_of_study}</p>
@@ -170,11 +155,7 @@ function EditProfile() {
 
             {/* เบอร์ติดต่อ */}
             <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-100">
-              <img
-                src="https://img.icons8.com/?size=100&id=I24lanX6Nq71&format=png&color=000000"
-                alt="user icon"
-                className="w-8 h-8"
-              />
+              <HiPhone className="w-8 h-8 text-blue-700" />
               <div className="flex-1">
                 <p className="text-sm text-gray-600 font-medium">เบอร์ติดต่อ</p>
                 <p className="text-lg font-semibold text-gray-800">{user.phone}</p>
@@ -211,11 +192,7 @@ function EditProfile() {
           <div className="bg-white p-8 rounded-2xl max-w-2xl w-full shadow-2xl max-h-[85vh] overflow-y-auto">
             <div className="text-center mb-6">
               <div className="inline-flex items-center justify-center w-20 h-20   mb-3">
-                <img
-                  src="https://img.icons8.com/?size=100&id=DXj6ILt461oM&format=png&color=000000"
-                  alt="user icon"
-                  className="w-20 h-20"
-                />
+                <HiPencilAlt className="w-20 h-20 text-orange-500" />
               </div>
               <h2 className="text-2xl font-bold text-gray-800">แก้ไขข้อมูลส่วนตัว</h2>
             </div>
@@ -230,11 +207,7 @@ function EditProfile() {
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <img
-                          src="https://img.icons8.com/?size=100&id=qEK2pqenBa22&format=png&color=CDCDCD"
-                          alt="user icon"
-                          className="w-5 h-5"
-                        />
+                        <HiIdentification className="w-5 h-5 text-gray-300" />
                       </div>
                       <input
                         type="text"
@@ -286,11 +259,7 @@ function EditProfile() {
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <img
-                          src="https://img.icons8.com/?size=100&id=3651&format=png&color=CDCDCD"
-                          alt="user icon"
-                          className="w-5 h-5"
-                        />
+                        <HiAcademicCap className="w-5 h-5 text-gray-300" />
                       </div>
                       <input
                         type="text"

@@ -21,6 +21,7 @@ function ManageTools() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [toolToDelete, setToolToDelete] = useState(null);
   const [toolToEdit, setToolToEdit] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchTools = async (page = currentPage) => {
     try {
@@ -44,6 +45,7 @@ function ManageTools() {
   }, [currentPage]);
 
   const deleteTool = async (equipmentId) => {
+    setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
       await axios.delete(
@@ -58,6 +60,8 @@ function ManageTools() {
     } catch (error) {
       console.error(error);
       toast.error("เกิดข้อผิดพลาดในการลบอุปกรณ์");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -80,6 +84,7 @@ function ManageTools() {
       }
     }
   
+    setIsLoading(true);
     try {
       const formData = new FormData();
       formData.append("equipment_name", e.target.equipment_name.value);
@@ -111,6 +116,8 @@ function ManageTools() {
       } else {
         toast.error("เกิดข้อผิดพลาดในการอัพเดตอุปกรณ์");
       }
+    } finally {
+      setIsLoading(false);
     }
   };
   
@@ -474,6 +481,7 @@ function ManageTools() {
               tool={toolToEdit}
               onSubmit={updateTool}
               onCancel={closeEditModal}
+              isLoading={isLoading}
             />
           )}
         </div>

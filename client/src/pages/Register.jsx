@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import bg2 from '../assets/bg2.webp';
+import { HiUser, HiAcademicCap, HiIdentification, HiMail, HiLockClosed, HiPhone, HiUserGroup } from 'react-icons/hi';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const Register = () => {
   const [studentIdDuplicate, setStudentIdDuplicate] = useState(false);
   const [phoneValid, setPhoneValid] = useState(true);
   const [studentIdValid, setStudentIdValid] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
   
   const handleRegister = async (e) => {
@@ -81,6 +83,7 @@ const Register = () => {
     setPhoneValid(true);
     setStudentIdValid(true);
 
+    setIsLoading(true);
     try {
       const response = await axios.post(`${apiUrl}/api/users/register`, {
         student_email,
@@ -116,6 +119,8 @@ const Register = () => {
           position: "top-right"
         });
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -148,11 +153,7 @@ const Register = () => {
                   ชื่อจริงผู้ใช้งาน
                 </label>
                 <div className="relative">
-                  <img
-                    src="https://img.icons8.com/?size=100&id=98957&format=png&color=CDCDCD"
-                    className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5"
-                    alt="name-icon"
-                  />
+                  <HiUser className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5 text-gray-300" />
                   <input
                     type="text"
                     id="student_name"
@@ -173,11 +174,7 @@ const Register = () => {
                     ชั้นปี
                   </label>
                   <div className="relative">
-                    <img
-                      src="https://img.icons8.com/?size=100&id=79387&format=png&color=CDCDCD"
-                      className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5"
-                      alt="year-icon"
-                    />
+                    <HiAcademicCap className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5 text-gray-300" />
                     <input
                       type="text"
                       id="year_of_study"
@@ -199,11 +196,7 @@ const Register = () => {
                     รหัสนักศึกษา
                   </label>
                   <div className="relative">
-                    <img
-                      src="https://img.icons8.com/?size=100&id=IU9d7JI9Ec9U&format=png&color=CDCDCD"
-                      className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5"
-                      alt="student-id-icon"
-                    />
+                    <HiIdentification className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5 text-gray-300" />
                     <input
                       type="text"
                       id="student_id"
@@ -242,11 +235,7 @@ const Register = () => {
                   </span>
                 </label>
                 <div className="relative">
-                  <img
-                    src="https://img.icons8.com/?size=100&id=qx71uoSIkCN3&format=png&color=CDCDCD"
-                    className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5"
-                    alt="email-icon"
-                  />
+                  <HiMail className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5 text-gray-300" />
                   <input
                     type="email"
                     id="student_email"
@@ -275,11 +264,7 @@ const Register = () => {
                   รหัสผ่าน
                 </label>
                 <div className="relative">
-                  <img
-                    src="https://img.icons8.com/?size=100&id=59825&format=png&color=CDCDCD"
-                    className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5"
-                    alt="password-icon"
-                  />
+                  <HiLockClosed className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5 text-gray-300" />
                   <input
                     type="password"
                     id="password"
@@ -299,11 +284,7 @@ const Register = () => {
                   เบอร์โทร
                 </label>
                 <div className="relative">
-                  <img
-                    src="https://img.icons8.com/?size=100&id=78382&format=png&color=CDCDCD"
-                    className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5"
-                    alt="phone-icon"
-                  />
+                  <HiPhone className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5 text-gray-300" />
                   <input
                     type="tel"
                     id="phone"
@@ -332,11 +313,7 @@ const Register = () => {
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium text-gray-600">ผู้ใช้งาน</label>
                 <div className="relative">
-                  <img
-                    src="https://img.icons8.com/?size=100&id=23265&format=png&color=CDCDCD"
-                    className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5"
-                    alt="role-icon"
-                  />
+                  <HiUserGroup className="absolute top-1/2 left-3 transform -translate-y-1/2 w-5 h-5 text-gray-300" />
                   <select
                     name="role"
                     id="role"
@@ -379,9 +356,24 @@ const Register = () => {
               <div className="col-span-full">
                 <button
                   type="submit"
-                  className="w-full py-3 mt-2 text-white bg-[#0F4C75] hover:bg-[#0D3A5F] rounded-lg text-base font-medium transition ease-in-out duration-200 shadow-md focus:ring-2 focus:ring-offset-2 focus:ring-[#0F4C75] focus:outline-none"
+                  disabled={isLoading}
+                  className={`w-full py-3 mt-2 text-white rounded-lg text-base font-medium transition ease-in-out duration-200 shadow-md focus:ring-2 focus:ring-offset-2 focus:ring-[#0F4C75] focus:outline-none flex items-center justify-center gap-2 ${
+                    isLoading 
+                      ? 'bg-gray-400 cursor-not-allowed' 
+                      : 'bg-[#0F4C75] hover:bg-[#0D3A5F]'
+                  }`}
                 >
-                  สมัครสมาชิก
+                  {isLoading ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      กำลังสมัคร...
+                    </>
+                  ) : (
+                    'สมัครสมาชิก'
+                  )}
                 </button>
               </div>
             </form>

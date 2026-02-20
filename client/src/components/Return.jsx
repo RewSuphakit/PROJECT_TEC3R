@@ -17,6 +17,7 @@ function Return() {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [sortField, setSortField] = useState('borrow_date');
   const [sortOrder, setSortOrder] = useState('desc');
+  const [returningItemId, setReturningItemId] = useState(null);
   const tableContainerRef = useRef(null);
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
@@ -167,6 +168,7 @@ function Return() {
       formData.append('image_return', images[itemId]);
     }
 
+    setReturningItemId(itemId);
     try {
       let token = localStorage.getItem('token');
       await axios.put(`${apiUrl}/api/borrow/update/${itemId}`, formData, {
@@ -181,6 +183,8 @@ function Return() {
     } catch (error) {
       console.error('Error returned equipment:', error);
       toast.warn('เกิดข้อผิดพลาดในการคืนอุปกรณ์');
+    } finally {
+      setReturningItemId(null);
     }
   };
 
@@ -292,12 +296,29 @@ function Return() {
                           {images[item.item_id] ? (
                             <button
                               onClick={() => handleReturned(item.item_id, 'Returned')}
-                              className="inline-flex items-center px-4 py-1.5 border border-transparent rounded-full shadow-md text-xs font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 focus:outline-none transform hover:-translate-y-0.5 transition-all duration-200"
+                              disabled={returningItemId === item.item_id}
+                              className={`inline-flex items-center px-4 py-1.5 border border-transparent rounded-full shadow-md text-xs font-bold text-white focus:outline-none transform transition-all duration-200 ${
+                                returningItemId === item.item_id
+                                  ? 'bg-gray-400 cursor-not-allowed'
+                                  : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 hover:-translate-y-0.5'
+                              }`}
                             >
-                              <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                              </svg>
-                              ยืนยัน
+                              {returningItemId === item.item_id ? (
+                                <>
+                                  <svg className="animate-spin h-4 w-4 mr-1.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  กำลังคืน...
+                                </>
+                              ) : (
+                                <>
+                                  <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                  ยืนยัน
+                                </>
+                              )}
                             </button>
                           ) : (
                             <span className="text-xs text-gray-400 italic">แนบรูปก่อนคืน</span>
@@ -354,9 +375,24 @@ function Return() {
                         {images[item.item_id] ? (
                           <button
                             onClick={() => handleReturned(item.item_id, 'Returned')}
-                            className="w-full flex justify-center items-center py-2 px-3 border border-transparent rounded-lg shadow-sm text-xs font-bold text-white bg-green-600 hover:bg-green-700 transition-all active:scale-95"
+                            disabled={returningItemId === item.item_id}
+                            className={`w-full flex justify-center items-center py-2 px-3 border border-transparent rounded-lg shadow-sm text-xs font-bold text-white transition-all active:scale-95 ${
+                              returningItemId === item.item_id
+                                ? 'bg-gray-400 cursor-not-allowed'
+                                : 'bg-green-600 hover:bg-green-700'
+                            }`}
                           >
-                            ยืนยันการคืน
+                            {returningItemId === item.item_id ? (
+                              <>
+                                <svg className="animate-spin h-4 w-4 mr-1.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                กำลังคืน...
+                              </>
+                            ) : (
+                              'ยืนยันการคืน'
+                            )}
                           </button>
                         ) : (
                           <div className="text-center text-xs text-orange-400 font-medium animate-pulse">

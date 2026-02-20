@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { FaArrowUp } from 'react-icons/fa';
 
 export default function ScrollToTopButton() {
   const [isVisible, setIsVisible] = useState(false);
@@ -31,7 +32,7 @@ export default function ScrollToTopButton() {
       isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
     }`}
   >
-    <i className="fas fa-arrow-up m-1" />
+    <FaArrowUp className="m-1" />
   </button>
   );
 }

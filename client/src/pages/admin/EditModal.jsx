@@ -1,7 +1,7 @@
 // EditModal.js
 import React, { useState, useEffect } from "react";
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
-const EditModal = ({ tool, onSubmit, onCancel }) => {
+const EditModal = ({ tool, onSubmit, onCancel, isLoading }) => {
   const [preview, setPreview] = useState("");
   // เมื่อ component ถูกโหลดหรือค่า tool เปลี่ยน ให้ตั้งค่า preview จากรูปเดิมของ tool
   useEffect(() => {
@@ -78,8 +78,22 @@ const EditModal = ({ tool, onSubmit, onCancel }) => {
             <button onClick={onCancel} type="button" className="btn btn-outline">
               ยกเลิก
             </button>
-            <button type="submit" className="btn bg-blue-600 hover:bg-blue-700 text-white border-none">
-              บันทึก
+            <button 
+              type="submit" 
+              className={`btn text-white border-none flex items-center gap-2 ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  กำลังบันทึก...
+                </>
+              ) : (
+                'บันทึก'
+              )}
             </button>
           </div>
         </form>

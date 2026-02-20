@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import useAuth from "../hooks/useAuth";
 import bg2 from '../assets/bg2.webp';
+import { HiMail, HiLockClosed } from 'react-icons/hi';
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
 
@@ -128,11 +129,7 @@ const Login = () => {
             <div>
               <label htmlFor="email" className="block text-gray-400 text-sm">อีเมล</label>
               <div className="relative">
-                <img
-                  src="https://img.icons8.com/?size=100&id=59835&format=png&color=CDCDCD"
-                  alt="email icon"
-                  className="absolute top-1/2 left-3 -translate-y-1/2 w-5 h-5"
-                />
+                <HiMail className="absolute top-1/2 left-3 -translate-y-1/2 w-5 h-5 text-gray-300" />
                 <input
                   id="email"
                   type="email"
@@ -148,11 +145,7 @@ const Login = () => {
             <div>
               <label htmlFor="password" className="block text-gray-400 text-sm">รหัสผ่าน</label>
               <div className="relative">
-                <img
-                  src="https://img.icons8.com/?size=100&id=59825&format=png&color=CDCDCD"
-                  alt="password icon"
-                  className="absolute top-1/2 left-3 -translate-y-1/2 w-5 h-5"
-                />
+                <HiLockClosed className="absolute top-1/2 left-3 -translate-y-1/2 w-5 h-5 text-gray-300" />
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}

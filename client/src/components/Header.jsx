@@ -4,6 +4,7 @@ import ContactAdminModal from './ContactAdminModal';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import useAuth from '../hooks/useAuth';
+import { HiUser, HiMail, HiRefresh, HiClock, HiPhone, HiLogout } from 'react-icons/hi';
 
 function Header() {
   const navigate = useNavigate();
@@ -41,83 +42,64 @@ function Header() {
   
   const userMenu = user?.user_id && (
     <>
-     <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2 ">
-    <Link to="/RMUTI/EditProfile" onClick={closeMenu} className="flex items-center gap-3  ">
-      <img
-        className="w-6 h-6"
-        src="https://img.icons8.com/?size=100&id=98957&format=png&color=374151"
-        alt="user icon"
-      />
-      <p className='text-wrap'>ชื่อผู้ใช้: {user?.student_name}</p>
-    </Link>
-  </li>
-  <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-    <Link to ="/RMUTI/EditEmail" onClick={closeMenu} className="flex items-center gap-3">
-      <img
-        className="w-6 h-6"
-        src="https://img.icons8.com/?size=100&id=59835&format=png&color=374151"
-        alt="email icon"
-      />
-     <p className='text-wrap'> อีเมล: {user?.student_email}</p>
-    </Link>
-  </li>
-  <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-    <Link to="/RMUTI/Return" onClick={closeMenu} className="flex justify-start  gap-3">
-      <img
-        className="w-6 h-6"
-        src="https://img.icons8.com/?size=100&id=1846&format=png&color=374151"
-        alt="history icon"
-      />
-      <div >คืนอุปกรณ์</div>
-      {borrowedCount <= 0  ? null : (
-      <div className="badge badge-error">{borrowedCount}</div>
-      )}
-    </Link>
-   </li>
-    <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-    <Link to="/RMUTI/History" onClick={closeMenu} className="flex justify-start  gap-3">
-      <img
-        className="w-6 h-6"
-        src="https://img.icons8.com/?size=100&id=6904&format=png&color=000000"
-        alt="history icon"
-      />
-      <div >ประวัติการยืม/คืน</div>
-    </Link>
-     </li>
-  <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-    <button className="flex items-center gap-3 w-full text-left" onClick={() => { setShowContactModal(true); closeMenu(); }}>
-      <img
-        className="w-6 h-6"
-        src="https://img.icons8.com/?size=100&id=2817&format=png&color=374151"
-        alt="contact admin icon"
-      />
-      ติดต่อผู้ดูแลระบบ
-    </button>
-  </li>
-
-  
-
-
-
-
-  <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2">
-    <button   onClick={() => { handleLogout(); closeMenu(); }}  className="flex items-center gap-3">
-      <img
-        className="w-6 h-6"
-        src="https://img.icons8.com/?size=100&id=2445&format=png&color=374151"
-        alt="logout icon"
-      />
-      ออกจากระบบ
-    </button>
-  </li>
+    <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2 transition-all duration-150">
+      <Link to="/RMUTI/EditProfile" onClick={closeMenu} className="flex items-center gap-3">
+        <div className="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+          <HiUser className="w-4 h-4 text-blue-600" />
+        </div>
+        <p className='text-wrap text-sm'>ชื่อผู้ใช้: {user?.student_name}</p>
+      </Link>
+    </li>
+    <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2 transition-all duration-150">
+      <Link to="/RMUTI/EditEmail" onClick={closeMenu} className="flex items-center gap-3">
+        <div className="w-7 h-7 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+          <HiMail className="w-4 h-4 text-indigo-600" />
+        </div>
+        <p className='text-wrap text-sm'>อีเมล: {user?.student_email}</p>
+      </Link>
+    </li>
+    <li className="hover:border-l-4 hover:border-orange-500 py-2 px-2 transition-all duration-150">
+      <Link to="/RMUTI/Return" onClick={closeMenu} className="flex items-center gap-3">
+        <div className="w-7 h-7 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+          <HiRefresh className="w-4 h-4 text-orange-600" />
+        </div>
+        <span className="text-sm">คืนอุปกรณ์</span>
+        {borrowedCount > 0 && (
+          <div className="badge badge-error badge-sm">{borrowedCount}</div>
+        )}
+      </Link>
+    </li>
+    <li className="hover:border-l-4 hover:border-blue-500 py-2 px-2 transition-all duration-150">
+      <Link to="/RMUTI/History" onClick={closeMenu} className="flex items-center gap-3">
+        <div className="w-7 h-7 bg-cyan-100 rounded-full flex items-center justify-center flex-shrink-0">
+          <HiClock className="w-4 h-4 text-cyan-600" />
+        </div>
+        <span className="text-sm">ประวัติการยืม/คืน</span>
+      </Link>
+    </li>
+    <li className="hover:border-l-4 hover:border-green-500 py-2 px-2 transition-all duration-150">
+      <button className="flex items-center gap-3 w-full text-left" onClick={() => { setShowContactModal(true); closeMenu(); }}>
+        <div className="w-7 h-7 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+          <HiPhone className="w-4 h-4 text-green-600" />
+        </div>
+        <span className="text-sm">ติดต่อผู้ดูแลระบบ</span>
+      </button>
+    </li>
+    <li className="hover:border-l-4 hover:border-red-500 py-2 px-2 transition-all duration-150">
+      <button onClick={() => { handleLogout(); closeMenu(); }} className="flex items-center gap-3">
+        <div className="w-7 h-7 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+          <HiLogout className="w-4 h-4 text-red-500" />
+        </div>
+        <span className="text-sm text-red-500">ออกจากระบบ</span>
+      </button>
+    </li>
     </>
-
-  
   );
+
   return (
     <section className="w-full text-gray-700 sticky top-0 z-50">
       {/* Gradient Background for Header */}
-      <nav className="navbar shadow-lg  border-gray-200/50 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-slate-50 via-white to-slate-50  ">
+      <nav className="navbar shadow-lg  border-gray-200/50 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-slate-50 via-white to-slate-50 font-[Kanit]">
         
         {/* Logo Container - Modern Layout */}
         <div className="flex items-center gap-2 sm:gap-4">
@@ -207,7 +189,7 @@ function Header() {
               </div>
 
               {menuOpen && (
-                <ul className="menu menu-sm absolute right-0 mt-3 p-3 shadow-xl bg-white rounded-2xl w-60 z-10 border border-gray-100">
+                <ul className="menu menu-sm absolute right-0 mt-3 p-3 shadow-2xl bg-white/95 backdrop-blur-lg rounded-2xl w-72 z-10 border border-gray-100">
                   {userMenu}
                 </ul>
               )}

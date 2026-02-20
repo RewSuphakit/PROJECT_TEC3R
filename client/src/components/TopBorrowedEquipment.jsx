@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { FaBox } from 'react-icons/fa';
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
 const TopBorrowedEquipment = () => {
@@ -83,7 +84,7 @@ const TopBorrowedEquipment = () => {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <i className="fas fa-box text-gray-400"></i>
+                    <FaBox className="text-gray-400" />
                   </div>
                 )}
               </div>

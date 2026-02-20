@@ -5,6 +5,7 @@ import AddTool from '../admin/addTool';
 import TopBorrowedEquipment from '../../components/TopBorrowedEquipment';
 import bg2 from '../../assets/bg2.webp';
 import { Link } from "react-router-dom";
+import { FaBox, FaBoxes, FaExchangeAlt, FaUsers } from 'react-icons/fa';
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
 import './AdminStyles.css';
@@ -74,12 +75,12 @@ function Dashboard() {
                     {statsData.total_equipment || 0}
                   </h3>
                   <p className="text-gray-500 text-sm font-medium mt-2 flex items-center gap-1">
-                    <i className="fa-solid fa-box text-xs" />
+                    <FaBox className="text-xs" />
                     <span>อุปกรณ์ทั้งหมด</span>
                   </p>
                 </div>
                 <div className="bg-blue-50 p-4 rounded-xl">
-                  <i className="fas fa-boxes text-2xl text-blue-600" />
+                  <FaBoxes className="text-2xl text-blue-600" />
                 </div>
               </div>
             </div>
@@ -93,12 +94,12 @@ function Dashboard() {
                     {statsData.total_borrow_items || 0}
                   </h3>
                   <p className="text-gray-500 text-sm font-medium mt-2 flex items-center gap-1">
-                    <i className="fas fa-exchange-alt text-xs" />
+                    <FaExchangeAlt className="text-xs" />
                     <span>จำนวนการยืมทั้งหมด</span>
                   </p>
                 </div>
                 <div className="bg-orange-50 p-4 rounded-xl">
-                  <i className="fas fa-exchange-alt text-2xl text-orange-500" />
+                  <FaExchangeAlt className="text-2xl text-orange-500" />
                 </div>
                 
               </div>
@@ -114,12 +115,12 @@ function Dashboard() {
                     {statsData.total_users || 0}
                   </h3>
                   <p className="text-gray-500 text-sm font-medium mt-2 flex items-center gap-1">
-                    <i className="fas fa-users text-xs" />
+                    <FaUsers className="text-xs" />
                     <span>ผู้ใช้งานในเว็บไซต์ทั้งหมด</span>
                   </p>
                 </div>
                 <div className="bg-cyan-50 p-4 rounded-xl">
-                  <i className="fas fa-users text-2xl text-cyan-600" />
+                  <FaUsers className="text-2xl text-cyan-600" />
                 </div>
               </div>
               </Link>
