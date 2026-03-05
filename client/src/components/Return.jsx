@@ -6,6 +6,8 @@ import CameraCapture from '../components/CameraCapture';
 import ImageUpload from '../components/ImageUpload';
 import { toast } from 'react-toastify';
 import bg2 from '../assets/bg2.webp';
+import { useSortable } from '../hooks/useSortable';
+import SortIcon from '../components/SortIcon';
 
 function Return() {
   const { user, fetchBorrowItems } = useAuth();
@@ -15,8 +17,7 @@ function Return() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [sortField, setSortField] = useState('borrow_date');
-  const [sortOrder, setSortOrder] = useState('desc');
+  const { sortField, sortOrder, handleSort } = useSortable('borrow_date', 'desc', setCurrentPage);
   const [returningItemId, setReturningItemId] = useState(null);
   const tableContainerRef = useRef(null);
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
@@ -126,26 +127,7 @@ function Return() {
 
   const currentItems = sortedItems.slice(indexOfFirstItem, indexOfLastItem);
 
-  // ฟังก์ชันจัดการการเรียงลำดับ
-  const handleSort = (field) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortOrder('asc');
-    }
-    setCurrentPage(1);
-  };
 
-  // Component แสดง icon การเรียงลำดับ
-  const SortIcon = ({ field }) => {
-    if (sortField !== field) {
-      return <span className="ml-1 text-gray-300 text-xs">⇅</span>;
-    }
-    return sortOrder === 'asc'
-      ? <span className="ml-1 text-blue-600 text-xs">▲</span>
-      : <span className="ml-1 text-blue-600 text-xs">▼</span>;
-  };
 
   const handleCaptureImage = (capturedImage, itemId) => {
     setImages((prevCapturedImages) => ({
@@ -237,7 +219,7 @@ function Return() {
                     >
                       <span className="flex items-center justify-center">
                         ชื่ออุปกรณ์
-                        <SortIcon field="equipment_name" />
+                        <SortIcon field="equipment_name" sortField={sortField} sortOrder={sortOrder} size="xs" />
                       </span>
                     </th>
                     <th
@@ -246,7 +228,7 @@ function Return() {
                     >
                       <span className="flex items-center justify-center">
                         จำนวน
-                        <SortIcon field="quantity" />
+                        <SortIcon field="quantity" sortField={sortField} sortOrder={sortOrder} size="xs" />
                       </span>
                     </th>
                     <th
@@ -255,7 +237,7 @@ function Return() {
                     >
                       <span className="flex items-center justify-center">
                         วันที่ยืม
-                        <SortIcon field="borrow_date" />
+                        <SortIcon field="borrow_date" sortField={sortField} sortOrder={sortOrder} size="xs" />
                       </span>
                     </th>
                     <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider bg-gray-50/80 backdrop-blur-sm">

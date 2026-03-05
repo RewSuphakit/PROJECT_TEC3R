@@ -2,6 +2,12 @@ import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import bg2 from '../../assets/bg2.webp';
+import { formatThaiDate } from '../../utils/formatDate';
+import { toggleGroup } from '../../utils/groupToggle';
+import { useSortable } from '../../hooks/useSortable';
+import SortIcon from '../../components/SortIcon';
+import Pagination from '../../components/Pagination';
+import ImagePreviewPopup, { useImagePreview } from '../../components/ImagePreviewPopup';
 
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
@@ -9,8 +15,6 @@ import './AdminStyles.css';
 
 function ListReturn() {
   const [tools, setTools] = useState([]);
-  const [popupImage, setPopupImage] = useState(null);
-  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -18,49 +22,10 @@ function ListReturn() {
   const [openGroups, setOpenGroups] = useState([]);
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [sortField, setSortField] = useState('returned_at');
-  const [sortOrder, setSortOrder] = useState('desc');
+  const { sortField, sortOrder, handleSort } = useSortable('returned_at', 'desc', setCurrentPage);
+  const { popupImage, popupPosition, handleImageMouseEnter, handleImageMouseLeave } = useImagePreview();
 
-  // ฟังก์ชัน mouse events สำหรับ popup รูป (Desktop)
-  const handleImageMouseEnter = (e, imageUrl) => {
-    const rect = e.target.getBoundingClientRect();
-    setPopupImage(imageUrl);
-    setPopupPosition({ x: rect.right + 10, y: rect.top });
-  };
 
-  const handleImageMouseLeave = () => {
-    setPopupImage(null);
-  };
-
-  // ฟังก์ชันสำหรับ Image Modal (Mobile)
-  const openImageModal = (imageUrl) => {
-    setSelectedImage(imageUrl);
-    setImageModalOpen(true);
-  };
-
-  const closeImageModal = () => {
-    setImageModalOpen(false);
-    setSelectedImage(null);
-  };
-
-  // ฟังก์ชันจัดรูปแบบวันที่ให้เป็นแบบไทย
-  const formatThaiDate = (dateStr) => {
-    if (!dateStr) return "—";
-    try {
-      const date = new Date(dateStr);
-      return date.toLocaleString("th-TH", {
-        timeZone: "Asia/Bangkok",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      });
-    } catch (error) {
-      return "Invalid date";
-    }
-  };
 
   // Fetch returned items with server-side pagination
   const fetchReturnedItems = async (page = 1) => {
@@ -156,38 +121,19 @@ function ListReturn() {
     });
   }, [groupedRecords, sortField, sortOrder]);
 
-  // ฟังก์ชันจัดการการเรียงลำดับ
-  const handleSort = (field) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortOrder('asc');
-    }
-    setCurrentPage(1);
+  // ฟังก์ชันสำหรับ Image Modal (Mobile)
+  const openImageModal = (imageUrl) => {
+    setSelectedImage(imageUrl);
+    setImageModalOpen(true);
   };
 
-  // Component สำหรับแสดง icon การเรียงลำดับ
-  const SortIcon = ({ field }) => {
-    if (sortField !== field) {
-      return <span className="ml-1 text-gray-300">⇅</span>;
-    }
-    return sortOrder === 'asc'
-      ? <span className="ml-1 text-blue-600">▲</span>
-      : <span className="ml-1 text-blue-600">▼</span>;
+  const closeImageModal = () => {
+    setImageModalOpen(false);
+    setSelectedImage(null);
   };
 
   // ใช้ groupKeys โดยตรง (ไม่ต้อง slice ที่ client)
   const currentGroupKeys = groupKeys;
-
-  // ฟังก์ชันเปิด/ปิด dropdown ของกลุ่ม
-  const toggleGroup = (groupId) => {
-    setOpenGroups((prev) =>
-      prev.includes(groupId)
-        ? prev.filter((id) => id !== groupId)
-        : [...prev, groupId]
-    );
-  };
 
   return (
     <>
@@ -238,7 +184,7 @@ function ListReturn() {
                         >
                           <span className="flex items-center">
                             ชื่อผู้ยืม
-                            <SortIcon field="student_name" />
+                            <SortIcon field="student_name" sortField={sortField} sortOrder={sortOrder} />
                           </span>
                         </th>
                         <th
@@ -247,7 +193,7 @@ function ListReturn() {
                         >
                           <span className="flex items-center">
                             ชื่ออุปกรณ์
-                            <SortIcon field="equipment_name" />
+                            <SortIcon field="equipment_name" sortField={sortField} sortOrder={sortOrder} />
                           </span>
                         </th>
                         <th
@@ -256,7 +202,7 @@ function ListReturn() {
                         >
                           <span className="flex items-center justify-center">
                             จำนวนที่คืน
-                            <SortIcon field="quantity" />
+                            <SortIcon field="quantity" sortField={sortField} sortOrder={sortOrder} />
                           </span>
                         </th>
                         <th className="py-4 px-6 text-center font-semibold">สถานะ</th>
@@ -267,7 +213,7 @@ function ListReturn() {
                         >
                           <span className="flex items-center justify-center">
                             วันที่คืน
-                            <SortIcon field="returned_at" />
+                            <SortIcon field="returned_at" sortField={sortField} sortOrder={sortOrder} />
                           </span>
                         </th>
                       </tr>
@@ -310,7 +256,7 @@ function ListReturn() {
                             return (
                               <React.Fragment key={groupId}>
                                 <tr
-                                  onClick={() => toggleGroup(groupId)}
+                                  onClick={() => toggleGroup(setOpenGroups, groupId)}
                                   className={`table-row border-b ${index % 2 === 0 ? 'bg-gray-50/50' : 'bg-white'} hover:bg-blue-50/30 transition-colors`}
                                 >
                                   <td className="py-4 px-6 font-medium text-gray-800 flex items-center gap-2">
@@ -398,7 +344,7 @@ function ListReturn() {
                             onClick={(e) => {
                               // ป้องกันไม่ให้คลิกรูปทำให้ toggle group
                               if (!e.target.classList.contains('image-clickable')) {
-                                groupItems.length > 1 && toggleGroup(groupId);
+                                toggleGroup(setOpenGroups, groupId);
                               }
                             }}
                           >
@@ -503,29 +449,7 @@ function ListReturn() {
             )}
 
             {/* Popup Image Preview - Desktop Only */}
-            {popupImage && (
-              <div
-                className="hidden lg:block"
-                style={{
-                  position: "fixed",
-                  left: popupPosition.x,
-                  top: popupPosition.y,
-                  zIndex: 1000,
-                  background: "rgba(255,255,255,0.95)",
-                  border: "1px solid #ddd",
-                  borderRadius: "8px",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                  padding: "8px"
-                }}
-                onMouseLeave={handleImageMouseLeave}
-              >
-                <img
-                  src={popupImage}
-                  alt="popup"
-                  style={{ width: "320px", height: "320px", objectFit: "contain", borderRadius: "8px" }}
-                />
-              </div>
-            )}
+            <ImagePreviewPopup popupImage={popupImage} popupPosition={popupPosition} onMouseLeave={handleImageMouseLeave} />
 
             {/* Image Modal for Mobile */}
             {imageModalOpen && selectedImage && (
@@ -551,63 +475,7 @@ function ListReturn() {
             )}
 
             {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="mt-6 flex justify-center">
-                <div className="filter-card rounded-xl p-4 shadow-lg flex flex-wrap gap-2 justify-center">
-                  <button
-                    onClick={() => setCurrentPage(1)}
-                    disabled={currentPage === 1}
-                    className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
-                  >
-                    «
-                  </button>
-                  <button
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
-                  >
-                    ‹
-                  </button>
-
-                  {Array.from({ length: totalPages }, (_, i) => {
-                    if (totalPages <= 5 || i === 0 || i === totalPages - 1 || Math.abs(currentPage - (i + 1)) <= 1) {
-                      return (
-                        <button
-                          key={i}
-                          onClick={() => setCurrentPage(i + 1)}
-                          className={`w-10 h-10 rounded-lg font-bold transition-all ${currentPage === i + 1
-                            ? "bg-blue-600 text-white shadow-md shadow-blue-200 scale-105"
-                            : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-                            }`}
-                        >
-                          {i + 1}
-                        </button>
-                      );
-                    } else if (i === 1 && currentPage > 3) {
-                      return <span key={i} className="w-10 h-10 flex items-center justify-center text-gray-400">...</span>;
-                    } else if (i === totalPages - 2 && currentPage < totalPages - 2) {
-                      return <span key={i} className="w-10 h-10 flex items-center justify-center text-gray-400">...</span>;
-                    }
-                    return null;
-                  })}
-
-                  <button
-                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                    className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
-                  >
-                    ›
-                  </button>
-                  <button
-                    onClick={() => setCurrentPage(totalPages)}
-                    disabled={currentPage === totalPages}
-                    className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
-                  >
-                    »
-                  </button>
-                </div>
-              </div>
-            )}
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
           </div>
         </div>
       </div>

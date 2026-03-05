@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import bg2 from '../../assets/bg2.webp';
 import { HiUserCircle, HiIdentification, HiUser, HiAcademicCap, HiPhone, HiPencilAlt } from 'react-icons/hi';
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
@@ -332,18 +331,7 @@ function EditProfile() {
         </div>
       )}
 
-      {/* Toast Container */}
-      <ToastContainer
-        position="top-right"
-        autoClose={2500}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
+
     </div>
   );
 }

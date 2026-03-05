@@ -71,7 +71,6 @@ function AuthContextProvider({ children }) {
 
       const { data } = response.data;
 
-      setBorrowedCount(data.borrowed_count || 0);
       setReturnedCount(data.returned_count || 0);
 
       const borrowedItems = (data.borrow_items || []).filter(

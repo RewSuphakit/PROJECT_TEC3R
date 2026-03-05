@@ -73,6 +73,11 @@ exports.addBorrow = async (req, res) => {
         return res.status(400).json({ message: "Missing or invalid required fields" });
     }
 
+    // ตรวจสอบว่า user_id ตรงกับผู้ใช้ที่ login อยู่ (ยกเว้น admin)
+    if (req.user.role !== 'admin' && String(req.user.user_id) !== String(user_id)) {
+        return res.status(403).json({ message: "ไม่สามารถยืมอุปกรณ์ในชื่อผู้ใช้อื่นได้" });
+    }
+
     let connection;
     try {
         connection = await promisePool.getConnection();

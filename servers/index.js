@@ -10,7 +10,21 @@ const userRoutes = require('./routes/userRoutes');
 const borrowRoutes = require('./routes/borrowRoutes');
 const StatsSection = require('./routes/StatsSection');
 
-app.use(cors());
+const allowedOrigins = process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL.split(',')
+  : ['http://localhost:5173', 'http://localhost:4000'];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json());
 
 // Static files with cache headers (1 day cache for uploaded images)

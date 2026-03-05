@@ -4,6 +4,8 @@ import { toast } from "react-toastify";
 import DeleteModal from "./DeleteModal";
 import EditModal from "./EditModal";
 import bg2 from '../../assets/bg2.webp';
+import ImagePreviewPopup, { useImagePreview } from '../../components/ImagePreviewPopup';
+import Pagination from '../../components/Pagination';
 
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
@@ -11,8 +13,7 @@ import './AdminStyles.css';
 
 function ManageTools() {
   const [tools, setTools] = useState([]);
-  const [popupImage, setPopupImage] = useState(null);
-  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+  const { popupImage, popupPosition, handleImageMouseEnter, handleImageMouseLeave } = useImagePreview();
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -164,15 +165,7 @@ function ManageTools() {
     setToolToEdit(null);
   };
 
-  const handleImageMouseEnter = (e, imageUrl) => {
-    const rect = e.target.getBoundingClientRect();
-    setPopupImage(imageUrl);
-    setPopupPosition({ x: rect.right + 10, y: rect.top });
-  };
-  
-  const handleImageMouseLeave = () => {
-    setPopupImage(null);
-  };
+
 
   return (
     <>
@@ -383,89 +376,10 @@ function ManageTools() {
           </div>
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="mt-6 flex justify-center">
-              <div className="filter-card rounded-xl p-4 shadow-lg flex flex-wrap gap-2 justify-center">
-                <button
-                  onClick={() => setCurrentPage(1)}
-                  disabled={currentPage === 1}
-                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
-                >
-                  «
-                </button>
-                <button
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
-                >
-                  ‹
-                </button>
-
-                {Array.from({ length: totalPages }, (_, i) => {
-                  if (totalPages <= 5 || i === 0 || i === totalPages - 1 || Math.abs(currentPage - (i + 1)) <= 1) {
-                    return (
-                      <button
-                        key={i}
-                        onClick={() => setCurrentPage(i + 1)}
-                        className={`w-10 h-10 rounded-lg font-bold transition-all ${
-                          currentPage === i + 1 
-                            ? "bg-blue-600 text-white shadow-md shadow-blue-200 scale-105" 
-                            : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-                        }`}
-                      >
-                        {i + 1}
-                      </button>
-                    );
-                  } else if (i === 1 && currentPage > 3) {
-                    return <span key={i} className="w-10 h-10 flex items-center justify-center text-gray-400">...</span>;
-                  } else if (i === totalPages - 2 && currentPage < totalPages - 2) {
-                    return <span key={i} className="w-10 h-10 flex items-center justify-center text-gray-400">...</span>;
-                  }
-                  return null;
-                })}
-
-                <button
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
-                >
-                  ›
-                </button>
-                <button
-                  onClick={() => setCurrentPage(totalPages)}
-                  disabled={currentPage === totalPages}
-                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
-                >
-                  »
-                </button>
-              </div>
-            </div>
-          )}
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
 
           {/* Popup Image Preview - Desktop Only */}
-          {popupImage && (
-            <div
-              className="hidden md:block"
-              style={{
-                position: "fixed",
-                left: popupPosition.x,
-                top: popupPosition.y,
-                zIndex: 1000,
-                background: "rgba(255,255,255,0.95)",
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                padding: "8px"
-              }}
-              onMouseLeave={handleImageMouseLeave}
-            >
-              <img
-                src={popupImage}
-                alt="popup"
-                style={{ width: "320px", height: "320px", objectFit: "contain", borderRadius: "8px" }}
-              />
-            </div>
-          )}
+          <ImagePreviewPopup popupImage={popupImage} popupPosition={popupPosition} onMouseLeave={handleImageMouseLeave} />
 
           {/* Modals */}
           {deleteModalOpen && toolToDelete && (

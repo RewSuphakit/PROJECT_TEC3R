@@ -10,7 +10,7 @@ const loginLimiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 นาที
     max: 10, // จำกัด 10 ครั้ง
     message: {
-        msg: 'มีการพยายามเข้าสู่ระบบมากเกินไป กรุณาลองใหม่ใน 1 นาที',
+        message: 'มีการพยายามเข้าสู่ระบบมากเกินไป กรุณาลองใหม่ใน 1 นาที',
         error: 'Too many login attempts. Please try again later.'
     },
     standardHeaders: true, // Return rate limit info in headers

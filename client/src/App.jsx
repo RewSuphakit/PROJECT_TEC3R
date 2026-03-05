@@ -8,7 +8,9 @@ function App() {
    
     <>
     {loading ? (
-      <span className="loading loading-bars loading-lg"></span>
+      <div className="flex items-center justify-center min-h-screen">
+        <span className="loading loading-bars loading-lg"></span>
+      </div>
     ) : (
       <>
         <ToastContainer 

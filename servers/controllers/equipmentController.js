@@ -268,6 +268,15 @@ exports.deleteEquipment = async (req, res) => {
       return res.status(404).json({ message: 'Equipment not found' });
     }
 
+    // ตรวจสอบว่ามีการยืมอุปกรณ์นี้ค้างอยู่หรือไม่
+    const [activeBorrows] = await promisePool.query(
+      "SELECT COUNT(*) as count FROM borrow_items bi JOIN equipment e ON bi.equipment_id = e.equipment_id WHERE bi.equipment_id = ? AND bi.status = 'Borrowed'",
+      [id]
+    );
+    if (activeBorrows[0].count > 0) {
+      return res.status(400).json({ message: `ไม่สามารถลบอุปกรณ์ได้ เนื่องจากยังมีการยืมค้างอยู่ ${activeBorrows[0].count} รายการ` });
+    }
+
     const oldImage = results[0].image;
 
     if (oldImage) {

@@ -2,6 +2,11 @@ import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import bg2 from '../../assets/bg2.webp';
+import { formatThaiDate } from '../../utils/formatDate';
+import { toggleGroup } from '../../utils/groupToggle';
+import { useSortable } from '../../hooks/useSortable';
+import SortIcon from '../../components/SortIcon';
+import Pagination from '../../components/Pagination';
 
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
@@ -13,48 +18,9 @@ function ListBorrow() {
   const [currentPage, setCurrentPage] = useState(1);
   const groupsPerPage = 5;
   const [openGroups, setOpenGroups] = useState([]);
-  const [sortField, setSortField] = useState('borrow_date');
-  const [sortOrder, setSortOrder] = useState('desc'); // 'asc' or 'desc'
+  const { sortField, sortOrder, handleSort } = useSortable('borrow_date', 'desc', setCurrentPage);
 
-  // ฟังก์ชันจัดรูปแบบวันที่เป็นแบบไทย
-  const formatThaiDate = (dateStr) => {
-    if (!dateStr) return "—";
-    try {
-      const date = new Date(dateStr);
-      return date.toLocaleString("th-TH", {
-        timeZone: "Asia/Bangkok",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      });
-    } catch (error) {
-      return "Invalid date";
-    }
-  };
 
-  // ฟังก์ชันจัดการการเรียงลำดับ
-  const handleSort = (field) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortOrder('asc');
-    }
-    setCurrentPage(1); // Reset to first page when sorting
-  };
-
-  // Component สำหรับแสดง icon การเรียงลำดับ
-  const SortIcon = ({ field }) => {
-    if (sortField !== field) {
-      return <span className="ml-1 text-gray-300">⇅</span>;
-    }
-    return sortOrder === 'asc'
-      ? <span className="ml-1 text-blue-600">▲</span>
-      : <span className="ml-1 text-blue-600">▼</span>;
-  };
 
   // ดึงข้อมูลบันทึกการยืมทั้งหมดจาก API
   useEffect(() => {
@@ -158,14 +124,7 @@ function ListBorrow() {
     currentPage * groupsPerPage
   );
 
-  // ฟังก์ชันเปิด/ปิด dropdown สำหรับกลุ่ม
-  const toggleGroup = (groupId) => {
-    setOpenGroups((prev) =>
-      prev.includes(groupId)
-        ? prev.filter((id) => id !== groupId)
-        : [...prev, groupId]
-    );
-  };
+
 
   return (
     <>
@@ -216,7 +175,7 @@ function ListBorrow() {
                         >
                           <span className="flex items-center">
                             ชื่อผู้ยืม
-                            <SortIcon field="student_name" />
+                            <SortIcon field="student_name" sortField={sortField} sortOrder={sortOrder} />
                           </span>
                         </th>
                         <th
@@ -225,7 +184,7 @@ function ListBorrow() {
                         >
                           <span className="flex items-center">
                             ชื่ออุปกรณ์
-                            <SortIcon field="equipment_name" />
+                            <SortIcon field="equipment_name" sortField={sortField} sortOrder={sortOrder} />
                           </span>
                         </th>
                         <th
@@ -234,7 +193,7 @@ function ListBorrow() {
                         >
                           <span className="flex items-center justify-center">
                             จำนวน
-                            <SortIcon field="quantity" />
+                            <SortIcon field="quantity" sortField={sortField} sortOrder={sortOrder} />
                           </span>
                         </th>
                         <th className="py-4 px-6 text-center font-semibold">สถานะ</th>
@@ -244,7 +203,7 @@ function ListBorrow() {
                         >
                           <span className="flex items-center justify-center">
                             วันที่ยืม
-                            <SortIcon field="borrow_date" />
+                            <SortIcon field="borrow_date" sortField={sortField} sortOrder={sortOrder} />
                           </span>
                         </th>
                       </tr>
@@ -278,7 +237,7 @@ function ListBorrow() {
                             return (
                               <React.Fragment key={groupId}>
                                 <tr
-                                  onClick={() => toggleGroup(groupId)}
+                                  onClick={() => toggleGroup(setOpenGroups, groupId)}
                                   className={`table-row border-b ${index % 2 === 0 ? 'bg-gray-50/50' : 'bg-white'} hover:bg-blue-50/30 transition-colors`}
                                 >
                                   <td className="py-4 px-6 font-medium text-gray-800 flex items-center gap-2">
@@ -345,7 +304,7 @@ function ListBorrow() {
                           {/* Main Card */}
                           <div
                             className={`p-4 ${groupItems.length > 1 ? 'cursor-pointer bg-gray-50' : ''}`}
-                            onClick={() => groupItems.length > 1 && toggleGroup(groupId)}
+                            onClick={() => groupItems.length > 1 && toggleGroup(setOpenGroups, groupId)}
                           >
                             <div className="flex justify-between items-start mb-3">
                               <div className="flex-1">
@@ -424,63 +383,7 @@ function ListBorrow() {
             )}
 
             {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="mt-6 flex justify-center">
-                <div className="filter-card rounded-xl p-4 shadow-lg flex flex-wrap gap-2 justify-center">
-                  <button
-                    onClick={() => setCurrentPage(1)}
-                    disabled={currentPage === 1}
-                    className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
-                  >
-                    «
-                  </button>
-                  <button
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
-                  >
-                    ‹
-                  </button>
-
-                  {Array.from({ length: totalPages }, (_, i) => {
-                    if (totalPages <= 5 || i === 0 || i === totalPages - 1 || Math.abs(currentPage - (i + 1)) <= 1) {
-                      return (
-                        <button
-                          key={i}
-                          onClick={() => setCurrentPage(i + 1)}
-                          className={`w-10 h-10 rounded-lg font-bold transition-all ${currentPage === i + 1
-                            ? "bg-blue-600 text-white shadow-md shadow-blue-200 scale-105"
-                            : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-                            }`}
-                        >
-                          {i + 1}
-                        </button>
-                      );
-                    } else if (i === 1 && currentPage > 3) {
-                      return <span key={i} className="w-10 h-10 flex items-center justify-center text-gray-400">...</span>;
-                    } else if (i === totalPages - 2 && currentPage < totalPages - 2) {
-                      return <span key={i} className="w-10 h-10 flex items-center justify-center text-gray-400">...</span>;
-                    }
-                    return null;
-                  })}
-
-                  <button
-                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                    className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
-                  >
-                    ›
-                  </button>
-                  <button
-                    onClick={() => setCurrentPage(totalPages)}
-                    disabled={currentPage === totalPages}
-                    className="w-10 h-10 rounded-lg bg-white border border-gray-200 text-gray-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-all"
-                  >
-                    »
-                  </button>
-                </div>
-              </div>
-            )}
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
           </div>
         </div>
       </div>

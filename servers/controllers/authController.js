@@ -53,7 +53,7 @@ exports.login = async (req, res) => {
   // ตรวจสอบว่าอีเมลมีโดเมน @rmuti.ac.th หรือไม่
   const emailRegex = /^[a-zA-Z0-9._%+-]+@rmuti\.ac\.th$/;
   if (!emailRegex.test(student_email)) {
-    return res.status(400).json({ msg: 'อีเมลต้องอยู่ในรูปแบบ @rmuti.ac.th' });
+    return res.status(400).json({ message: 'อีเมลต้องอยู่ในรูปแบบ @rmuti.ac.th' });
   }
 
   try {
@@ -61,7 +61,7 @@ exports.login = async (req, res) => {
     const [results] = await promisePool.query('SELECT * FROM users WHERE student_email = ?', [student_email]);
 
     if (results.length === 0) {
-      return res.status(400).json({ msg: 'ชื่อหรือรหัสผ่านไม่ถูกต้อง' });
+      return res.status(400).json({ message: 'ชื่อหรือรหัสผ่านไม่ถูกต้อง' });
     }
 
     const user = results[0];
@@ -69,7 +69,7 @@ exports.login = async (req, res) => {
     // ตรวจสอบรหัสผ่าน
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ msg: 'ชื่อหรือรหัสผ่านไม่ถูกต้อง' });
+      return res.status(400).json({ message: 'ชื่อหรือรหัสผ่านไม่ถูกต้อง' });
     }
 
     // สร้าง JWT payload
